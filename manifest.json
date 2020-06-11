@@ -18,6 +18,14 @@
     "permissions": [
         "storage",
         "tabs",
-        "<all_urls>"
+        "*://*.hololink.co/",
+        "cookies"
+    ],
+
+    "content_scripts":[
+        {
+            "matches":["http://*/*"],
+            "js":["getHtml.js"]
+        }   
     ]
 }
