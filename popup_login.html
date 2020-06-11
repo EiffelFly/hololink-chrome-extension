@@ -3,8 +3,8 @@
     <head>
         <!--Imdport Google Icon Font-->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <!--Import materialize.css-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <!--Import Bootstrape-->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">     
         <!--Import google font-->
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
         <title>Hololink</title>
@@ -12,23 +12,39 @@
         <script src="popup.js"></script>
     </head>
     <style>
-        .container {
+        .hololink-chrome-extension {
             min-width: 300px;
             min-height: 300px;
         }
+        
+        h4 {
+            font-size: 0.9rem !important;
+            text-align: center !important;
+            padding: 10px;
+            font-family: "Roboto";
+        }
+
+        .vertical-wrapper{
+            min-height: 90%;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            
+        }
+
+
+
     </style>
     <body>
-        <div class="container">
-            <div class="row">
-                <div class="col s12">
-                    <div class="login instruction">
-                        <h3>To use Hololink, you need to login in or create a new account</p>
-                    </div>
-                    <div class="login_button">
-                        
-                    </div>
-                </div>
+        <div class="hololink-chrome-extension d-flex align-items-center flex-column justify-content-center">
+            <div class="text-align-center">
+                <h4>To use Hololink, you need to login in or create a new account</h4>     
             </div>
+            <div>
+                <button id="user-log-in" type="button" class="btn btn-outline-secondary shadow-sm">Log in</button>
+            </div>
+
         </div>
     </body>
 </html>
+

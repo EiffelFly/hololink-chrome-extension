@@ -15,11 +15,6 @@ $(function(){
             
         } 
     });
-});
-
-
-
-$(function(){
     chrome.tabs.query({active:true, currentWindow:true},function(tab){ /*之所以要放上 currentWindow 的原因在於如果不加這個指令，系統會以為你是指 popup，這樣會回傳 undefined */
         var title = tab[0].title;
         var url = tab[0].url;
@@ -27,7 +22,13 @@ $(function(){
         console.log(title);
         $('#user_input_title').val(title);
     });
+
+    $('#user-log-in').click(function(){
+        chrome.tabs.create({'url':'https://hololink.co/accounts/login/'})
+    });
 });
+
+
 
 
 
