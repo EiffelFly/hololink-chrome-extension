@@ -104,6 +104,7 @@ function findContentContainer(){
     return selectedContainer.innerHTML;
 }
 
+console.log('begin process')
 
 // 呼叫上述 function 並且將資料丟回去
 chrome.runtime.sendMessage({action: "gotText",source: findContentContainer()}, function(){

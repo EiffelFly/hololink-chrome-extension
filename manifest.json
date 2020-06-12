@@ -18,8 +18,10 @@
     "permissions": [
         "storage",
         "tabs",
-        "*://*.hololink.co/",
-        "cookies"
+        "*://*.hololink.co/*",
+        "cookies",
+        "https://*/",
+        "http://*/"
     ],
 
     "content_scripts":[
@@ -27,5 +29,9 @@
             "matches":["http://*/*"],
             "js":["getHtml.js"]
         }   
-    ]
+    ],
+
+    "background":{
+        "scripts":["background.js"]
+    }
 }

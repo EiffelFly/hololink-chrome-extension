@@ -1,6 +1,9 @@
 
 // check 使用者是否有登入 — Check login cookie，如果沒有則顯示 popup_notlogin.html 導到 Hololink 的登入頁面
 
+var title = " ";
+var url = " ";
+
 $(function(){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
         if (cookie){
@@ -16,8 +19,8 @@ $(function(){
         } 
     });
     chrome.tabs.query({active:true, currentWindow:true},function(tab){ /*之所以要放上 currentWindow 的原因在於如果不加這個指令，系統會以為你是指 popup，這樣會回傳 undefined */
-        var title = tab[0].title;
-        var url = tab[0].url;
+        title = tab[0].title;
+        url = tab[0].url;
         console.log(url);
         console.log(title);
         $('#user_input_title').val(title);
@@ -30,15 +33,26 @@ $(function(){
 
 
 
-
-
-
-
 /*listen clipper 是否成功擷取資料，並且存入 */
 chrome.runtime.onMessage.addListener(function(request,sender){ 
     if (request.action == "gotText"){
-        var fullText = request.source;
-        console.log(fullText)
+        console.log(request.source)
+        chrome.runtime.sendMessage({
+            Query: "postData",
+            data: request.source,
+            url: "https://hololink.co/article/add/",
+            data_url: url ,
+            data_title: title,
+        }, function(response){
+            debugger;
+            if (response != undefined && response != "") {
+                console.log(response);
+            }
+            else {
+                debugger;
+                console.log(null);
+            }
+        });
     }
 });
 
