@@ -1,6 +1,19 @@
 
 var csrfToken = ' ';
 
+function ErrorsHandler(response){
+    if (!response.ok) {
+        console.log('ERROR: ' + response)
+        //throw Error(response.statusText)
+        chrome.runtime.sendMessage({'action':'Dataposted', 'result':'failed'})
+    }
+    else{
+        chrome.runtime.sendMessage({'action':'Dataposted', 'result':"success"})
+    }
+    return response
+}
+
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
         csrfToken = cookie.value;
@@ -22,11 +35,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 },
                 body: formData,
             })
+                .then(ErrorsHandler)
                 .then(response => response.text())
                 .then(response => console.log(response))
                 .catch(error => console.log('Error:', error));
     
             return true;
+            
         }
     });
 });

@@ -3,8 +3,8 @@
     <head>
         <!--Imdport Google Icon Font-->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <!--Import materialize.css-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <!--Import Bootstrape-->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
         <!--Import google font-->
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
         <title>Hololink</title>
@@ -12,9 +12,10 @@
         <script src="popup.js"></script>
     </head>
     <style>
-        .container{
+        .hololink-chrome-extension-popup{
             min-width: 300px;
             min-height: 300px;
+            margin: 20px;
         }
 
         textarea {
@@ -25,26 +26,47 @@
             border-radius: 0.5rem !important;
             border-color: #b2dfdb !important;
             font-family: "Roboto" !important;
-            font-size: 1rem !important;
+            font-size: 0.9rem !important;
             background-color: #fafafa !important;
             line-height: 1.5rem !important;
         }
 
+
+
+        .popup_spacing{
+            padding: 30px 10px;
+            display: block;
+        }
+
+        small .check_recommdation{ 
+            padding: 0px !important;
+        }
+
+        .checkRecommandation_Help{
+            font-size: 0.8rem;
+            color: gray;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+
     </style>
     <body>
-        <div class="container">
-            <div class="row">
-                <form class="col s12">
-                    <div class="row">
-                        <div class="input-field col s12 ">
-                            <textarea id="user_input_title" rows="5"></textarea>
-                            <label for="user_input_title"></label>
-                        </div>
-
-                        </div>
-                    </div>
-                </form>
+        <div class="hololink-chrome-extension-popup d-flex flex-column">
+            <div class="form-group">
+                <textarea class="form-control" id="websiteTitleInput" placeholder="Website Title" rows="4"></textarea>
+                <small id="titleInputHelp" class="form-text text-muted">Feel free to modify the title</small>
             </div>
+            <div class="form-check">
+                <input class="form-check-input checkRecommandation" type="checkbox" value="" id="check_recommandation">
+                <label class="form-check-label" for="check_recommdation">
+                    Recommand This Article?
+                </label>
+                <label id="check_recommandation_help" class='checkRecommandation_Help'>Daily usage remain</label>
+            </div>
+            <div class="popup_spacing" row='6'></div>
+            <button id="upload_hololink_button" class="btn btn-light">Upload Hololink</button>
         </div>
     </body>
 </html>
+
+

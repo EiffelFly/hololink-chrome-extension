@@ -1,3 +1,8 @@
+20200614
+    1. 使用 cloneNode 來處理 DOM -> 避免到 content_script 會改動到使用者頁面的問題
+    2. 製作 Upload Hololink 的 button 動畫及標示
+    3. Upload Hololink 內部的 message 串接
+
 
 20200612-1：
     使用 <Fetch> 來 POST 請求到 Hololink.co, 無法解決 csrf token 的問題

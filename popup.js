@@ -23,41 +23,91 @@ $(function(){
         url = tab[0].url;
         console.log(url);
         console.log(title);
-        $('#user_input_title').val(title);
+        $('#websiteTitleInput').attr("placeholder",title)
+
     });
 
     $('#user-log-in').click(function(){
         chrome.tabs.create({'url':'https://hololink.co/accounts/login/'})
     });
+
+    $('#upload_hololink_button').click(function(){
+        window.onload = callTextClipper(); //window.onload會等網頁的全部內容，包括圖片，CSS及<iframe>等外部內容載入後才會觸發*/
+        $(this).prop("disabled", true);
+        $(this).prop('spinner',true).html(
+            `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+             <span style="font-size: 1rem; padding-left: 10px;">Loading ...</span>`
+        );
+    });
 });
 
+chrome.runtime.onMessage.addListener(function(request,sender){
+    if (request.action == 'Dataposted'){
+        if (request.action == 'success'){
+            $('#upload_hololink_button').prop('spinner', true).html(
+                `<span style="font-size: 1rem; padding-left: 10px;">Done</span>`             
+            );
+        }
+        else {
+            $('#upload_hololink_button').prop('spinner', true).html(
+                `<span style="font-size: 1rem; padding-left: 10px;">Failed</span>`             
+            );
+        }
+        
+    }
+    
+}); 
 
 
 /*listen clipper 是否成功擷取資料，並且存入 */
 chrome.runtime.onMessage.addListener(function(request,sender){ 
     if (request.action == "gotText"){
-        console.log(request.source)
-        chrome.runtime.sendMessage({
-            Query: "postData",
-            data: request.source,
-            url: "https://hololink.co/article/add/",
-            data_url: url ,
-            data_title: title,
-        }, function(response){
-            debugger;
-            if (response != undefined && response != "") {
-                console.log(response);
-            }
-            else {
-                debugger;
-                console.log(null);
-            }
-        });
-    }
+
+        if ($('#check_recommandation').is(":checked")){
+            console.log('recommandation true');
+            chrome.runtime.sendMessage({
+                Query: "postData",
+                data: request.source,
+                url: "https://hololink.co/article/add/",
+                data_url: url ,
+                data_title: title,
+                recommandation: 'true'
+            }, function(response){
+                //debugger;
+                if (response != undefined && response != "") {
+                    console.log(response);
+                }
+                else {
+                    //debugger;
+                    console.log(null);
+                }
+            });
+        }
+        else{
+            console.log('recommandation false');
+            chrome.runtime.sendMessage({
+                Query: "postData",
+                data: request.source,
+                url: "https://hololink.co/article/add/",
+                data_url: url ,
+                data_title: title,
+                recommandation: 'false',
+            }, function(response){
+                //debugger;
+                if (response != undefined && response != "") {
+                    console.log(response);
+                }
+                else {
+                    //debugger;
+                    console.log(null);
+                }
+            });
+        }   
+    };
 });
 
 /* 呼叫 Text-Clipper */
-function onPopupLoad(){
+function callTextClipper(){
     chrome.tabs.executeScript(null, {file:"getHtml.js"}, function(){
         // If you try and inject into an extensions page or the webstore/NTP you'll get an error
         console.log("let's go")
@@ -67,7 +117,7 @@ function onPopupLoad(){
     });
 }
 
-window.onload = onPopupLoad; //window.onload會等網頁的全部內容，包括圖片，CSS及<iframe>等外部內容載入後才會觸發*/
+
 
 
 /** 
