@@ -45,8 +45,39 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     });
 });
 
+chrome.tabs.onUpdated.addListener(function(){
+    chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
+        if (cookie){
+            chrome.browserAction.setPopup({"popup":"popup.html"})
+            //window.location.href="popup.html";
+            console.log('user already logged in');  
+        }
+        else{
+            //window.location.href="popup_login.html";
+            chrome.browserAction.setPopup({"popup":"popup_login.html"})
+            console.log('user not log in'); 
+        } 
+    });
+})
 
 
+/*
+chrome.tabs.onActivated.addListener(function(){
+    console.log('popup open');
+    chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
+        if (cookie){
+            //chrome.browserAction.setPopup({"popup":"popup.html"})
+            window.location.href="popup.html";
+            console.log('user already logged in');  
+        }
+        else{
+            window.location.href="popup_login.html";
+            //chrome.browserAction.setPopup({"popup":"popup_login.html"})
+            console.log('user not log in'); 
+        } 
+    });
+})
+*/
 
 /*
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){

@@ -5,26 +5,28 @@ var title = " ";
 var url = " ";
 
 $(function(){
+
+    /*
     chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
         if (cookie){
-            chrome.browserAction.setPopup({"popup":"popup.html"}, function(){
-                console.log('user already logged in');
-            });   
+            chrome.browserAction.setPopup({"popup":"popup.html"})
+            //window.location.href="popup.html";
+            console.log('user already logged in');  
         }
         else{
-            chrome.browserAction.setPopup({"popup":"popup_login.html"}, function(){
-                console.log('user not log in'); 
-            });
-            
+            //window.location.href="popup_login.html";
+            chrome.browserAction.setPopup({"popup":"popup_login.html"})
+            console.log('user not log in'); 
         } 
     });
+    */
+
     chrome.tabs.query({active:true, currentWindow:true},function(tab){ /*之所以要放上 currentWindow 的原因在於如果不加這個指令，系統會以為你是指 popup，這樣會回傳 undefined */
         title = tab[0].title;
         url = tab[0].url;
         console.log(url);
         console.log(title);
         $('#websiteTitleInput').attr("placeholder",title)
-
     });
 
     $('#user-log-in').click(function(){
@@ -121,17 +123,4 @@ function callTextClipper(){
 
 
 
-
-/** 
-$(function(){
-    chrome.tabs.getCurrent(function(tab){
-        if(tab.title){n m 
-            $('#auto_gen_title').text(tab.title);
-        }
-    });
-});
-
-        Materialize.textareaAutoResize($('#user_input_title'));
-
-*/
 
