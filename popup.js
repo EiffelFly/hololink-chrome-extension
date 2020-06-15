@@ -41,15 +41,16 @@ $(function(){
     });
 });
 
+
 chrome.runtime.onMessage.addListener(function(request,sender){
     if (request.action == 'Dataposted'){
-        if (request.action == 'success'){
-            $('#upload_hololink_button').prop('spinner', true).html(
+        if (request.result == 'success'){
+            $('#upload_hololink_button').prop('spinner', false).html(
                 `<span style="font-size: 1rem; padding-left: 10px;">Done</span>`             
             );
         }
         else {
-            $('#upload_hololink_button').prop('spinner', true).html(
+            $('#upload_hololink_button').prop('spinner', false).html(
                 `<span style="font-size: 1rem; padding-left: 10px;">Failed</span>`             
             );
         }
@@ -65,6 +66,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
 
         if ($('#check_recommandation').is(":checked")){
             console.log('recommandation true');
+            console.log(request.source)
             chrome.runtime.sendMessage({
                 Query: "postData",
                 data: request.source,

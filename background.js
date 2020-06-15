@@ -13,7 +13,6 @@ function ErrorsHandler(response){
     return response
 }
 
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
         csrfToken = cookie.value;
@@ -21,7 +20,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         
             var formData = new FormData();
             formData.append("name", request.data_title);
-            formData.append("content", "hello~~~~");
+            formData.append("content", request.data);
             formData.append("url", request.data_url);
             console.log(csrfToken);
     
