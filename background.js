@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             var formData = new FormData();
             formData.append("name", request.data_title);
             formData.append("content", request.data);
-            formData.append("url", request.data_url);
+            formData.append("from_url", request.data_url);
             console.log(csrfToken);
     
             fetch(request.url, {

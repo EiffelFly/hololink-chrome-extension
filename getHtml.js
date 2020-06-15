@@ -92,7 +92,7 @@ function findContentContainer(){
         deletestylesheet[0].parentNode.removeChild(deletestylesheet[0]);
     }
 
-    return clone_selectedContainer.innerText;
+    return clone_selectedContainer.innerHTML;
 }
 
 console.log('begin process')
