@@ -79,10 +79,10 @@ chrome.runtime.onMessage.addListener(function(request,sender){
         }
         
         if ($('#check_recommendation').is(":checked")){
-            fullData['recommendation'] = 'true';
+            fullData['recommendation'] = 'on';
         }
         else{
-            fullData['recommendation'] = 'false';
+            fullData['recommendation'] = '';
         }
         
         chrome.runtime.sendMessage(fullData, function(response){

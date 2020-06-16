@@ -13,67 +13,82 @@
     </head>
     <style>
         .hololink-chrome-extension-popup{
-            min-width: 300px;
+            min-width: 360px;
             min-height: 300px;
-            margin: 20px;
+        }
+
+        .form-group{
+            max-width: 100%;
         }
 
         textarea {
-            min-height: 6rem !important;
-            resize: none !important;
-            padding: 1rem !important;
-            border-style: solid !important;
+            resize:none;
+            margin: 5% 5% 2% 5%;
+            max-width: 90% !important;
             border-radius: 0.5rem !important;
-            border-color: #b2dfdb !important;
-            font-family: "Roboto" !important;
-            font-size: 0.9rem !important;
-            background-color: #fafafa !important;
-            line-height: 1.5rem !important;
+
         }
 
-
+        .web-title-help {
+            margin: 0 0 0 5%;
+        }
 
         .popup_spacing{
             padding: 30px 10px;
             display: block;
         }
 
-        .checkRecommendation_Help{
-            font-size: 0.8rem;
-            color: gray;
-            font-family:Arial, Helvetica, sans-serif;
+        .recommendation_form{
+            margin-left: 5%;
+            display: block;
         }
 
         hr {
             color: black;
-            width: 100%;
+            width: 90%;
         }
 
-        .form-group{
-            margin: 0 0 10 0px;
+        .btn-light {
+            color: #03045e;
         }
 
+        .upload_hololink_button{
+            margin: 0 5% 5% 5%;
+        }
 
     </style>
     <body>
         <div class="hololink-chrome-extension-popup d-flex flex-column">
             <div class="form-group">
                 <textarea autofocus required class="form-control" id="websiteTitleInput" placeholder="Website Title" rows="4"></textarea>
-                <small id="titleInputHelp" class="form-text text-muted">Feel free to modify the title</small>
+                <small id="titleInputHelp" class="form-text text-muted web-title-help">The word added in this area will generate tags.</small>
             </div>
             <hr>
-            <div class="form-check">
-                <input class="form-check-input checkRecommendation" type="checkbox" value="" id="check_recommendation">
-                <label class="form-check-label" for="check_recommendation">
-                    Recommand This Article?
+            <div class="custom-control custom-checkbox recommendation_form">
+                <input class="custom-control-input checkRecommendation" type="checkbox" id="check_recommendation">
+                <label class="custom-control-label check_recommendation_title" for="check_recommendation">
+                    Recommend this article?
                 </label>
-                <label id="check_recommendation_help" class='checkRecommendation_Help'>Daily usage remain</label>
+                <div class='dailyUsage d-flex flex-row'>
+                    <small class="form-text text-muted">Daily usage remain:&nbsp;&nbsp;&nbsp;</small>
+                    <small class="form-text text-muted" id="dailyUsageRemain">5</small>
+                </div>
             </div>
             <hr>
             <div class="popup_spacing" row='6'></div>
-            <button id="upload_hololink_button" class="btn btn-light">Upload Hololink</button>
+            <button id="upload_hololink_button" class="btn btn-light upload_hololink_button">Upload Hololink</button>
         </div>
     </body>
 </html>
 
 
+<!--
+    <div class="form-check">
+    <input class="form-check-input checkRecommendation" type="checkbox" value="" id="check_recommendation">
+    <label class="form-check-label" for="check_recommendation">
+        Recommand This Article?
+    </label>
+    <label id="check_recommendation_help" class='checkRecommendation_Help'>Daily usage remain</label>
+    </div>
+
+-->

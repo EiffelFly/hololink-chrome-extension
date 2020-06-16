@@ -1,8 +1,10 @@
 20200616
 1. Textarea: 不使用 placeholder 置放 webtitle 而直接放置於 textarea.innerText 
 2. Textarea: autofoucs last letter
-3. 增加 <hr>，調整佈局
+3. 增加 hr，調整佈局
 4. 辨識出 FormData 會將其值轉為 string 因此 boolean 會失效
+5. popup.html: 不再使用 container 的 padding 而是旗下所有元素自行設定 margin
+6. popup.html: Daily usage remain: 的數字目前為單獨的 element 可以修改
 
 20200615
 1. 處理不能上傳 url 的問題
@@ -27,4 +29,3 @@
 20200609-1：
 1. 在公司修改：增加消除body 內 script 和 style 的方法
 
-    
