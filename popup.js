@@ -26,7 +26,12 @@ $(function(){
         url = tab[0].url;
         console.log(url);
         console.log(title);
-        $('#websiteTitleInput').attr("placeholder",title)
+        document.getElementById("websiteTitleInput").innerText = title;
+        //我們要讓鼠標 focus 在 title 的最後一個字
+        var len = title.length;
+        $('#websiteTitleInput')[0].focus();
+        $('#websiteTitleInput')[0].setSelectionRange(len, len);
+
     });
 
     $('#user-log-in').click(function(){
@@ -65,7 +70,33 @@ chrome.runtime.onMessage.addListener(function(request,sender){
 /*listen clipper 是否成功擷取資料，並且存入 */
 chrome.runtime.onMessage.addListener(function(request,sender){ 
     if (request.action == "gotText"){
+        fullData = {
+            query: "postData",
+            data: request.source,
+            target_url: "https://hololink.co/article/add/",
+            data_url: url,
+            data_title:  title,
+        }
+        
+        if ($('#check_recommendation').is(":checked")){
+            fullData['recommendation'] = 'true';
+        }
+        else{
+            fullData['recommendation'] = 'false';
+        }
+        
+        chrome.runtime.sendMessage(fullData, function(response){
+            if (response != undefined && response != "") {
+                console.log(response);
+            }
+            else {
+                console.log(null);
+            }
+        });
 
+
+
+        /*
         if ($('#check_recommandation').is(":checked")){
             console.log('recommandation true');
             console.log(request.source)
@@ -75,7 +106,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
                 url: "https://hololink.co/article/add/",
                 data_url: url ,
                 data_title: title,
-                recommandation: 'true'
+                recommandation: true
             }, function(response){
                 //debugger;
                 if (response != undefined && response != "") {
@@ -106,7 +137,8 @@ chrome.runtime.onMessage.addListener(function(request,sender){
                     console.log(null);
                 }
             });
-        }   
+        } 
+        */  
     };
 });
 

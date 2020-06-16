@@ -38,14 +38,19 @@
             display: block;
         }
 
-        small .check_recommdation{ 
-            padding: 0px !important;
-        }
-
-        .checkRecommandation_Help{
+        .checkRecommendation_Help{
             font-size: 0.8rem;
             color: gray;
             font-family:Arial, Helvetica, sans-serif;
+        }
+
+        hr {
+            color: black;
+            width: 100%;
+        }
+
+        .form-group{
+            margin: 0 0 10 0px;
         }
 
 
@@ -53,16 +58,18 @@
     <body>
         <div class="hololink-chrome-extension-popup d-flex flex-column">
             <div class="form-group">
-                <textarea class="form-control" id="websiteTitleInput" placeholder="Website Title" rows="4"></textarea>
+                <textarea autofocus required class="form-control" id="websiteTitleInput" placeholder="Website Title" rows="4"></textarea>
                 <small id="titleInputHelp" class="form-text text-muted">Feel free to modify the title</small>
             </div>
+            <hr>
             <div class="form-check">
-                <input class="form-check-input checkRecommandation" type="checkbox" value="" id="check_recommandation">
-                <label class="form-check-label" for="check_recommdation">
+                <input class="form-check-input checkRecommendation" type="checkbox" value="" id="check_recommendation">
+                <label class="form-check-label" for="check_recommendation">
                     Recommand This Article?
                 </label>
-                <label id="check_recommandation_help" class='checkRecommandation_Help'>Daily usage remain</label>
+                <label id="check_recommendation_help" class='checkRecommendation_Help'>Daily usage remain</label>
             </div>
+            <hr>
             <div class="popup_spacing" row='6'></div>
             <button id="upload_hololink_button" class="btn btn-light">Upload Hololink</button>
         </div>

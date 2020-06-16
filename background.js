@@ -16,15 +16,17 @@ function ErrorsHandler(response){
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
         csrfToken = cookie.value;
-        if (request.Query == "postData"){
+        if (request.query == "postData"){
         
             var formData = new FormData();
             formData.append("name", request.data_title);
             formData.append("content", request.data);
             formData.append("from_url", request.data_url);
+            formData.append("recommandation", request.recommendation);
             console.log(csrfToken);
+            console.log(request.recommendation);
     
-            fetch(request.url, {
+            fetch(request.target_url, {
                 method:'POST',
                 credentials: "same-origin",
                 headers:{
