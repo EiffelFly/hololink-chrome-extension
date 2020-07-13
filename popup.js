@@ -73,16 +73,16 @@ chrome.runtime.onMessage.addListener(function(request,sender){
         fullData = {
             query: "postData",
             data: request.source,
-            target_url: "https://hololink.co/article/add/",
+            target_url: "http://127.0.0.1:8000/api/articles/",
             data_url: url,
             data_title:  title,
         }
         
         if ($('#check_recommendation').is(":checked")){
-            fullData['recommendation'] = 'on';
+            fullData['recommendation'] = 'true';
         }
         else{
-            fullData['recommendation'] = '';
+            fullData['recommendation'] = 'false';
         }
         
         chrome.runtime.sendMessage(fullData, function(response){

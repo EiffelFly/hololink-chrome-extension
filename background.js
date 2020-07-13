@@ -17,24 +17,23 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
         csrfToken = cookie.value;
         if (request.query == "postData"){
-        
-            var formData = new FormData();
-            formData.append("name", request.data_title);
-            formData.append("content", request.data);
-            formData.append("from_url", request.data_url);
-            formData.append("recommandation", request.recommendation);
-            console.log(csrfToken);
-            console.log(request.recommendation);
+
+            data = {
+                name : request.data_title,
+                content : request.data,
+                from_url : request.data_url,
+                recommendation : request.recommendation
+            }
     
             fetch(request.target_url, {
                 method:'POST',
-                credentials: "same-origin",
                 headers:{
-                    'X-CSRF-Token': csrfToken,
-                    'Accept': 'multipart/form-data',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'Content-Type':'application/json',
+                    'Accept': 'text/html',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    "X-CSRF-TOKEN", csrfToken
                 },
-                body: formData,
+                body: JSON.stringify(data),
             })
                 .then(ErrorsHandler)
                 .then(response => response.text())
