@@ -18,10 +18,11 @@
     "permissions": [
         "storage",
         "tabs",
-        "*://*.hololink.co/*",
+        "https://hololink.co/*",
         "cookies",
         "https://*/",
-        "http://*/"
+        "webRequest",
+        "webRequestBlocking"
     ],
 
     "content_scripts":[

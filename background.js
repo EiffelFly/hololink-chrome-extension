@@ -22,13 +22,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             if (request.query == "postData"){   
                 var myHeaders = new Headers();
                 myHeaders.append("X-CSRFToken", csrfToken);
-                myHeaders.append("Referer", "https://hololink.co/api/articles");
                 myHeaders.append("Content-Type", "application/json");
                 myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
                 myHeaders.append("X-Requested-With", "XMLHttpRequest");
+                console.log(myHeaders)
 
                 var raw = JSON.stringify({
-                    "name": request.title,
+                    "name": request.data_title,
                     "content": request.data,
                     "from_url": request.data_url,
                     "recommendation": request.recommendation
@@ -39,6 +39,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                     headers: myHeaders,
                     body: raw,
                     redirect: 'follow',
+                    credentials: 'include',
+                    mode:'cors'
                 };
     
                 fetch(request.target_url, requestOptions)
@@ -50,6 +52,38 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         });
     });
 });
+
+
+/*
+    由於 Google Chrome 會自動 overwrite referer 所以要特別用 webRequest
+    api 來重新設置 referer。
+    -> 之後要注意如何修改才能更保障安全性
+*/
+
+chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
+    var newRef = "https://hololink.co/api/articles";
+    var gotRef = false;
+    console.log('ohYA, inwebRequest')
+    for(var n in details.requestHeaders){
+        gotRef = details.requestHeaders[n].name.toLowerCase()=="referer";
+        if(gotRef){
+            details.requestHeaders[n].value = newRef;
+            break;
+            
+        }
+    }
+    if(!gotRef){
+        details.requestHeaders.push({name:"Referer",value:newRef});
+    }
+    return {requestHeaders:details.requestHeaders};},
+    {urls:["https://hololink.co/*"]},
+    [
+        "requestHeaders",
+        "blocking",
+        "extraHeaders"
+    ]
+);
+
 
 chrome.tabs.onUpdated.addListener(function(){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
