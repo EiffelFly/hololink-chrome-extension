@@ -4,6 +4,7 @@
 var title = " ";
 var url = " ";
 
+
 $(function(){
 
     /*
@@ -38,6 +39,8 @@ $(function(){
         chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'https://hololink.co/api/projects'})
     
     });
+
+    $('select-project').selectpicker();
 
     $('#user-log-in').click(function(){
         chrome.tabs.create({'url':'https://hololink.co/accounts/login/'})
