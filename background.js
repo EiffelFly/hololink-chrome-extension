@@ -15,6 +15,33 @@ function ErrorsHandler(response){
     return response
 }
 
+function gotPeojectsListHandler(response){
+    if (!response.ok){
+        console.log('ERROR: ' + response)
+        chrome.runtime.sendMessage({'action':'gotProjectsList', 'result':'failed'})
+    }
+    else{
+        console.log('got projects list success')
+        
+        response.json().then(json => {
+            // the status was ok and there is a json body and resolve to another object for further usage
+            var response_data =  Promise.resolve({json: json, response: response});
+            var ProjectsList = [];
+            for (i=0; i<json.length; i++){
+                ProjectsList.push(json[i]['name'])                
+            }
+            console.log(ProjectsList)
+            chrome.runtime.sendMessage({'action':'gotProjectsList', 'result':'success', 'data':ProjectsList})
+            
+        }).catch(err => {
+             // the status was ok but there is no json body
+            console.log(Promise.resolve({response: response}))
+        });
+
+        
+    }
+}
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
         csrfToken = cookie.value;
@@ -54,6 +81,34 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         });
     });
 });
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.action == "loadUserProjects"){
+        chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
+        csrfToken = cookie.value;
+            chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
+                sessionid = cookie.value
+              
+                var myHeaders = new Headers();
+                myHeaders.append("X-CSRFToken", csrfToken);
+                myHeaders.append("Content-Type", "application/json");
+                myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
+                myHeaders.append("X-Requested-With", "XMLHttpRequest");
+
+                var requestOptions = {
+                    method: 'GET',
+                    headers: myHeaders,
+                    redirect: 'follow',
+                    credentials: 'include',
+                };
+    
+                fetch(request.target_url, requestOptions)
+                    .then(gotPeojectsListHandler)   
+            });
+        });
+    }
+});
+
 
 
 /*

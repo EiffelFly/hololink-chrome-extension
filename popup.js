@@ -22,16 +22,21 @@ $(function(){
     */
 
     chrome.tabs.query({active:true, currentWindow:true},function(tab){ /*之所以要放上 currentWindow 的原因在於如果不加這個指令，系統會以為你是指 popup，這樣會回傳 undefined */
+        
         title = tab[0].title;
         url = tab[0].url;
         console.log(url);
         console.log(title);
         document.getElementById("websiteTitleInput").innerText = title;
+
         //我們要讓鼠標 focus 在 title 的最後一個字
         var len = title.length;
         $('#websiteTitleInput')[0].focus();
         $('#websiteTitleInput')[0].setSelectionRange(len, len);
 
+        //呼叫 background.js 去取用 hololink api-projectsList 
+        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'https://hololink.co/api/projects'})
+    
     });
 
     $('#user-log-in').click(function(){
