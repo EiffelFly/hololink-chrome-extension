@@ -1,5 +1,6 @@
 
 var csrfToken = ' ';
+var sessionid = ' ';
 
 function ErrorsHandler(response){
     if (!response.ok) {
@@ -16,33 +17,37 @@ function ErrorsHandler(response){
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
         csrfToken = cookie.value;
-        if (request.query == "postData"){
+        chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
+            sessionid = cookie.value
+            if (request.query == "postData"){   
+                var myHeaders = new Headers();
+                myHeaders.append("X-CSRFToken", csrfToken);
+                myHeaders.append("Referer", "https://hololink.co/api/articles");
+                myHeaders.append("Content-Type", "application/json");
+                myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
+                myHeaders.append("X-Requested-With", "XMLHttpRequest");
 
-            data = {
-                name : request.data_title,
-                content : request.data,
-                from_url : request.data_url,
-                recommendation : request.recommendation
+                var raw = JSON.stringify({
+                    "name": request.title,
+                    "content": request.data,
+                    "from_url": request.data_url,
+                    "recommendation": request.recommendation
+                });
+    
+                var requestOptions = {
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: raw,
+                    redirect: 'follow',
+                };
+    
+                fetch(request.target_url, requestOptions)
+                    .then(response => response.text())
+                    .then(result => console.log(result))
+                    .catch(error => console.log('error', error));
+                    
             }
-    
-            fetch(request.target_url, {
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    'Accept': 'text/html',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    "X-CSRF-TOKEN", csrfToken
-                },
-                body: JSON.stringify(data),
-            })
-                .then(ErrorsHandler)
-                .then(response => response.text())
-                .then(response => console.log(response))
-                .catch(error => console.log('Error:', error));
-    
-            return true;
-            
-        }
+        });
     });
 });
 
