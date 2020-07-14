@@ -53,8 +53,22 @@ $(function(){
     });
 });
 
+chrome.runtime.onMessage.addListener(function(response){
+    if (response.action == 'gotProjectsList'){
+        if (response.result == 'success'){
+            response.data.forEach(element => {
+                var option = document.createElement('option');
+                option.setAttribute('data-token',element);
+                document.getElementById('select-project').appendChild(option);
+                option.innerHTML=option.innerHTML + element;
+                console.log('append go!')
+            });
+        }
+    }
+})
 
-chrome.runtime.onMessage.addListener(function(request,sender){
+
+chrome.runtime.onMessage.addListener(function(request){
     if (request.action == 'Dataposted'){
         if (request.result == 'success'){
             $('#upload_hololink_button').prop('spinner', false).html(
