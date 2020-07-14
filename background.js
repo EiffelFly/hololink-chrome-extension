@@ -9,6 +9,7 @@ function ErrorsHandler(response){
         chrome.runtime.sendMessage({'action':'Dataposted', 'result':'failed'})
     }
     else{
+        console.log('post success')
         chrome.runtime.sendMessage({'action':'Dataposted', 'result':"success"})
     }
     return response
@@ -44,6 +45,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 };
     
                 fetch(request.target_url, requestOptions)
+                    .then(ErrorsHandler)
                     .then(response => response.text())
                     .then(result => console.log(result))
                     .catch(error => console.log('error', error));
