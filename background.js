@@ -85,26 +85,30 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == "loadUserProjects"){
         chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
-        csrfToken = cookie.value;
-            chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
-                sessionid = cookie.value
-              
-                var myHeaders = new Headers();
-                myHeaders.append("X-CSRFToken", csrfToken);
-                myHeaders.append("Content-Type", "application/json");
-                myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
-                myHeaders.append("X-Requested-With", "XMLHttpRequest");
+            if (cookie){
+                csrfToken = cookie.value;
+                chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
+                    if (cookie){
+                        sessionid = cookie.value
+                        var myHeaders = new Headers();
+                        myHeaders.append("X-CSRFToken", csrfToken);
+                        myHeaders.append("Content-Type", "application/json");
+                        myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
+                        myHeaders.append("X-Requested-With", "XMLHttpRequest");
 
-                var requestOptions = {
-                    method: 'GET',
-                    headers: myHeaders,
-                    redirect: 'follow',
-                    credentials: 'include',
-                };
-    
-                fetch(request.target_url, requestOptions)
-                    .then(gotPeojectsListHandler)   
-            });
+                        var requestOptions = {
+                            method: 'GET',
+                            headers: myHeaders,
+                            redirect: 'follow',
+                            credentials: 'include',
+                        };
+
+                        fetch(request.target_url, requestOptions)
+                            .then(gotPeojectsListHandler)   
+                    } 
+             
+                });
+            }
         });
     }
 });

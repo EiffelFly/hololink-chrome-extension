@@ -3,7 +3,7 @@
 
 var title = " ";
 var url = " ";
-
+var selectProjectOptions = []
 
 $(function(){
 
@@ -40,7 +40,7 @@ $(function(){
     
     });
 
-    $('select-project').selectpicker();
+    //$('select-project').selectpicker();
 
     $('#user-log-in').click(function(){
         chrome.tabs.create({'url':'https://hololink.co/accounts/login/'})
@@ -60,16 +60,15 @@ chrome.runtime.onMessage.addListener(function(response){
     if (response.action == 'gotProjectsList'){
         if (response.result == 'success'){
             response.data.forEach(element => {
-                var option = document.createElement('option');
-                option.setAttribute('data-token',element);
-                document.getElementById('select-project').appendChild(option);
-                option.innerHTML=option.innerHTML + element;
-                console.log('append go!')
+                var option = `<option data-token=${element}>` + element + "</option>";
+                selectProjectOptions.push(option);
             });
+            $('.selectpicker').html(selectProjectOptions);
+            $('.selectpicker').selectpicker('refresh');
         }
     }
 })
-
+11
 
 chrome.runtime.onMessage.addListener(function(request){
     if (request.action == 'Dataposted'){
