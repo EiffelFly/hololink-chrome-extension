@@ -44,41 +44,45 @@ function gotPeojectsListHandler(response){
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
-        csrfToken = cookie.value;
-        chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
-            sessionid = cookie.value
-            if (request.query == "postData"){   
-                var myHeaders = new Headers();
-                myHeaders.append("X-CSRFToken", csrfToken);
-                myHeaders.append("Content-Type", "application/json");
-                myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
-                myHeaders.append("X-Requested-With", "XMLHttpRequest");
-                console.log(myHeaders)
-
-                var raw = JSON.stringify({
-                    "name": request.data_title,
-                    "content": request.data,
-                    "from_url": request.data_url,
-                    "recommendation": request.recommendation
-                });
-    
-                var requestOptions = {
-                    method: 'POST',
-                    headers: myHeaders,
-                    body: raw,
-                    redirect: 'follow',
-                    credentials: 'include',
-                    mode:'cors'
-                };
-    
-                fetch(request.target_url, requestOptions)
-                    .then(ErrorsHandler)
-                    .then(response => response.text())
-                    .then(result => console.log(result))
-                    .catch(error => console.log('error', error));
-                    
-            }
-        });
+        if (cookie){
+            csrfToken = cookie.value;
+            chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
+                if (cookie){
+                    sessionid = cookie.value
+                    if (request.query == "postData"){   
+                        var myHeaders = new Headers();
+                        myHeaders.append("X-CSRFToken", csrfToken);
+                        myHeaders.append("Content-Type", "application/json");
+                        myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
+                        myHeaders.append("X-Requested-With", "XMLHttpRequest");
+                        console.log(myHeaders)
+        
+                        var raw = JSON.stringify({
+                            "name": request.data_title,
+                            "content": request.data,
+                            "from_url": request.data_url,
+                            "recommendation": request.recommendation
+                        });
+            
+                        var requestOptions = {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: raw,
+                            redirect: 'follow',
+                            credentials: 'include',
+                            mode:'cors'
+                        };
+            
+                        fetch(request.target_url, requestOptions)
+                            .then(ErrorsHandler)
+                            .then(response => response.text())
+                            .then(result => console.log(result))
+                            .catch(error => console.log('error', error));
+                            
+                    }
+                }    
+            });
+        }
     });
 });
 

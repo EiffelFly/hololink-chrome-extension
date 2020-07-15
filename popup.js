@@ -56,6 +56,14 @@ $(function(){
     });
 });
 
+//確認 Project-select 是否有被選
+$('select').on("changed.bs.select",function(e, clickedIndex, newValue, oldValue) {
+    var ProjectSelected = clickedIndex;
+});
+
+
+
+
 chrome.runtime.onMessage.addListener(function(response){
     if (response.action == 'gotProjectsList'){
         if (response.result == 'success'){
@@ -68,7 +76,7 @@ chrome.runtime.onMessage.addListener(function(response){
         }
     }
 })
-11
+
 
 chrome.runtime.onMessage.addListener(function(request){
     if (request.action == 'Dataposted'){
@@ -97,6 +105,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
             target_url: "https://hololink.co/api/articles/",
             data_url: url,
             data_title:  title,
+            data_projects: ProjectSelected,
         }
         
         if ($('#check_recommendation').is(":checked")){
