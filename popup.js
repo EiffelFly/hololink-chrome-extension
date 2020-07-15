@@ -3,7 +3,8 @@
 
 var title = " ";
 var url = " ";
-var selectProjectOptions = []
+var userSelectedProjects = []
+var userProjectsOptions = []
 
 $(function(){
 
@@ -46,6 +47,26 @@ $(function(){
         chrome.tabs.create({'url':'https://hololink.co/accounts/login/'})
     });
 
+
+    //確認 Project-select 是否有被選
+    //由於 Django rest framework m2m field 目前只接受傳入 Id(pk)，因此這個 background.js 
+    //Get 到 project list 時會完全遵照 id 來排列，故 select box 挑到 clickedIndex+1 將等同 Id(pk)
+    $('select').on("changed.bs.select",function(e, clickedIndex, newValue, oldValue) {
+        clickedIndex = clickedIndex + 1
+        if(newValue==true){
+            if(userSelectedProjects.includes(clickedIndex)==false){
+                userSelectedProjects.push(clickedIndex)
+            }
+        }
+        else{
+            if(userSelectedProjects.includes(clickedIndex)==true){
+                index = userSelectedProjects.indexOf(clickedIndex)
+                userSelectedProjects.splice(index,1)
+            }
+        }
+        console.log(userSelectedProjects)
+    });
+
     $('#upload_hololink_button').click(function(){
         window.onload = callTextClipper(); //window.onload會等網頁的全部內容，包括圖片，CSS及<iframe>等外部內容載入後才會觸發*/
         $(this).prop("disabled", true);
@@ -56,10 +77,8 @@ $(function(){
     });
 });
 
-//確認 Project-select 是否有被選
-$('select').on("changed.bs.select",function(e, clickedIndex, newValue, oldValue) {
-    var ProjectSelected = clickedIndex;
-});
+
+
 
 
 
@@ -69,9 +88,9 @@ chrome.runtime.onMessage.addListener(function(response){
         if (response.result == 'success'){
             response.data.forEach(element => {
                 var option = `<option data-token=${element}>` + element + "</option>";
-                selectProjectOptions.push(option);
+                userProjectsOptions.push(option);
             });
-            $('.selectpicker').html(selectProjectOptions);
+            $('.selectpicker').html(userProjectsOptions);
             $('.selectpicker').selectpicker('refresh');
         }
     }
@@ -105,7 +124,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
             target_url: "https://hololink.co/api/articles/",
             data_url: url,
             data_title:  title,
-            data_projects: ProjectSelected,
+            data_projects: userSelectedProjects,
         }
         
         if ($('#check_recommendation').is(":checked")){

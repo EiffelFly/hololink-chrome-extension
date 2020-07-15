@@ -30,6 +30,7 @@ function gotPeojectsListHandler(response){
             for (i=0; i<json.length; i++){
                 ProjectsList.push(json[i]['name'])                
             }
+            console.log(json)
             console.log(ProjectsList)
             chrome.runtime.sendMessage({'action':'gotProjectsList', 'result':'success', 'data':ProjectsList})
             
@@ -61,9 +62,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                             "name": request.data_title,
                             "content": request.data,
                             "from_url": request.data_url,
-                            "recommendation": request.recommendation
+                            "recommendation": request.recommendation,
+                            "projects": request.data_projects,
                         });
-            
+                        
+                        console.log(request.data_projects)
+
                         var requestOptions = {
                             method: 'POST',
                             headers: myHeaders,
