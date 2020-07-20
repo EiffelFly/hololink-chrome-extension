@@ -3,7 +3,9 @@
 
 var title = " ";
 var url = " ";
-var userSelectedProjects = []
+var userSelectedProjectsIndex = []
+var userSelectedProjectsId = []
+var userProjectsOptionsHtml = []
 var userProjectsOptions = []
 
 $(function(){
@@ -52,19 +54,26 @@ $(function(){
     //由於 Django rest framework m2m field 目前只接受傳入 Id(pk)，因此這個 background.js 
     //Get 到 project list 時會完全遵照 id 來排列，故 select box 挑到 clickedIndex+1 將等同 Id(pk)
     $('select').on("changed.bs.select",function(e, clickedIndex, newValue, oldValue) {
-        clickedIndex = clickedIndex + 1
+        //clickedIndex 
+        
         if(newValue==true){
-            if(userSelectedProjects.includes(clickedIndex)==false){
-                userSelectedProjects.push(clickedIndex)
+            if(userSelectedProjectsIndex.includes(clickedIndex)==false){
+                project = userProjectsOptions[clickedIndex]['id']
+                userSelectedProjectsId.push(project)
+                userSelectedProjectsIndex.push(clickedIndex)
             }
         }
         else{
-            if(userSelectedProjects.includes(clickedIndex)==true){
-                index = userSelectedProjects.indexOf(clickedIndex)
-                userSelectedProjects.splice(index,1)
+            if(userSelectedProjectsIndex.includes(clickedIndex)==true){
+                idIndex = userSelectedProjectsId.indexOf(userProjectsOptions[clickedIndex]['id'])
+                index = userSelectedProjectsIndex.indexOf(clickedIndex)
+                userSelectedProjectsId.splice(idIndex,1)
+                userSelectedProjectsIndex.splice(index,1)
             }
         }
-        console.log(userSelectedProjects)
+      
+
+        console.log(userSelectedProjectsId)
     });
 
     $('#upload_hololink_button').click(function(){
@@ -86,11 +95,12 @@ $(function(){
 chrome.runtime.onMessage.addListener(function(response){
     if (response.action == 'gotProjectsList'){
         if (response.result == 'success'){
+            userProjectsOptions = response.data
             response.data.forEach(element => {
-                var option = `<option data-token=${element}>` + element + "</option>";
-                userProjectsOptions.push(option);
+                var option = `<option data-token=${element['name']}>` + element['name'] + "</option>";
+                userProjectsOptionsHtml.push(option);
             });
-            $('.selectpicker').html(userProjectsOptions);
+            $('.selectpicker').html(userProjectsOptionsHtml);
             $('.selectpicker').selectpicker('refresh');
         }
     }
@@ -124,7 +134,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
             target_url: "https://hololink.co/api/articles/",
             data_url: url,
             data_title:  title,
-            data_projects: userSelectedProjects,
+            data_projects: userSelectedProjectsId,
         }
         
         if ($('#check_recommendation').is(":checked")){

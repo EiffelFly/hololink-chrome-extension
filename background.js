@@ -28,7 +28,12 @@ function gotPeojectsListHandler(response){
             var response_data =  Promise.resolve({json: json, response: response});
             var ProjectsList = [];
             for (i=0; i<json.length; i++){
-                ProjectsList.push(json[i]['name'])                
+                ProjectsList_json = {
+                    "id": json[i]['id'],
+                    "name": json[i]['name']
+
+                }
+                ProjectsList.push(ProjectsList_json)                
             }
             console.log(json)
             console.log(ProjectsList)
