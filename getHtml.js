@@ -45,7 +45,7 @@ function findContentContainer(){
         countSelectedWords = countHightestWord;
     
     //從最多字的 <p> 一圈一圈向外拓，直到圈起了 2/5 的總字數
-    while (countSelectedWords/countTotlaWordsOnPage < 0.4
+    while (countSelectedWords/countTotlaWordsOnPage < 0.1
     && selectedContainer != document.body
     && selectedContainer.parentNode.innerText){ //這一圈裡必須要有字
         selectedContainer = selectedContainer.parentNode; //向外擴一圈
@@ -83,6 +83,19 @@ function findContentContainer(){
         deleteScripts[0].parentNode.removeChild(deleteScripts[0]);
     }
 
+    //刪除圖片
+    var deleteImages = clone_selectedContainer.getElementsByTagName('img');
+
+    while(deleteImages[0]){
+        deleteImages[0].parentNode.removeChild(deleteImages[0]);
+    }
+
+    //刪除影片
+    var deleteVideos = clone_selectedContainer.getElementsByTagName('video');
+
+    while(deleteVideos[0]){
+        deleteVideos[0].parentNode.removeChild(deleteVideos[0]);
+    }
     
     //有些網頁會在 body 裡放置 dynamic css 
     var deletestylesheet = clone_selectedContainer.getElementsByTagName('style');
