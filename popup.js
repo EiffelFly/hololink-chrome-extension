@@ -97,7 +97,6 @@ chrome.runtime.onMessage.addListener(function(response){
         if (response.result == 'success'){
             userProjectsOptions = response.data
             response.data.forEach(element => {
-                console.log(element)
                 var option = `<option data-token=${element['name']}>` + element['name'] + "</option>";
                 userProjectsOptionsHtml.push(option);
             });
@@ -144,8 +143,9 @@ chrome.runtime.onMessage.addListener(function(request,sender){
         else{
             fullData['recommendation'] = 'false';
         }
+        console.log(fullData['recommendation'])
         
-        chrome.runtime.sendMessage(fullData, function(response){
+        chrome.runtime.sendMessage({"action":"DataReadyForPost", "data": fullData}, function(response){
             if (response != undefined && response != "") {
                 console.log(response);
             }

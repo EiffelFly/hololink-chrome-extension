@@ -49,13 +49,14 @@ function gotPeojectsListHandler(response){
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
-        if (cookie){
-            csrfToken = cookie.value;
-            chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
-                if (cookie){
-                    sessionid = cookie.value
-                    if (request.query == "postData"){   
+    if (request.action == 'DataReadyForPost'){
+        chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
+            if (cookie){
+                csrfToken = cookie.value;
+                chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
+                    if (cookie){
+                        sessionid = cookie.value
+                        
                         var myHeaders = new Headers();
                         myHeaders.append("X-CSRFToken", csrfToken);
                         myHeaders.append("Content-Type", "application/json");
@@ -64,14 +65,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                         console.log(myHeaders)
         
                         var raw = JSON.stringify({
-                            "name": request.data_title,
-                            "content": request.data,
-                            "from_url": request.data_url,
-                            "recommendation": request.recommendation,
-                            "projects": request.data_projects,
+                            "name": request.data.data_title,
+                            "content": request.data.data,
+                            "from_url": request.data.data_url,
+                            "recommended": request.data.recommendation,
+                            "projects": request.data.data_projects,
                         });
-                        
-                        console.log(request.data_projects)
+
+                        console.log(raw)
 
                         var requestOptions = {
                             method: 'POST',
@@ -82,17 +83,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                             mode:'cors'
                         };
             
-                        fetch(request.target_url, requestOptions)
+                        fetch(request.data.target_url, requestOptions)
                             .then(ErrorsHandler)
                             .then(response => response.text())
                             .then(result => console.log(result))
-                            .catch(error => console.log('error', error));
-                            
-                    }
-                }    
-            });
-        }
-    });
+                            .catch(error => console.log('error', error));                  
+                    }    
+                });
+            }
+        });
+    }
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
