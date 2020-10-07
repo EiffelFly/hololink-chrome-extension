@@ -39,7 +39,7 @@ $(function(){
         $('#websiteTitleInput')[0].setSelectionRange(len, len);
 
         //呼叫 background.js 去取用 hololink api-projectsList 
-        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'https://hololink.co/api/projects'})
+        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'https://hololink.co/api/projects-chrome/'})
     
     });
 
@@ -97,6 +97,7 @@ chrome.runtime.onMessage.addListener(function(response){
         if (response.result == 'success'){
             userProjectsOptions = response.data
             response.data.forEach(element => {
+                console.log(element)
                 var option = `<option data-token=${element['name']}>` + element['name'] + "</option>";
                 userProjectsOptionsHtml.push(option);
             });

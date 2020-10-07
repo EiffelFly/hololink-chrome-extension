@@ -104,8 +104,12 @@ function findContentContainer(){
         console.log(deletestylesheet[0]);
         deletestylesheet[0].parentNode.removeChild(deletestylesheet[0]);
     }
+    
+    var data = clone_selectedContainer.innerText
+    
+    data = data.replace(/(\r\n|\n|\r)/gm, "");
 
-    return clone_selectedContainer.innerHTML;
+    return data;
 }
 
 console.log('begin process')

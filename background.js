@@ -21,16 +21,15 @@ function gotPeojectsListHandler(response){
         chrome.runtime.sendMessage({'action':'gotProjectsList', 'result':'failed'})
     }
     else{
-        console.log('got projects list success')
-        
         response.json().then(json => {
             // the status was ok and there is a json body and resolve to another object for further usage
             var response_data =  Promise.resolve({json: json, response: response});
             var ProjectsList = [];
-            for (i=0; i<json.length; i++){
+            for (i=0; i<json.count; i++){
+                console.log(json.results[i])
                 ProjectsList_json = {
-                    "id": json[i]['id'],
-                    "name": json[i]['name']
+                    "id": json.results[i]['id'],
+                    "name": json.results[i]['name']
 
                 }
                 ProjectsList.push(ProjectsList_json)                
@@ -42,6 +41,7 @@ function gotPeojectsListHandler(response){
         }).catch(err => {
              // the status was ok but there is no json body
             console.log(Promise.resolve({response: response}))
+            console.log(err)
         });
 
         
