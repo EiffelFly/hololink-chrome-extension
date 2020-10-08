@@ -39,7 +39,7 @@ $(function(){
         $('#websiteTitleInput')[0].setSelectionRange(len, len);
 
         //呼叫 background.js 去取用 hololink api-projectsList 
-        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'https://hololink.co/api/projects-chrome/'})
+        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'https://hololink.co/api/broswer-extension-data/'})
     
     });
 
