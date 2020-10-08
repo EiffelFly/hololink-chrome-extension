@@ -93,15 +93,28 @@ $(function(){
 
 
 chrome.runtime.onMessage.addListener(function(response){
-    if (response.action == 'gotProjectsList'){
+    if (response.action == 'gotProjectandRecommendationData'){
         if (response.result == 'success'){
-            userProjectsOptions = response.data
-            response.data.forEach(element => {
+            
+            response.projects.forEach(element => {
                 var option = `<option data-token=${element['name']}>` + element['name'] + "</option>";
                 userProjectsOptionsHtml.push(option);
             });
             $('.selectpicker').html(userProjectsOptionsHtml);
             $('.selectpicker').selectpicker('refresh');
+
+            recommendation_dailuUsageRemain = 5 - response.recommendations.length
+
+            console.log(recommendation_dailuUsageRemain)
+
+            if (recommendation_dailuUsageRemain == 0){
+                $('#check_recommendation').attr("disabled", true);
+            } else {
+                $('#check_recommendation').attr("disabled", false);
+            }
+
+            $('#dailyUsageRemain').text(recommendation_dailuUsageRemain)
+
         }
     }
 })
