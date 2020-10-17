@@ -57,7 +57,9 @@ $(function(){
         //clickedIndex 
         
         if(newValue==true){
+
             if(userSelectedProjectsIndex.includes(clickedIndex)==false){
+                console.log(userProjectsOptions[clickedIndex])
                 project = userProjectsOptions[clickedIndex]['id']
                 userSelectedProjectsId.push(project)
                 userSelectedProjectsIndex.push(clickedIndex)
@@ -95,6 +97,8 @@ $(function(){
 chrome.runtime.onMessage.addListener(function(response){
     if (response.action == 'gotProjectandRecommendationData'){
         if (response.result == 'success'){
+
+            userProjectsOptions = response.projects
             
             response.projects.forEach(element => {
                 var option = `<option data-token=${element['name']}>` + element['name'] + "</option>";
@@ -106,6 +110,9 @@ chrome.runtime.onMessage.addListener(function(response){
             recommendation_dailuUsageRemain = 5 - response.recommendations.length
 
             console.log(recommendation_dailuUsageRemain)
+
+            console.log(response.user)
+            $('#userIndicator').text('Current user: '+ response.user)
 
             if (recommendation_dailuUsageRemain == 0){
                 $('#check_recommendation').attr("disabled", true);
