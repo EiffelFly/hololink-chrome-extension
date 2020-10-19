@@ -5,13 +5,13 @@
     "description": "this extension is for highting the world",
     "version":"1.0",
     "icons":{
-        "128":"icon_128.png",
-        "48":"icon_48.png",
-        "16":"icon_16.png"
+        "128":"img/icon_128.png",
+        "48":"img/icon_48.png",
+        "16":"img/icon_16.png"
     },
 
     "browser_action":{
-        "default_icon":"icon_16.png",
+        "default_icon":"img/icon_16.png",
         "default_popup":"popup.html"
     },
 
@@ -28,11 +28,11 @@
     "content_scripts":[
         {
             "matches":["http://*/*"],
-            "js":["getHtml.js"]
+            "js":["src/getHtml.js"]
         }   
     ],
 
     "background":{
-        "scripts":["background.js"]
+        "scripts":["src/background.js"]
     }
 }
