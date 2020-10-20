@@ -3,7 +3,7 @@
 
     "name":"Hololink",
     "description": "this extension is for highting the world",
-    "version":"1.0",
+    "version":"v0.1",
     "icons":{
         "128":"img/icon_128.png",
         "48":"img/icon_48.png",
