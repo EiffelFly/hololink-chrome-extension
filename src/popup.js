@@ -39,14 +39,14 @@ $(function(){
         $('#websiteTitleInput')[0].setSelectionRange(len, len);
 
         //呼叫 background.js 去取用 hololink api-projectsList 
-        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'http://127.0.0.1:8000/api/broswer-extension-data/'})
+        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'http://hololink.co/api/broswer-extension-data/'})
     
     });
 
     //$('select-project').selectpicker();
 
     $('#user-log-in').click(function(){
-        chrome.tabs.create({'url':'https://127.0.0.1:8000/accounts/login/'})
+        chrome.tabs.create({'url':'https://hololink.co/accounts/login/'})
     });
 
 

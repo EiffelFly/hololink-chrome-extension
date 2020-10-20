@@ -50,10 +50,10 @@ function gotPeojectsListHandler(response){
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == 'DataReadyForPost'){
-        chrome.cookies.get({"url":"https://127.0.0.1:8000/", "name":"csrftoken"}, function(cookie){
+        chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
             if (cookie){
                 csrfToken = cookie.value;
-                chrome.cookies.get({"url":"https://127.0.0.1:8000/", "name":"sessionid"}, function(cookie){
+                chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
                     if (cookie){
                         sessionid = cookie.value
                         
@@ -97,10 +97,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == "loadUserProjects"){
-        chrome.cookies.get({"url":"https://127.0.0.1:8000//", "name":"csrftoken"}, function(cookie){
+        chrome.cookies.get({"url":"https://hololink.co/", "name":"csrftoken"}, function(cookie){
             if (cookie){
                 csrfToken = cookie.value;
-                chrome.cookies.get({"url":"https://127.0.0.1:8000//", "name":"sessionid"}, function(cookie){
+                chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
                     if (cookie){
                         sessionid = cookie.value
                         var myHeaders = new Headers();
@@ -135,7 +135,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 */
 
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
-    var newRef = "https://127.0.0.1:8000//api/articles";
+    var newRef = "https://hololink.co/api/articles";
     var gotRef = false;
     console.log('ohYA, inwebRequest')
     for(var n in details.requestHeaders){
@@ -150,7 +150,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
         details.requestHeaders.push({name:"Referer",value:newRef});
     }
     return {requestHeaders:details.requestHeaders};},
-    {urls:["https://127.0.0.1:8000//*"]},
+    {urls:["https://hololink.co/*"]},
     [
         "requestHeaders",
         "blocking",
@@ -160,7 +160,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
 
 
 chrome.tabs.onUpdated.addListener(function(){
-    chrome.cookies.get({"url":"https://127.0.0.1:8000//", "name":"sessionid"}, function(cookie){
+    chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
         if (cookie){
             chrome.browserAction.setPopup({"popup":"popup.html"})
             //window.location.href="popup.html";
