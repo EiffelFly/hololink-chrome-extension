@@ -1,7 +1,7 @@
 {
     "manifest_version":2,
 
-    "name":"Highlight Practice",
+    "name":"Hololink",
     "description": "this extension is for highting the world",
     "version":"1.0",
     "icons":{
