@@ -4,12 +4,15 @@ var sessionid = ' ';
 
 function ErrorsHandler(response){
     if (!response.ok) {
-        console.log('ERROR: ' + response)
-        //throw Error(response.statusText)
-        chrome.runtime.sendMessage({'action':'Dataposted', 'result':'failed'})
+        response.json().then( json => {
+            if (json.duplication_error){
+                chrome.runtime.sendMessage({'action':'Dataposted', 'result':'failed_duplication', 'duplicated_projects':json.duplication_error})
+            } else {
+                chrome.runtime.sendMessage({'action':'Dataposted', 'result':'failed'})
+            }
+        })
     }
     else{
-        console.log('post success')
         chrome.runtime.sendMessage({'action':'Dataposted', 'result':"success"})
     }
     return response

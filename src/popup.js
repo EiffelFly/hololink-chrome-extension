@@ -135,9 +135,20 @@ chrome.runtime.onMessage.addListener(function(request){
             );
         }
         else {
-            $('#upload_hololink_button').prop('spinner', false).html(
-                `<span style="font-size: 1rem; padding-left: 10px;">Failed</span>`             
-            );
+            if (request.result == 'failed_duplication'){
+                console.log('rr')
+                $('#upload_hololink_button').prop('spinner', false).html(
+                    `<span style="font-size: 1rem; padding-left: 10px;">Failed</span>`             
+                );
+                $('#upload_warning').html(
+                    `Duplicated galaxy: ${request.duplicated_projects}.<br> Please upload to another galaxy`             
+                );
+            } else {
+                $('#upload_hololink_button').prop('spinner', false).html(
+                    `<span style="font-size: 1rem; padding-left: 10px;">Failed</span>`             
+                );
+            }
+            
         }
         
     }
