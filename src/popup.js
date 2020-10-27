@@ -151,7 +151,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
         fullData = {
             query: "postData",
             data: request.source,
-            target_url: "http://127.0.0.1:8000/api/articles/",
+            target_url: "https://hololink.co/api/articles/",
             data_url: url,
             data_title:  title,
             data_projects: userSelectedProjectsId,
