@@ -25,6 +25,10 @@ $(function(){
     });
     */
 
+    // Upload foolproof
+    $('#upload_hololink_button').prop("disabled", true);
+    $('#upload_warning').html(`Please choose project`)
+
     chrome.tabs.query({active:true, currentWindow:true},function(tab){ /*之所以要放上 currentWindow 的原因在於如果不加這個指令，系統會以為你是指 popup，這樣會回傳 undefined */
         
         title = tab[0].title;
@@ -55,6 +59,7 @@ $(function(){
     //Get 到 project list 時會完全遵照 id 來排列，故 select box 挑到 clickedIndex+1 將等同 Id(pk)
     $('select').on("changed.bs.select",function(e, clickedIndex, newValue, oldValue) {
         //clickedIndex 
+        console.log(e, clickedIndex, newValue, oldValue)
         
         if(newValue==true){
 
@@ -74,7 +79,11 @@ $(function(){
             }
         }
       
-
+        if ( !Array.isArray(userSelectedProjectsId) || !userSelectedProjectsId.length ){
+            $('#upload_hololink_button').prop("disabled", true);
+        } else {
+            $('#upload_hololink_button').prop("disabled", false);
+        }
         console.log(userSelectedProjectsId)
     });
 
