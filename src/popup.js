@@ -27,7 +27,7 @@ $(function(){
 
     // Upload foolproof
     $('#upload_hololink_button').prop("disabled", true);
-    $('#upload_warning').html(`Please choose project`)
+    $('#upload_hololink_button').html(`Galaxy is not selected`)
 
     chrome.tabs.query({active:true, currentWindow:true},function(tab){ /*之所以要放上 currentWindow 的原因在於如果不加這個指令，系統會以為你是指 popup，這樣會回傳 undefined */
         
@@ -81,8 +81,10 @@ $(function(){
       
         if ( !Array.isArray(userSelectedProjectsId) || !userSelectedProjectsId.length ){
             $('#upload_hololink_button').prop("disabled", true);
+            $('#upload_hololink_button').html(`Galaxy is not selected`)
         } else {
             $('#upload_hololink_button').prop("disabled", false);
+            $('#upload_hololink_button').html(`Upload to Hololink`)
         }
         console.log(userSelectedProjectsId)
     });
