@@ -30,7 +30,7 @@ function render_tooltip(x, y, selection) {
 function calaculate_tooltip_position(){
     const range = document.getSelection().getRangeAt(0);
     const boundingRect = range.getBoundingClientRect();
-    const x = boundingRect.left + boundingRect.width / 2;
+    const x = boundingRect.left + boundingRect.width / 2 - 50;
     const y = window.pageYOffset + boundingRect.top + boundingRect.height + 10;
     return {x:x, y:y} 
 }
