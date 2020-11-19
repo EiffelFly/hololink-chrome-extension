@@ -10,8 +10,8 @@ highlight_button.setAttribute('id', 'hololink_toolbar_highlight');
 var highlighte_img = document.createElement('img');
 highlight_img_path = chrome.runtime.getURL("img/highlighter.svg");
 highlighte_img.setAttribute('src', highlight_img_path);
-highlighte_img.setAttribute('width', 24);
-highlighte_img.setAttribute('height', 24);
+highlighte_img.setAttribute('width', 20);
+highlighte_img.setAttribute('height', 20);
 highlight_button.appendChild(highlighte_img);
 
 var annotate_button = document.createElement('button');
@@ -20,8 +20,8 @@ annotate_button.setAttribute('id', 'hololink_toolbar_annotate');
 var annotate_img = document.createElement('img');
 highlight_img_path = chrome.runtime.getURL("img/chat.svg");
 annotate_img.setAttribute('src', highlight_img_path);
-annotate_img.setAttribute('width', 24);
-annotate_img.setAttribute('height', 24);
+annotate_img.setAttribute('width', 20);
+annotate_img.setAttribute('height', 20);
 annotate_button.appendChild(annotate_img);
 
 hololink_toolbar_container.appendChild(highlight_button);
