@@ -27,9 +27,12 @@
 
     "content_scripts":[
         {
-            "matches":["http://*/*"],
-            "js":["src/getHtml.js"]
-        }   
+            "matches":["http://*/*", "https://*/*"],
+            "js":["src/prep.js"],
+            "css":["src/prep.css"],
+            "run_at": "document_end",
+            "all_frames": true
+        }
     ],
 
     "background":{
