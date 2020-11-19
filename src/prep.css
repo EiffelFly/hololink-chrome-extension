@@ -13,8 +13,10 @@
     justify-content: space-around;
 }
 
-.toolbar-button{
+.hololink-toolbar-button{
     border: none;
-    background-color: white;
+    background-color: white !important;
+    color: white;
     margin: auto 0;
+    background: white !important;
 }
