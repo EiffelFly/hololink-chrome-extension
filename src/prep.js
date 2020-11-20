@@ -84,7 +84,28 @@ function calaculate_tooltip_position(){
 //'open' mode to access shadow dom elements from outisde the shadow root.
 const hololink_sidebar_container = document.createElement('div');
 hololink_sidebar_container.setAttribute('class', 'hololink-sidebar-container')
+document.body.appendChild(hololink_sidebar_container);
 
 const shadowRoot = hololink_sidebar_container.attachShadow({mode: 'open'});
 const hololink_sidebar_inner = document.createElement('div');
+hololink_sidebar_inner.setAttribute('class', 'hololink-sidebar-inner')
 shadowRoot.appendChild(hololink_sidebar_inner)
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.action == 'open_sidebar'){
+        console.log('receive msg')
+        $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
+            //$(data).appendTo($('.hololink-sidebar-inner'));
+            $('.hololink-sidebar-inner').html('dddd')
+        });
+    }
+})
+
+// callback for ensure_content_script_is_runnung
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if(request.ping) { 
+        console.log('ensured')
+        sendResponse({pong: true}); 
+        return true; 
+    }
+});
