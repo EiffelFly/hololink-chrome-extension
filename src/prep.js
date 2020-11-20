@@ -4,6 +4,9 @@ var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
 
+var hololink_toolbar_inner = document.createElement('div');
+hololink_toolbar_inner.setAttribute('class', 'hololink-toolbar-inner');
+
 var highlight_button = document.createElement('button');
 highlight_button.setAttribute('class', 'hololink-toolbar-button');
 highlight_button.setAttribute('id', 'hololink_toolbar_highlight');
@@ -30,8 +33,8 @@ annotate_img.setAttribute('width', 20);
 annotate_img.setAttribute('height', 20);
 annotate_button.appendChild(annotate_img);
 
-hololink_toolbar_container.appendChild(highlight_button);
-hololink_toolbar_container.appendChild(annotate_button);
+hololink_toolbar_inner.appendChild(highlight_button);
+hololink_toolbar_inner.appendChild(annotate_button);
 
 $('.hololink-toolbar-button').on("click", function(e){
 
@@ -48,6 +51,7 @@ document.addEventListener('mouseup', function (e) {
     var position = calaculate_tooltip_position()
     if (selection.length > 0) {
       render_tooltip(position.x, position.y, selection);
+      hololink_toolbar_container.appendChild(hololink_toolbar_inner)
     }
     $('.hololink-toolbar-button').tooltip({
         template: '<div class="hololink-toolbar-tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
@@ -58,15 +62,22 @@ document.addEventListener('mouseup', function (e) {
 
 // Close the bubble when we click on the screen.
 document.addEventListener('mousedown', function (e) {
-    hololink_toolbar_container.style.visibility = 'hidden';
+    var toolbar_inner = document.getElementsByClassName('hololink-toolbar-inner')[0]
+    if(toolbar_inner){
+        console.log(toolbar_inner)
+        toolbar_inner.parentNode.removeChild(toolbar_inner)
+    }
+    
+    //hololink_toolbar_container.style.visibility = 'hidden';
+    //hololink_toolbar_inner.remove()
 }, false);
 
 // Move that bubble to the appropriate location.
 function render_tooltip(x, y, selection) {
     //hololink_toolbar_container.innerHTML = 'sdsss';
-    hololink_toolbar_container.style.left = x + 'px';
-    hololink_toolbar_container.style.top = y + 'px';
-    hololink_toolbar_container.style.visibility = 'visible';
+    hololink_toolbar_inner.style.left = x + 'px';
+    hololink_toolbar_inner.style.top = y + 'px';
+    //hololink_toolbar_inner.style.visibility = 'visible';
 }
 
 function calaculate_tooltip_position(){
