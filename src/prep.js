@@ -40,10 +40,7 @@ $('.hololink-toolbar-button').on("click", function(e){
 
 })
 
-
-
 console.log('selection sanity check')
-
 
 // Lets listen to mouseup DOM events.
 document.addEventListener('mouseup', function (e) {
@@ -64,12 +61,8 @@ document.addEventListener('mouseup', function (e) {
 document.addEventListener('mousedown', function (e) {
     var toolbar_inner = document.getElementsByClassName('hololink-toolbar-inner')[0]
     if(toolbar_inner){
-        console.log(toolbar_inner)
         toolbar_inner.parentNode.removeChild(toolbar_inner)
     }
-    
-    //hololink_toolbar_container.style.visibility = 'hidden';
-    //hololink_toolbar_inner.remove()
 }, false);
 
 // Move that bubble to the appropriate location.
@@ -87,3 +80,11 @@ function calaculate_tooltip_position(){
     const y = window.pageYOffset + boundingRect.top + boundingRect.height + 10;
     return {x:x, y:y} 
 }
+
+//'open' mode to access shadow dom elements from outisde the shadow root.
+const hololink_sidebar_container = document.createElement('div');
+hololink_sidebar_container.setAttribute('class', 'hololink-sidebar-container')
+
+const shadowRoot = hololink_sidebar_container.attachShadow({mode: 'open'});
+const hololink_sidebar_inner = document.createElement('div');
+shadowRoot.appendChild(hololink_sidebar_inner)

@@ -39,5 +39,5 @@
         "scripts":["src/background.js"]
     },
 
-    "web_accessible_resources":["img/chat.svg", "img/highlighter.svg"]
+    "web_accessible_resources":["img/chat.svg", "img/highlighter.svg", "hololink-sidebar.html"]
 }
