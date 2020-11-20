@@ -1,6 +1,5 @@
 .hololink-toolbar-container {
     visibility: hidden;
-    transition:visibility 0.2s ease;
     position: absolute;
     top: 0;
     left: 0;
@@ -39,17 +38,20 @@
 }
 
 .hololink-toolbar-tooltip{
-    border-radius: 5px !important;
-    background-color: #999999 !important;
+    border-radius: 7px !important;
+    background-color: #666666 !important;
     padding: 5px 8px !important; 
     color: white !important;
     margin-top: 10px !important;
 }
 
 .hololink-toolbar-tooltip > .tooltip-inner {
-    background-color: #999999 !important;
+    background-color: #666666 !important;
     color: white !important;
     padding: 0 !important;
+    font-size: 14px !important;
+    font-family: Arial, sans-serif !important;
+    font-weight: 700;
 }
 
 
