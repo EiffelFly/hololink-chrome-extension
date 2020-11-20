@@ -96,7 +96,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         console.log('receive msg')
         $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
             //$(data).appendTo($('.hololink-sidebar-inner'));
-            $('.hololink-sidebar-inner').html('dddd')
+            var shadow = $('.hololink-sidebar-container')[0].shadowRoot
+            console.log(shadow)
+            var inner = $(shadow).find('.hololink-sidebar-inner');
+            inner.html(data);
         });
     }
 })
