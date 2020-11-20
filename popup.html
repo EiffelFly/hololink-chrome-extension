@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css">
         <!--Import google font-->
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+        
         <title>Hololink</title>
         <!--Import Bootstrape-select-js-->
         
@@ -16,6 +17,10 @@
         <script src="src/bootstrap.bundle.min.js"></script>
         <script src="src/bootstrap-select.min.js"></script>
         <script src="src/popup.js"></script>
+
+        <!--Import Bootstrape-toggle-->
+        <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+        <script src="src/bootstrap2-toggle.min.js"></script>
 
     </head>
     <style>
@@ -102,7 +107,13 @@
             <div class="popup_spacing" row='2'></div>
             <button id="upload_hololink_button" class="btn btn-light upload_hololink_button">Upload to Hololink</button>
             <small class="upload_warning" id="upload_warning"></small>
+            <hr>
+            <div class="controller" style="margin: 0 5% 5% 5%;">
+                <input type="checkbox" checked data-toggle="toggle">
+            </div>
         </div>
+        
+        
     </body>
 </html>
 
