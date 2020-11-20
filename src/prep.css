@@ -31,3 +31,14 @@
     opacity: 0.5;
 }
 
+.hololink-toolbar-tooltip{
+    visibility: hidden;
+}
+
+.tooltip .tooltip-inner { 
+    border-radius: 5px;
+    background-color: #999999;
+    padding: 5px 8px; 
+    color: white;
+    margin-top: 10px;
+}
