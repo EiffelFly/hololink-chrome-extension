@@ -27,7 +27,9 @@ annotate_button.appendChild(annotate_img);
 hololink_toolbar_container.appendChild(highlight_button);
 hololink_toolbar_container.appendChild(annotate_button);
 
-
+$('.hololink-toolbar-button').on("click", function(e){
+    
+})
 
 
 

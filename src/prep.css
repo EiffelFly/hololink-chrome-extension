@@ -1,5 +1,6 @@
 .hololink-toolbar-container {
     visibility: hidden;
+    transition:visibility 0.2s ease;
     position: absolute;
     top: 0;
     left: 0;
@@ -11,6 +12,7 @@
     box-shadow: 2px 10px 16px 2px rgba(0,0,0,0.2);
     border-radius: 5px;
     justify-content: space-around;
+    border: 0.2px solid rgba(0,0,0,0.1);
 }
 
 .hololink-toolbar-button{
@@ -20,3 +22,12 @@
     margin: auto 0;
     background: white !important;
 }
+
+.hololink-toolbar-button:hover{
+    opacity: 0.5;
+}
+
+.img:hover{
+    opacity: 0.5;
+}
+
