@@ -16,11 +16,18 @@
 }
 
 .hololink-toolbar-button{
+    display: flex;
     border: none;
     background-color: white !important;
     color: white;
     margin: auto 0;
     background: white !important;
+    height: 100% !important;
+    margin: auto 0;
+}
+
+.hololink-toolbar-button img {
+    margin: auto 0;
 }
 
 .hololink-toolbar-button:hover{
@@ -32,13 +39,17 @@
 }
 
 .hololink-toolbar-tooltip{
-    visibility: hidden;
+    border-radius: 5px !important;
+    background-color: #999999 !important;
+    padding: 5px 8px !important; 
+    color: white !important;
+    margin-top: 10px !important;
 }
 
-.tooltip .tooltip-inner { 
-    border-radius: 5px;
-    background-color: #999999;
-    padding: 5px 8px; 
-    color: white;
-    margin-top: 10px;
+.hololink-toolbar-tooltip > .tooltip-inner {
+    background-color: #999999 !important;
+    color: white !important;
+    padding: 0 !important;
 }
+
+

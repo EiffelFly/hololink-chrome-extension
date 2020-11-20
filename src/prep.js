@@ -16,9 +16,6 @@ highlighte_img.setAttribute('src', highlight_img_path);
 highlighte_img.setAttribute('width', 20);
 highlighte_img.setAttribute('height', 20);
 highlight_button.appendChild(highlighte_img);
-highlight_tooltip = document.createElement('span');
-highlight_tooltip.innerHTML = 'Highlight';
-highlight_tooltip.setAttribute('class', 'hololink-toolbar-tooltip')
 
 var annotate_button = document.createElement('button');
 annotate_button.setAttribute('class', 'hololink-toolbar-button');
@@ -32,9 +29,6 @@ annotate_img.setAttribute('src', highlight_img_path);
 annotate_img.setAttribute('width', 20);
 annotate_img.setAttribute('height', 20);
 annotate_button.appendChild(annotate_img);
-annotate_tooltip = document.createElement('span');
-annotate_tooltip.innerHTML = 'Annotate';
-annotate_tooltip.setAttribute('class', 'hololink-toolbar-tooltip')
 
 hololink_toolbar_container.appendChild(highlight_button);
 hololink_toolbar_container.appendChild(annotate_button);
@@ -55,7 +49,10 @@ document.addEventListener('mouseup', function (e) {
     if (selection.length > 0) {
       render_tooltip(position.x, position.y, selection);
     }
-    $('[data-toggle="tooltip"]').tooltip()
+    $('.hololink-toolbar-button').tooltip({
+        template: '<div class="hololink-toolbar-tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
+        html: true
+    })
     console.log(position)
 }, false);
 
