@@ -1,5 +1,4 @@
 
-
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
@@ -87,9 +86,9 @@ hololink_sidebar_container.setAttribute('class', 'hololink-sidebar-container')
 document.body.appendChild(hololink_sidebar_container);
 
 const shadowRoot = hololink_sidebar_container.attachShadow({mode: 'open'});
-const hololink_sidebar_inner = document.createElement('div');
-hololink_sidebar_inner.setAttribute('class', 'hololink-sidebar-inner')
-shadowRoot.appendChild(hololink_sidebar_inner)
+//const hololink_sidebar_inner = document.createElement('div');
+//hololink_sidebar_inner.setAttribute('class', 'hololink-sidebar-inner')
+//shadowRoot.appendChild(hololink_sidebar_inner)
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == 'open_sidebar'){
@@ -97,12 +96,26 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
             //$(data).appendTo($('.hololink-sidebar-inner'));
             var shadow = $('.hololink-sidebar-container')[0].shadowRoot
-            console.log(shadow)
+
+            shadow.innerHTML = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
+            integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"><div class="hololink-sidebar-inner"></div>`
+
             var inner = $(shadow).find('.hololink-sidebar-inner');
             inner.html(data);
+
+            
+            
+            x_img_path = chrome.extension.getURL("img/x.svg")
+
+            var x_img = $(shadow).find('.close-hololink-sidebar-img');
+            x_img.attr('width', 20)
+            x_img.attr('height', 20)
+            x_img.attr('src', `${x_img_path}`)
+
         });
+        
     }
-})
+});
 
 // callback for ensure_content_script_is_runnung
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
