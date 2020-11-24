@@ -127,6 +127,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
+            // Close sidebar if user's click event triggered outside the sidebar.
+
             $(window).on('click', function(e){
                 if(!$(e.target).is('.hololink-sidebar-container')){
                     //console.log('uee')
