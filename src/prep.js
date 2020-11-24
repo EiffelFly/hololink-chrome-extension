@@ -97,14 +97,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             //$(data).appendTo($('.hololink-sidebar-inner'));
             var shadow = $('.hololink-sidebar-container')[0].shadowRoot
 
+            jquery_path = chrome.extension.getURL("src/jquery-3.5.1.min.js")
+
             shadow.innerHTML = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
-            integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"><div class="hololink-sidebar-inner"></div>`
+            integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+            <script src=${jquery_path}></script>
+            <div class="hololink-sidebar-inner"></div>`
 
             var inner = $(shadow).find('.hololink-sidebar-inner');
             inner.html(data);
 
-            
-            
             x_img_path = chrome.extension.getURL("img/x.svg")
 
             var x_img = $(shadow).find('.close-hololink-sidebar-img');
