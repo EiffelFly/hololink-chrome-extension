@@ -140,18 +140,3 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return true; 
     }
 });
-
-
-
-$(shadow).find('#close_hololink_sidebar').on('click', function(){
-    console.log('ddd')
-});
-
-$(shadow).find('#close_hololink_sidebar').on('click', function(){
-    console.log('ddd')
-});
-
-$('.hololink-sidebar-inner').on('click', '#close_hololink_sidebar', function(){
-    console.log('buttton cheeeck')
-    $('.hololink-sidebar').html('');
-});
