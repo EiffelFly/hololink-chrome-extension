@@ -1,5 +1,6 @@
 
 var shadow
+var lock_sidebar = false
 
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
@@ -126,8 +127,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
+            $(window).on('click', function(e){
+                if(!$(e.target).is('.hololink-sidebar-container')){
+                    //console.log('uee')
+                    if (lock_sidebar == false){
+                        $(shadow).find('.hololink-sidebar').remove();
+                    }
+                }
+            });
         });
-        
     }
 });
 
