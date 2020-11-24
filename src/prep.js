@@ -1,4 +1,6 @@
 
+var shadow
+
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
@@ -101,7 +103,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         console.log('receive msg')
         $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
             //$(data).appendTo($('.hololink-sidebar-inner'));
-            var shadow = $('.hololink-sidebar-container')[0].shadowRoot
+            shadow = $('.hololink-sidebar-container')[0].shadowRoot
 
             jquery_path = chrome.extension.getURL("src/jquery-3.5.1.min.js")
 
@@ -120,10 +122,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             x_img.attr('height', 20)
             x_img.attr('src', `${x_img_path}`)
 
+            $(shadow).find('#close_hololink_sidebar').on('click', function(){
+                $(shadow).find('.hololink-sidebar').remove();
+            });
+
         });
         
     }
 });
+
 
 // callback for ensure_content_script_is_runnung
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -132,4 +139,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         sendResponse({pong: true}); 
         return true; 
     }
+});
+
+
+
+$(shadow).find('#close_hololink_sidebar').on('click', function(){
+    console.log('ddd')
+});
+
+$(shadow).find('#close_hololink_sidebar').on('click', function(){
+    console.log('ddd')
+});
+
+$('.hololink-sidebar-inner').on('click', '#close_hololink_sidebar', function(){
+    console.log('buttton cheeeck')
+    $('.hololink-sidebar').html('');
 });
