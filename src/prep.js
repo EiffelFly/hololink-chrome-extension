@@ -64,6 +64,11 @@ document.addEventListener('mouseup', function (e) {
         console.log('inside')
         $('#hololink_toolbar_highlight').on('click', function(){
             render_highlight();
+
+            //close bubble
+            if ($('.hololink-toolbar-inner').length){
+                $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
+            }
         });
 
         $('#hololink_toolbar_annotate').on('click', function(){
@@ -104,6 +109,13 @@ function render_highlight(){
         console.log(range.endContainer)
         highlight_id = generate_url(datetime)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
+
+        //clean selection
+        if (window.getSelection) {
+            if (window.getSelection().empty) {  
+                window.getSelection().empty();
+            }
+        }
     }
 };
 
