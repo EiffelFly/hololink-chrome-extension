@@ -8,13 +8,13 @@ var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
 
+// Inject css into current page
 highlight_style_href = chrome.runtime.getURL("src/highlight/highlight.css")
 highlight_style_container = document.createElement('link');
 highlight_style_container.setAttribute('rel', 'stylesheet')
 highlight_style_container.setAttribute('type', 'text/css')
 highlight_style_container.setAttribute('id', 'hololink-highlight-style');
 highlight_style_container.setAttribute('href', highlight_style_href);
-
 (document.head||document.documentElement).appendChild(highlight_style_container);
 
 var hololink_toolbar_inner = document.createElement('div');
