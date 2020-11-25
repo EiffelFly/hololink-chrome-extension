@@ -48,11 +48,11 @@ console.log('selection sanity check')
 document.addEventListener('mouseup', function (e) {
     var selection = document.getSelection && document.getSelection();
     var position = calaculate_tooltip_position()
-    if (selection.toString().length > 0) {
+    console.log(e)
+    if (selection.toString().length > 0 && !$('.hololink-toolbar-inner').length) {
         render_tooltip(position.x, position.y);
-        console.log(hololink_toolbar_inner)
         hololink_toolbar_container.appendChild(hololink_toolbar_inner);
-
+        console.log('inside')
         $('#hololink_toolbar_highlight').on('click', function(){
             render_highlight();
         });
@@ -60,24 +60,19 @@ document.addEventListener('mouseup', function (e) {
         $('#hololink_toolbar_annotate').on('click', function(){
             render_annotation();
         });
-
-
-
     }
     $('.hololink-toolbar-button').tooltip({
         template: '<div class="hololink-toolbar-tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
-        html: true
+        trigger : 'hover',
+        html: true,
     })
 }, false);
 
 // Close the bubble when we click on the screen.
 $(window).on('mousedown', function(e){
-    
-    
     // check if click event occured inside the hololink-toolbar-container
     target_array = Array.from(e.target.classList)
     const check_array_exist_target_class = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner'].indexOf(r) >= 0 )
-    console.log(check_array_exist_target_class, target_array)
 
     if ($('.hololink-toolbar-inner').length){
         if (!check_array_exist_target_class){
@@ -85,24 +80,6 @@ $(window).on('mousedown', function(e){
         }
     }
 });
-
-function to_array(obj){
-    var array = [];
-    // iterate backwards ensuring that length is an UInt32
-    for (var i = obj.length >>> 0; i--;) { 
-        array[i] = obj[i];
-    }
-    return array;
-}
-
-/*
-document.addEventListener('mousedown', function (e) {
-    var toolbar_inner = document.getElementsByClassName('hololink-toolbar-inner')[0]
-    if(toolbar_inner){
-        toolbar_inner.parentNode.removeChild(toolbar_inner)
-    }
-}, false);
-*/
 
 function render_annotation(){
 
