@@ -21,6 +21,7 @@ highlight_img_path = chrome.runtime.getURL("img/highlighter.svg");
 highlighte_img.setAttribute('src', highlight_img_path);
 highlighte_img.setAttribute('width', 20);
 highlighte_img.setAttribute('height', 20);
+highlighte_img.setAttribute('class', 'hololink-toolbar-button-img');
 highlight_button.appendChild(highlighte_img);
 
 var annotate_button = document.createElement('button');
@@ -34,6 +35,7 @@ highlight_img_path = chrome.runtime.getURL("img/chat.svg");
 annotate_img.setAttribute('src', highlight_img_path);
 annotate_img.setAttribute('width', 20);
 annotate_img.setAttribute('height', 20);
+annotate_img.setAttribute('class', 'hololink-toolbar-button-img');
 annotate_button.appendChild(annotate_img);
 
 hololink_toolbar_inner.appendChild(highlight_button);
@@ -48,7 +50,8 @@ document.addEventListener('mouseup', function (e) {
     var position = calaculate_tooltip_position()
     if (selection.toString().length > 0) {
         render_tooltip(position.x, position.y);
-        hololink_toolbar_container.appendChild(hololink_toolbar_inner)
+        console.log(hololink_toolbar_inner)
+        hololink_toolbar_container.appendChild(hololink_toolbar_inner);
 
         $('#hololink_toolbar_highlight').on('click', function(){
             render_highlight();
@@ -68,12 +71,38 @@ document.addEventListener('mouseup', function (e) {
 }, false);
 
 // Close the bubble when we click on the screen.
+$(window).on('mousedown', function(e){
+    
+    
+    // check if click event occured inside the hololink-toolbar-container
+    target_array = Array.from(e.target.classList)
+    const check_array_exist_target_class = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner'].indexOf(r) >= 0 )
+    console.log(check_array_exist_target_class, target_array)
+
+    if ($('.hololink-toolbar-inner').length){
+        if (!check_array_exist_target_class){
+            $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
+        }
+    }
+});
+
+function to_array(obj){
+    var array = [];
+    // iterate backwards ensuring that length is an UInt32
+    for (var i = obj.length >>> 0; i--;) { 
+        array[i] = obj[i];
+    }
+    return array;
+}
+
+/*
 document.addEventListener('mousedown', function (e) {
     var toolbar_inner = document.getElementsByClassName('hololink-toolbar-inner')[0]
     if(toolbar_inner){
         toolbar_inner.parentNode.removeChild(toolbar_inner)
     }
 }, false);
+*/
 
 function render_annotation(){
 
