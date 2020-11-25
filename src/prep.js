@@ -1,5 +1,3 @@
-
-
 var shadow
 var lock_sidebar = false
 var highlight_and_annotation 
@@ -91,10 +89,20 @@ function render_highlight(){
     console.log('sss',selection.getRangeAt(0))
     if (!selection.isCollapsed) {
         const range = selection.getRangeAt(0);
-        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight' });
-        console.log(removeHighlight)
+        var datetime = Date.now();
+        highlight_id = generate_url(datetime)
+        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
     }
 };
+
+function generate_url(target_id){
+    var current_page_url = window.location.href;
+    if (current_page_url.substr(-1) != '/'){
+        return `${current_page_url}/#${target_id}`
+    } else {
+        return `${current_page_url}#${target_id}`
+    }
+}
 
 // Move that bubble to the appropriate location.
 function render_tooltip(x, y) {
