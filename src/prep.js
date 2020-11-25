@@ -2,9 +2,20 @@ var shadow
 var lock_sidebar = false
 var highlight_and_annotation 
 
+
+
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
+
+highlight_style_href = chrome.runtime.getURL("src/highlight/highlight.css")
+highlight_style_container = document.createElement('link');
+highlight_style_container.setAttribute('rel', 'stylesheet')
+highlight_style_container.setAttribute('type', 'text/css')
+highlight_style_container.setAttribute('id', 'hololink-highlight-style');
+highlight_style_container.setAttribute('href', highlight_style_href);
+
+(document.head||document.documentElement).appendChild(highlight_style_container);
 
 var hololink_toolbar_inner = document.createElement('div');
 hololink_toolbar_inner.setAttribute('class', 'hololink-toolbar-inner');
@@ -94,6 +105,8 @@ function render_highlight(){
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
     }
 };
+
+
 
 function generate_url(target_id){
     var current_page_url = window.location.href;

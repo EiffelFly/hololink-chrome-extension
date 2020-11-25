@@ -1,0 +1,8 @@
+/* Hololink highlight Style */
+
+.hololink-highlight {
+    background-color: #A29ECD;
+    transition: all 0.1s;
+    cursor: pointer;
+}
+
