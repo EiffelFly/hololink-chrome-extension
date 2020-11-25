@@ -1,0 +1,66 @@
+
+
+
+<style>
+
+    .col {
+        padding: 0;
+        margin: 0;
+    }
+
+    .row {
+        padding: 0;
+        margin: 0;
+    }
+
+    .hololink-sidebar{
+        top: 0;
+        right: 0;
+        position: fixed;
+        width: 450px;
+        background-color: #fff;
+        height: 100%;
+        z-index: 9999999999999;
+        overflow: scoll;
+    }
+
+    #close_hololink_sidebar {
+        border:none;
+        background-color: #fff;
+        padding: 3px;
+        border-radius: 5px;
+    }
+
+    #close_hololink_sidebar:hover{
+        background-color: lightgray;
+        opacity: 0.5;
+    }
+
+</style>
+
+<div class="hololink-sidebar shadow">
+    <div class="row">
+        <div class="col d-flex flex-column top-controlbar">
+            <div style="padding: 10px;">
+                <button id="close_hololink_sidebar" style="display: flex;"><img class="close-hololink-sidebar-img" style="margin:auto"></button>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="border-bottom: lightgray 1px solid;"></div>
+    <div class="row highlight-annotation-container">
+        <div class="col" style="padding: 20px 20px;">
+            <div class="card highlight-annotation shadow" style="border-radius: 5px; padding: 10px;">
+                <div class="row user-name">
+                    Summerbud
+                </div>
+                <div class="row highlight-content">
+                    While shadows on components are disabled by default in Bootstrap and can be enabled via $enable-shadows, you can also quickly add or remove a shadow with our box-shadow utility classes. Includes support for .shadow-none and three default sizes (which have associated variables to match).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+</script>

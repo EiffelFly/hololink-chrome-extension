@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css">
         <!--Import google font-->
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+        
         <title>Hololink</title>
         <!--Import Bootstrape-select-js-->
         
@@ -19,25 +20,31 @@
 
     </head>
     <style>
+
+        .col  {
+            padding: 0;
+            margin: 0;
+        }
+
+        .row {
+            padding: 0;
+            margin: 0;
+        }
+
         .hololink-chrome-extension-popup{
             min-width: 360px;
             min-height: 300px;
+            padding: 0;
         }
 
         .form-group{
-            max-width: 100%;
+            width: 100%;
+            margin: 0;
         }
 
         textarea {
             resize:none;
-            margin: 5% 5% 2% 5%;
-            max-width: 90% !important;
             border-radius: 0.5rem !important;
-
-        }
-
-        .web-title-help {
-            margin: 0 0 0 5%;
         }
 
         .popup_spacing{
@@ -46,7 +53,6 @@
         }
 
         .recommendation_form{
-            margin-left: 5%;
             display: block;
         }
 
@@ -61,41 +67,57 @@
         }
 
         .upload_hololink_button{
-            margin: 0 5% 0 5%;
+            width: 100%;
         }
         .upload_warning{
-            margin: 1% 5% 5% 5%;
+            margin: 1% 0 5% 0;
             color: gray;
+        }
+
+        
+        .toggle-group > label {
+            display: inline-block;
+            vertical-align: middle;
         }
 
     </style>
     <body>
-        <div class="hololink-chrome-extension-popup d-flex flex-column">
-            <div class="form-group">
-                <textarea autofocus required class="form-control" id="websiteTitleInput" placeholder="Website Title" rows="4"></textarea>
-                <small id="userIndicator" class="form-text text-muted web-title-help"></small>
-            </div>
-            <div class="searchable-project-dropdown" style="margin: 20px 5%;">
-                <select class="selectpicker form-control" multiple id="select-project" aria-placeholder="Choose project" data-live-search="true" title="Upload to one or multiple galaxies">         
-                </select>
-                <small class="form-text text-muted" style="padding-left: 10px;">If you doesn't get any option, please create galaxy at home page first.</small>
-            </div>
-            <hr>
-            <div class="custom-control custom-checkbox recommendation_form">
-                <input class="custom-control-input checkRecommendation" type="checkbox" id="check_recommendation">
-                <label class="custom-control-label check_recommendation_title" for="check_recommendation">
-                    Recommend this article?
-                </label>
-                <div class='dailyUsage d-flex flex-row'>
-                    <small class="form-text text-muted">Daily usage remain:&nbsp;&nbsp;&nbsp;</small>
-                    <small class="form-text text-muted" id="dailyUsageRemain"></small>
+        <div class="container-fluid hololink-chrome-extension-popup">
+            <div class="row" style="padding: 5%; width: 100%;">
+                <div class="form-group">
+                    <textarea autofocus required class="form-control" id="websiteTitleInput" placeholder="Website Title" rows="4"></textarea>
+                    <small id="userIndicator" class="form-text text-muted web-title-help"></small>
                 </div>
             </div>
-            <hr>
-
-            <div class="popup_spacing" row='2'></div>
-            <button id="upload_hololink_button" class="btn btn-light upload_hololink_button">Upload to Hololink</button>
-            <small class="upload_warning" id="upload_warning"></small>
+            <div class="row" style="padding: 5%; width: 100%;">
+                <div class="searchable-project-dropdown">
+                    <select class="selectpicker form-control" multiple id="select-project" aria-placeholder="Choose project" data-live-search="true" title="Upload to one or multiple galaxies">         
+                    </select>
+                    <small class="form-text text-muted" style="padding-left: 10px;">If you doesn't get any option, please create galaxy at home page first.</small>
+                </div>
+            </div>
+            <div class="row" style="padding: 5%; width: 100%;">
+                <div class="custom-control custom-checkbox recommendation_form">
+                    <input class="custom-control-input checkRecommendation" type="checkbox" id="check_recommendation">
+                    <label class="custom-control-label check_recommendation_title" for="check_recommendation">
+                        Recommend this article?
+                    </label>
+                    <div class='dailyUsage d-flex flex-row'>
+                        <small class="form-text text-muted">Daily usage remain:&nbsp;&nbsp;&nbsp;</small>
+                        <small class="form-text text-muted" id="dailyUsageRemain"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="padding: 5%; width: 100%;">
+                <button id="upload_hololink_button" class="btn btn-light upload_hololink_button">Upload to Hololink</button>
+                <small class="upload_warning" id="upload_warning"></small>
+            </div>
+            <div style="border-bottom: solid 1px lightgrey;"></div>
+            <div class="row" style="padding: 5%; width: 100%;">
+                <div class="controller">
+                    <button class="btn btn-light" id="open_sidebar">Open sidebar</button>
+                </div>
+            </div> 
         </div>
     </body>
 </html>

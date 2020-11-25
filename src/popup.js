@@ -10,6 +10,14 @@ var userProjectsOptions = []
 
 $(function(){
 
+    $('#open_sidebar').click(function(){
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            console.log('ensuring',tabs[0].id)
+            ensure_content_script_is_running(tabs[0].id, {"action": "open_sidebar"});
+            // window.close();
+        });
+    });
+
     /*
     chrome.cookies.get({"url":"https://hololink.co/", "name":"sessionid"}, function(cookie){
         if (cookie){
@@ -100,7 +108,24 @@ $(function(){
 });
 
 
-
+// This function will ping the target content_script first, if it is running then send message, or excute the content_script on current tab
+function ensure_content_script_is_running(tabId, message, callback){
+    console.log('activate')
+    chrome.tabs.sendMessage(tabId, {ping: true}, function(response){
+        if(response && response.pong) { // Content script is ready
+            chrome.tabs.sendMessage(tabId, message, callback);
+        } else { // No listener on the other end
+            chrome.tabs.executeScript(tabId, {file: "prep.js"}, function(){
+                if(chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError);
+                    throw Error("Unable to inject script into tab " + tabId);
+                }
+                // OK, now it's injected and ready
+                chrome.tabs.sendMessage(tabId, message, callback);
+            });
+        }
+    });
+}
 
 
 

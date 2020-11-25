@@ -27,12 +27,17 @@
 
     "content_scripts":[
         {
-            "matches":["http://*/*"],
-            "js":["src/getHtml.js"]
-        }   
+            "matches":["http://*/*", "https://*/*"],
+            "js":["src/jquery-3.5.1.min.js", "src/bootstrap.bundle.min.js", "src/prep.js"],
+            "css":["src/prep.css"],
+            "run_at": "document_end",
+            "all_frames": true
+        }
     ],
 
     "background":{
         "scripts":["src/background.js"]
-    }
+    },
+
+    "web_accessible_resources":["img/chat.svg", "img/highlighter.svg", "hololink-sidebar.html", "img/x.svg", "src/highlight/highlight.css"]
 }
