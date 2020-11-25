@@ -1,6 +1,7 @@
 
 var shadow
 var lock_sidebar = false
+var highlight_and_annotation 
 
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
@@ -38,25 +39,32 @@ annotate_button.appendChild(annotate_img);
 hololink_toolbar_inner.appendChild(highlight_button);
 hololink_toolbar_inner.appendChild(annotate_button);
 
-$('.hololink-toolbar-button').on("click", function(e){
-
-})
 
 console.log('selection sanity check')
 
 // Lets listen to mouseup DOM events.
 document.addEventListener('mouseup', function (e) {
-    var selection = window.getSelection().toString();
+    var selection = document.getSelection && document.getSelection();
     var position = calaculate_tooltip_position()
-    if (selection.length > 0) {
-      render_tooltip(position.x, position.y, selection);
-      hololink_toolbar_container.appendChild(hololink_toolbar_inner)
+    if (selection.toString().length > 0) {
+        render_tooltip(position.x, position.y);
+        hololink_toolbar_container.appendChild(hololink_toolbar_inner)
+
+        $('#hololink_toolbar_highlight').on('click', function(){
+            render_highlight();
+        });
+
+        $('#hololink_toolbar_annotate').on('click', function(){
+            render_annotation();
+        });
+
+
+
     }
     $('.hololink-toolbar-button').tooltip({
         template: '<div class="hololink-toolbar-tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
         html: true
     })
-    console.log(position)
 }, false);
 
 // Close the bubble when we click on the screen.
@@ -67,16 +75,22 @@ document.addEventListener('mousedown', function (e) {
     }
 }, false);
 
+function render_annotation(){
+
+};
+
+function render_highlight(){
+    var selection = document.getSelection && document.getSelection();
+    console.log('sss',selection.getRangeAt(0))
+};
+
 // Move that bubble to the appropriate location.
-function render_tooltip(x, y, selection) {
-    //hololink_toolbar_container.innerHTML = 'sdsss';
+function render_tooltip(x, y) {
     hololink_toolbar_inner.style.left = x + 'px';
     hololink_toolbar_inner.style.top = y + 'px';
-    //hololink_toolbar_inner.style.visibility = 'visible';
 }
 
 function calaculate_tooltip_position(){
-
     var selection = document.getSelection && document.getSelection();
     if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
@@ -85,9 +99,7 @@ function calaculate_tooltip_position(){
         const y = window.pageYOffset + boundingRect.top + boundingRect.height + 10;
         return {x:x, y:y} 
     }
-
-    
-}
+};
 
 //'open' mode to access shadow dom elements from outisde the shadow root.
 const hololink_sidebar_container = document.createElement('div');
@@ -127,16 +139,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
-            // Close sidebar if user's click event triggered outside the sidebar.
 
-            $(window).on('click', function(e){
-                if(!$(e.target).is('.hololink-sidebar-container')){
-                    //console.log('uee')
-                    if (lock_sidebar == false){
-                        $(shadow).find('.hololink-sidebar').remove();
-                    }
-                }
-            });
+            close_sidebar_if_user_click_outside();
+
         });
     }
 });
@@ -150,3 +155,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return true; 
     }
 });
+
+function close_sidebar_if_user_click_outside(){
+    // Close sidebar if user's click event triggered outside the sidebar.
+
+    $(window).on('click', function(e){
+        if(!$(e.target).is('.hololink-sidebar-container')){
+            //console.log('uee')
+            if (lock_sidebar == false){
+                $(shadow).find('.hololink-sidebar').remove();
+            }
+        }
+    });
+}
