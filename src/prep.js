@@ -1,7 +1,6 @@
 var shadow
 var lock_sidebar = false
-var highlight_and_annotation 
-
+var highlight_and_annotation = {}
 
 
 var hololink_toolbar_container = document.createElement('div');
@@ -99,12 +98,32 @@ function render_highlight(){
     var selection = document.getSelection && document.getSelection();
     console.log('sss',selection.getRangeAt(0))
     if (!selection.isCollapsed) {
+        
         const range = selection.getRangeAt(0);
         var datetime = Date.now();
+        console.log(range.endContainer)
         highlight_id = generate_url(datetime)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
     }
 };
+
+// this function can get the select text including in textarea, input:text,search,password,te
+function getSelectionText() {
+    var text = "";
+    var active_element = document.activeElement;
+    var active_element_tag_name = active_element ? active_element.tagName.toLowerCase() : null;
+    if (
+        (active_element_tag_name == "textarea") || 
+        (active_element_tag_name == "input" && /^(?:text|search|password|tel|url)$/i.test(active_element.type)) && 
+        (typeof activeEl.selectionStart == "number")
+    ) {
+        text = active_element.value.slice(active_element.selectionStart, active_element.selectionEnd);
+    } else if (window.getSelection) {
+        text = window.getSelection().toString();
+    }
+    return text;
+}
+
 
 
 
