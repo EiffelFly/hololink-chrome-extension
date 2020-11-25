@@ -65,7 +65,7 @@ document.addEventListener('mouseup', function (e) {
         $('#hololink_toolbar_highlight').on('click', function(){
             render_highlight();
 
-            //close bubble
+            //close hololink-toolbar bubble
             if ($('.hololink-toolbar-inner').length){
                 $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
             }
@@ -82,7 +82,7 @@ document.addEventListener('mouseup', function (e) {
     })
 }, false);
 
-// Close the bubble when we click on the screen.
+// Close the hololink-toolbar bubble when we click on the screen.
 $(window).on('mousedown', function(e){
     // check if click event occured inside the hololink-toolbar-container
     target_array = Array.from(e.target.classList)
@@ -101,7 +101,7 @@ function render_annotation(){
 
 function render_highlight(){
     var selection = document.getSelection && document.getSelection();
-    console.log('sss',selection.getRangeAt(0))
+    //console.log('sss', selection.anchorNode, selection.getRangeAt(0).commonAncestorContainer.innerText)
     if (!selection.isCollapsed) {
         
         const range = selection.getRangeAt(0);
@@ -109,6 +109,10 @@ function render_highlight(){
         console.log(range.endContainer)
         highlight_id = generate_url(datetime)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
+
+        //get selection text and insert it in sidebar
+        var user_selected_text = getSelectionText()
+        console.log(user_selected_text)
 
         //clean selection
         if (window.getSelection) {
@@ -124,14 +128,12 @@ function getSelectionText() {
     var text = "";
     var active_element = document.activeElement;
     var active_element_tag_name = active_element ? active_element.tagName.toLowerCase() : null;
-    if (
-        (active_element_tag_name == "textarea") || 
-        (active_element_tag_name == "input" && /^(?:text|search|password|tel|url)$/i.test(active_element.type)) && 
-        (typeof activeEl.selectionStart == "number")
-    ) {
+    if (active_element_tag_name == "textarea") {
         text = active_element.value.slice(active_element.selectionStart, active_element.selectionEnd);
     } else if (window.getSelection) {
-        text = window.getSelection().toString();
+        if (window.getSelection().getRangeAt(0).commonAncestorContainer){
+            text = window.getSelection().getRangeAt(0).commonAncestorContainer.innerText
+        }
     }
     return text;
 }
