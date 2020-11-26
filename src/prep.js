@@ -2,6 +2,7 @@ var shadow
 var lock_sidebar = false
 var highlight_and_annotation = []
 var hololink_have_this_article = true
+var current_user = ''
 
 
 var hololink_toolbar_container = document.createElement('div');
@@ -9,8 +10,11 @@ hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if(request.action == 'check_status' && request.message == 'hololink_doesnt_have_this_article'){
-        hololink_have_this_article = false
+    if(request.action == 'content_script_change_status'){
+        if (request.message == 'hololink_doesnt_have_this_article'){
+            hololink_have_this_article = false
+        }
+        current_user = request.user;
     }
     console.log(hololink_have_this_article);
 });
@@ -129,7 +133,7 @@ function render_highlight(){
             page_url: current_page_url,
             page_title: current_page_title,
             comment:'',
-            username:'',
+            username:current_user,
         };
 
         highlight_and_annotation.push(data);
