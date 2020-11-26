@@ -1,6 +1,6 @@
 var shadow
 var lock_sidebar = false
-var highlight_and_annotation = {}
+var highlight_and_annotation = []
 
 
 var hololink_toolbar_container = document.createElement('div');
@@ -106,13 +106,25 @@ function render_highlight(){
         
         const range = selection.getRangeAt(0);
         var datetime = Date.now();
-        console.log(range.endContainer)
-        highlight_id = generate_url(datetime)
+        var current_page_url = window.location.href;
+        var current_page_title = document.title;
+
+        highlight_id = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
 
         //get selection text and insert it in sidebar
-        var user_selected_text = getSelectionText()
-        console.log(user_selected_text)
+        var user_select_text = getSelectionText()
+
+        var data = {
+            highlight_id: highlight_id,
+            user_select_text: user_selected_text,
+            page_url: current_page_url,
+            page_title: current_page_title,
+            comment:'',
+            username:'',
+        };
+
+        highlight_and_annotation.push(data);
 
         //clean selection
         if (window.getSelection) {
@@ -123,7 +135,7 @@ function render_highlight(){
     }
 };
 
-// this function can get the select text including in textarea, input:text,search,password,te
+// this function can get the user selected text including in textarea
 function getSelectionText() {
     var text = "";
     var active_element = document.activeElement;
@@ -141,12 +153,11 @@ function getSelectionText() {
 
 
 
-function generate_url(target_id){
-    var current_page_url = window.location.href;
-    if (current_page_url.substr(-1) != '/'){
-        return `${current_page_url}/#${target_id}`
+function generate_url(target_id, page_url){
+    if (page_url.substr(-1) != '/'){
+        return `${page_url}/#${target_id}`
     } else {
-        return `${current_page_url}#${target_id}`
+        return `${page_url}#${target_id}`
     }
 }
 

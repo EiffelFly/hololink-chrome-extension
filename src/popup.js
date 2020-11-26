@@ -7,6 +7,7 @@ var userSelectedProjectsIndex = []
 var userSelectedProjectsId = []
 var userProjectsOptionsHtml = []
 var userProjectsOptions = []
+var target_hololink_host = "http://127.0.0.1:8000/"
 
 $(function(){
 
@@ -51,14 +52,14 @@ $(function(){
         $('#websiteTitleInput')[0].setSelectionRange(len, len);
 
         //呼叫 background.js 去取用 hololink api-projectsList 
-        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url':'http://hololink.co/api/broswer-extension-data/'})
+        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url': target_hololink_host+'api/broswer-extension-data/'})
     
     });
 
     //$('select-project').selectpicker();
 
     $('#user-log-in').click(function(){
-        chrome.tabs.create({'url':'https://hololink.co/accounts/login/'})
+        chrome.tabs.create({'url':target_hololink_host + 'accounts/login/'})
     });
 
 
@@ -198,7 +199,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
         fullData = {
             query: "postData",
             data: request.source,
-            target_url: "https://hololink.co/api/articles/",
+            target_url: target_hololink_host+"api/articles/",
             data_url: url,
             data_title:  title,
             data_projects: userSelectedProjectsId,
