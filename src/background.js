@@ -111,6 +111,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                         myHeaders.append("Content-Type", "application/json");
                         myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
                         myHeaders.append("X-Requested-With", "XMLHttpRequest");
+                        myHeaders.append("Page-Url", request.page_url);
+                        myHeaders.append("Page-Title", request.page_title);
 
                         var requestOptions = {
                             method: 'GET',

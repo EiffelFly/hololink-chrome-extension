@@ -52,7 +52,7 @@ $(function(){
         $('#websiteTitleInput')[0].setSelectionRange(len, len);
 
         //呼叫 background.js 去取用 hololink api-projectsList 
-        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url': target_hololink_host+'api/broswer-extension-data/'})
+        chrome.runtime.sendMessage({'action':'loadUserProjects', 'target_url': target_hololink_host+'api/broswer-extension-data/', 'page_title':title, 'page_url':url})
     
     });
 

@@ -19,6 +19,7 @@
         "storage",
         "tabs",
         "https://hololink.co/*",
+        "http://127.0.0.1:8000/*",
         "cookies",
         "https://*/",
         "webRequest",
