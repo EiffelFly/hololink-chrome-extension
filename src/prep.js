@@ -1,11 +1,19 @@
 var shadow
 var lock_sidebar = false
 var highlight_and_annotation = []
+var hololink_have_this_article = true
 
 
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if(request.action == 'check_status' && request.message == 'hololink_doesnt_have_this_article'){
+        hololink_have_this_article = false
+    }
+    console.log(hololink_have_this_article);
+});
 
 // Inject css into current page
 highlight_style_href = chrome.runtime.getURL("src/highlight/highlight.css")

@@ -37,9 +37,18 @@ function gotPeojectsListHandler(response){
                 }
                 ProjectsList.push(ProjectsList_json)                
             }
-            console.log(json)
-            console.log(ProjectsList)
+            //console.log(json.highlight[0].message)
+            //console.log(ProjectsList)
             chrome.runtime.sendMessage({'action':'gotProjectandRecommendationData', 'result':'success', 'projects':ProjectsList, 'recommendations':json.recommendations, 'user':json.user})
+
+            // send warning to content_script that Hololink doesn't have this article
+            if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
+                //console.log('Hololink')
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {action: 'check_status', message:"hololink_doesnt_have_this_article"});
+                });
+                
+            }
             
         }).catch(err => {
              // the status was ok but there is no json body
