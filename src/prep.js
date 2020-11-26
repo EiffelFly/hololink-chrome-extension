@@ -1,9 +1,9 @@
 var shadow
 var lock_sidebar = false
-var highlight_and_annotation = []
+var highlight = []
 var hololink_have_this_article = true
 var current_user = ''
-
+var sidebar_update_highlight = false
 
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
@@ -13,8 +13,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.action == 'content_script_change_status'){
         if (request.message == 'hololink_doesnt_have_this_article'){
             hololink_have_this_article = false
+        } else {
+            highlight = request.highlight
         }
         current_user = request.user;
+        
     }
     console.log(hololink_have_this_article);
 });
@@ -137,6 +140,7 @@ function render_highlight(){
         };
 
         highlight_and_annotation.push(data);
+        sidebar_update_highlight = true
 
         //clean selection
         if (window.getSelection) {
@@ -218,11 +222,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             inner.html(data);
 
             x_img_path = chrome.extension.getURL("img/x.svg")
+            var close_sidebar_img = $(shadow).find('.close-hololink-sidebar-img');
+            close_sidebar_img.attr('width', 20)
+            close_sidebar_img.attr('height', 20)
+            close_sidebar_img.attr('src', `${x_img_path}`)
 
-            var x_img = $(shadow).find('.close-hololink-sidebar-img');
-            x_img.attr('width', 20)
-            x_img.attr('height', 20)
-            x_img.attr('src', `${x_img_path}`)
+            trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
+            var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
+            delere_highlight_img.attr('width', 20)
+            delere_highlight_img.attr('height', 20)
+            delere_highlight_img.attr('src', `${trashcan_img_path}`)
+
 
             $(shadow).find('#close_hololink_sidebar').on('click', function(){
                 $(shadow).find('.hololink-sidebar').remove();

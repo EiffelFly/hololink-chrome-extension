@@ -40,5 +40,5 @@
         "scripts":["src/background.js"]
     },
 
-    "web_accessible_resources":["img/chat.svg", "img/highlighter.svg", "hololink-sidebar.html", "img/x.svg", "src/highlight/highlight.css"]
+    "web_accessible_resources":["img/chat.svg", "img/highlighter.svg", "hololink-sidebar.html", "img/x.svg", "img/trashcan.svg", "src/highlight/highlight.css"]
 }

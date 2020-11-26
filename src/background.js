@@ -46,7 +46,7 @@ function gotPeojectsListHandler(response){
                 if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
                     chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user});
                 } else if (json.highlight.length) {
-                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user});
+                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight});
                 }
                 
             });
