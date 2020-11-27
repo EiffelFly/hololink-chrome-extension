@@ -148,6 +148,43 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     }
 });
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.action == "post_highlight"){
+        chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
+            if (cookie){
+                csrf_token = cookie.value;
+                chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
+                    if (cookie){
+                        session_id = cookie.value
+                        var myHeaders = new Headers();
+                        myHeaders.append("X-CSRFToken", csrf_token);
+                        myHeaders.append("Content-Type", "application/json");
+                        myHeaders.append("Cookie", `sessionid=${session_id.value}; csrftoken=${csrf_token.value}`);
+                        myHeaders.append("X-Requested-With", "XMLHttpRequest");
+
+                        var raw = JSON.stringify(request.data)
+
+                        var requestOptions = {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: raw,
+                            redirect: 'follow',
+                            credentials: 'include',
+                            mode:'cors'
+                        };
+
+                        console.log('send')
+
+                        fetch(target_hololink_host+'api/highlight/', requestOptions)
+                            .then(response => response.text())
+                            .then(result => console.log(result))
+                            .catch(error => console.log('error', error));    
+                    } 
+                });
+            }
+        });
+    }
+});
 
 
 /*
@@ -180,7 +217,41 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
     ]
 );
 
+// Take consideration on onCreated event, but it's too unreliable
+// [Improvement] - Need to find solution to limit request 
+chrome.tabs.onUpdated.addListener(function(){
+    //check whether user logged in
+    
+    chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
+        if (cookie){
+            session_id = cookie
+            chrome.browserAction.setPopup({"popup":"popup.html"})
+            //window.location.href="popup.html";
+            console.log('user already logged in');  
+        }
+        else{
+            //window.location.href="popup_login.html";
+            chrome.browserAction.setPopup({"popup":"popup_login.html"})
+            console.log('user not log in'); 
+        } 
+    });
+     
+    //get csrf_token
+    chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
+        csrf_token = cookie;
+        console.log(csrf_token)
+    });
+    
 
+    //send csrf_token and session_id to content_script
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        console.log('send msg to content')
+        console.log(csrf_token, session_id)
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'change_csrftoken_and_sessionid', csrf_token:csrf_token, session_id:session_id});
+    });
+})
+
+/*
 chrome.tabs.onCreated.addListener(function(){
     //check whether user logged in 
     chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
@@ -201,7 +272,7 @@ chrome.tabs.onCreated.addListener(function(){
         csrf_token = cookie;
     });
 });
-
+*/
 
 /*
 chrome.tabs.onActivated.addListener(function(){

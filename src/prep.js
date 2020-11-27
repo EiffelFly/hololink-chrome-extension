@@ -1,9 +1,15 @@
+
+// current task: upload highlight to main
+
+var csrf_token
+var session_id
 var shadow
 var lock_sidebar = false
 var highlight = []
 var hololink_have_this_article = true
 var current_user = ''
 var sidebar_update_highlight = false
+var target_hololink_host = "http://127.0.0.1:8000/"
 
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
@@ -17,9 +23,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             highlight = request.highlight
         }
         current_user = request.user;
-        
+        csrf_token = request.csrf_token;
+        session_id = request.session_id;
+        console.log(current_user, 'kkk')
     }
-    console.log(hololink_have_this_article);
+});
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.action == 'change_csrftoken_and_sessionid'){
+        console.log('received')
+        csrf_token = request.csrf_token;
+        session_id = request.session_id;
+        console.log(csrf_token, session_id)
+    }
 });
 
 // Inject css into current page
@@ -89,7 +105,7 @@ document.addEventListener('mouseup', function (e) {
 
         });
 
-        // Force tooltip close after use clicked toolbar button
+        // Force tooltip to close after use clicked toolbar button
         $('#hololink_toolbar_annotate').on('click', function(){
             render_annotation();
         });
@@ -129,23 +145,24 @@ function render_highlight(){
         var current_page_url = window.location.href;
         var current_page_title = document.title;
 
-        highlight_id = generate_url(datetime, current_page_url)
-        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
+        highlight_id_on_page = generate_url(datetime, current_page_url)
+        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id_on_page});
 
         //get selection text and insert it in sidebar
-        var user_selected_text = getSelectionText()
+        var highlight_text = getSelectionText()
 
         var data = {
-            highlight_id: highlight_id,
-            user_selected_text: user_selected_text,
-            page_url: current_page_url,
-            page_title: current_page_title,
-            comment:'',
-            username:current_user,
+            "id_on_page": highlight_id_on_page,
+            "text": highlight_text,
+            "page_url": [current_page_url],
+            "page_title": [current_page_title],
+            "comment":'',
+            "highlighted_by":current_user,
         };
 
         highlight.push(data);
         sidebar_update_highlight = true
+        post_highligh_to_hololink(data)
 
         //clean selection
         if (window.getSelection) {
@@ -172,7 +189,9 @@ function getSelectionText() {
 }
 
 
-
+function post_highligh_to_hololink(data){
+    chrome.runtime.sendMessage({action:'post_highlight', data:data});
+};
 
 function generate_url(target_id, page_url){
     if (page_url.substr(-1) != '/'){
