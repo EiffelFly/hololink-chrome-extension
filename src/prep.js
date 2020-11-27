@@ -84,8 +84,12 @@ document.addEventListener('mouseup', function (e) {
             if ($('.hololink-toolbar-inner').length){
                 $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
             }
+
+            $('.hololink-toolbar-tooltip').remove()
+
         });
 
+        // Force tooltip close after use clicked toolbar button
         $('#hololink_toolbar_annotate').on('click', function(){
             render_annotation();
         });
@@ -95,6 +99,7 @@ document.addEventListener('mouseup', function (e) {
         trigger : 'hover',
         html: true,
     })
+
 }, false);
 
 // Close the hololink-toolbar bubble when we click on the screen.
@@ -128,18 +133,18 @@ function render_highlight(){
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id});
 
         //get selection text and insert it in sidebar
-        var user_select_text = getSelectionText()
+        var user_selected_text = getSelectionText()
 
         var data = {
             highlight_id: highlight_id,
-            user_select_text: user_selected_text,
+            user_selected_text: user_selected_text,
             page_url: current_page_url,
             page_title: current_page_title,
             comment:'',
             username:current_user,
         };
 
-        highlight_and_annotation.push(data);
+        highlight.push(data);
         sidebar_update_highlight = true
 
         //clean selection
