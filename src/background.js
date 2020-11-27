@@ -1,6 +1,6 @@
 var target_hololink_host = "http://127.0.0.1:8000/"
-var csrfToken = ' ';
-var sessionid = ' ';
+var csrf_token
+var session_id
 
 function ErrorsHandler(response){
     if (!response.ok) {
@@ -44,9 +44,9 @@ function gotPeojectsListHandler(response){
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                 // send warning to content_script that Hololink doesn't have this article
                 if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
-                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user});
+                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user, csrf_token:csrf_token, session_id:session_id});
                 } else if (json.highlight.length) {
-                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight});
+                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id});
                 }
                 
             });
@@ -66,15 +66,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == 'DataReadyForPost'){
         chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
             if (cookie){
-                csrfToken = cookie.value;
+                csrf_token = cookie.value;
                 chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
                     if (cookie){
-                        sessionid = cookie.value
+                        session_id = cookie.value
                         
                         var myHeaders = new Headers();
-                        myHeaders.append("X-CSRFToken", csrfToken);
+                        myHeaders.append("X-CSRFToken", csrf_token);
                         myHeaders.append("Content-Type", "application/json");
-                        myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
+                        myHeaders.append("Cookie", `sessionid=${session_id}; csrftoken=${csrf_token}`);
                         myHeaders.append("X-Requested-With", "XMLHttpRequest");
                         console.log(myHeaders)
         
@@ -113,21 +113,27 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == "loadUserProjects"){
         chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
             if (cookie){
-                csrfToken = cookie.value;
+                csrf_token = cookie.value;
                 chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
                     if (cookie){
-                        sessionid = cookie.value
+                        session_id = cookie.value
                         var myHeaders = new Headers();
-                        myHeaders.append("X-CSRFToken", csrfToken);
+                        myHeaders.append("X-CSRFToken", csrf_token);
                         myHeaders.append("Content-Type", "application/json");
-                        myHeaders.append("Cookie", `sessionid=${sessionid}; csrftoken=${csrfToken}`);
+                        myHeaders.append("Cookie", `sessionid=${session_id}; csrftoken=${csrf_token}`);
                         myHeaders.append("X-Requested-With", "XMLHttpRequest");
-                        myHeaders.append("Page-Url", request.page_url);
-                        myHeaders.append("Page-Title", request.page_title);
+                        // myHeaders.append("Page-Url", request.page_url);
+                        // myHeaders.append("Page-Title", request.page_title);
+
+                        var raw = JSON.stringify({
+                            "page_url":request.page_url,
+                            "page_title":request.page_title
+                        })
 
                         var requestOptions = {
-                            method: 'GET',
+                            method: 'POST',
                             headers: myHeaders,
+                            body: raw,
                             redirect: 'follow',
                             credentials: 'include',
                         };
@@ -175,9 +181,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
 );
 
 
-chrome.tabs.onUpdated.addListener(function(){
+chrome.tabs.onCreated.addListener(function(){
+    //check whether user logged in 
     chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
         if (cookie){
+            session_id = cookie
             chrome.browserAction.setPopup({"popup":"popup.html"})
             //window.location.href="popup.html";
             console.log('user already logged in');  
@@ -188,7 +196,11 @@ chrome.tabs.onUpdated.addListener(function(){
             console.log('user not log in'); 
         } 
     });
-})
+    //get csrf_token
+    chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
+        csrf_token = cookie;
+    });
+});
 
 
 /*
