@@ -1,6 +1,8 @@
 var target_hololink_host = "http://127.0.0.1:8000/"
 var csrf_token
 var session_id
+var current_page_title
+var current_page_url
 
 function ErrorsHandler(response){
     if (!response.ok) {
@@ -40,7 +42,7 @@ function gotPeojectsListHandler(response){
             //console.log(json.highlight[0].message)
             //console.log(ProjectsList)
             chrome.runtime.sendMessage({'action':'gotProjectandRecommendationData', 'result':'success', 'projects':ProjectsList, 'recommendations':json.recommendations, 'user':json.user});
-
+            console.log(json)
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                 // send warning to content_script that Hololink doesn't have this article
                 if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
@@ -109,42 +111,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     }
 });
 
+function get_user_data_from_hololink(request){
+
+}
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == "loadUserProjects"){
-        chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
-            if (cookie){
-                csrf_token = cookie.value;
-                chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
-                    if (cookie){
-                        session_id = cookie.value
-                        var myHeaders = new Headers();
-                        myHeaders.append("X-CSRFToken", csrf_token);
-                        myHeaders.append("Content-Type", "application/json");
-                        myHeaders.append("Cookie", `sessionid=${session_id}; csrftoken=${csrf_token}`);
-                        myHeaders.append("X-Requested-With", "XMLHttpRequest");
-                        // myHeaders.append("Page-Url", request.page_url);
-                        // myHeaders.append("Page-Title", request.page_title);
-
-                        var raw = JSON.stringify({
-                            "page_url":request.page_url,
-                            "page_title":request.page_title
-                        })
-
-                        var requestOptions = {
-                            method: 'POST',
-                            headers: myHeaders,
-                            body: raw,
-                            redirect: 'follow',
-                            credentials: 'include',
-                        };
-
-                        fetch(request.target_url, requestOptions)
-                            .then(gotPeojectsListHandler)   
-                    } 
-             
-                });
-            }
-        });
+        get_user_basic_data_of_current_page(request)
     }
 });
 
@@ -161,9 +134,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                         myHeaders.append("Content-Type", "application/json");
                         myHeaders.append("Cookie", `sessionid=${session_id.value}; csrftoken=${csrf_token.value}`);
                         myHeaders.append("X-Requested-With", "XMLHttpRequest");
-
+    
                         var raw = JSON.stringify(request.data)
-
+    
                         var requestOptions = {
                             method: 'POST',
                             headers: myHeaders,
@@ -172,9 +145,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                             credentials: 'include',
                             mode:'cors'
                         };
-
+    
                         console.log('send')
-
+    
                         fetch(target_hololink_host+'api/highlight/', requestOptions)
                             .then(response => response.text())
                             .then(result => console.log(result))
@@ -185,6 +158,43 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         });
     }
 });
+
+function get_user_basic_data_of_current_page(request){
+    chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
+        if (cookie){
+            csrf_token = cookie.value;
+            chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
+                if (cookie){
+                    session_id = cookie.value
+                    var myHeaders = new Headers();
+                    myHeaders.append("X-CSRFToken", csrf_token);
+                    myHeaders.append("Content-Type", "application/json");
+                    myHeaders.append("Cookie", `sessionid=${session_id}; csrftoken=${csrf_token}`);
+                    myHeaders.append("X-Requested-With", "XMLHttpRequest");
+                    // myHeaders.append("Page-Url", request.page_url);
+                    // myHeaders.append("Page-Title", request.page_title);
+
+                    var raw = JSON.stringify({
+                        "page_url":request.page_url,
+                        "page_title":request.page_title
+                    })
+
+                    var requestOptions = {
+                        method: 'POST',
+                        headers: myHeaders,
+                        body: raw,
+                        redirect: 'follow',
+                        credentials: 'include',
+                    };
+
+                    fetch(request.target_url, requestOptions)
+                        .then(gotPeojectsListHandler)   
+                } 
+         
+            });
+        }
+    });
+}
 
 
 /*
@@ -242,14 +252,21 @@ chrome.tabs.onUpdated.addListener(function(){
         console.log(csrf_token)
     });
     
-
-    //send csrf_token and session_id to content_script
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        console.log('send msg to content')
-        console.log(csrf_token, session_id)
-        chrome.tabs.sendMessage(tabs[0].id, {action: 'change_csrftoken_and_sessionid', csrf_token:csrf_token, session_id:session_id});
-    });
 })
+
+chrome.tabs.onCreated.addListener(function(){
+    //send csrf_token and session_id to content_script
+    chrome.tabs.query({active: true, currentWindow: true}, function(tab) {
+        current_page_title = tab[0].title;
+        current_page_url = tab[0].url;
+        request = {
+            page_url:current_page_url,
+            page_title:current_page_title,
+            target_url:target_hololink_host+'api/broswer-extension-data/'
+        }
+        get_user_basic_data_of_current_page(request)
+    });
+});
 
 /*
 chrome.tabs.onCreated.addListener(function(){
