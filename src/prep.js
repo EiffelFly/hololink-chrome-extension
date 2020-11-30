@@ -25,7 +25,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         current_user = request.user;
         csrf_token = request.csrf_token;
         session_id = request.session_id;
-        console.log(current_user, 'kkk')
     }
 });
 
@@ -142,6 +141,9 @@ function render_highlight(selection){
         var datetime = Date.now();
         var current_page_url = window.location.href;
         var current_page_title = document.title;
+        console.log(range)
+        var serialize_test = serialize(range)
+        console.log(deserialize(serialize_test))
 
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
@@ -291,6 +293,8 @@ function close_sidebar_if_user_click_outside(){
 
 /* 
 * Need to refactor to module later
+* Treora / dom-highlight-range
+* https://github.com/Treora/dom-highlight-range
 */
 
 
@@ -392,4 +396,78 @@ function removeHighlight(highlightElement) {
         }
         highlightElement.remove();
     }
+}
+
+/*
+ * Using tildeio / range-serializer
+ * https://github.com/tildeio/range-serializer
+ */
+
+function serialize(range) {
+    var start = generate(range.startContainer);
+    start.offset = range.startOffset;
+    var end = generate(range.endContainer);
+    end.offset = range.endOffset;
+
+    return {start: start, end: end};
+}
+
+function deserialize(result) {
+    var range = document.createRange(),
+        startNode = find(result.start),
+        endNode = find(result.end);
+
+    range.setStart(startNode, result.start.offset);
+    range.setEnd(endNode, result.end.offset);
+    
+    return range;
+}
+
+function generate(node) {
+    var textNodeIndex = childNodeIndexOf(node.parentNode, node),
+        currentNode = node,
+        tagNames = [];
+
+    while (currentNode) {
+        var tagName = currentNode.tagName;
+
+        if (tagName) {
+            var nthIndex = computedNthIndex(currentNode);
+            var selector = tagName;
+
+            if (nthIndex > 1) {
+                selector += ":nth-of-type(" + nthIndex + ")";
+            }
+
+            tagNames.push(selector);
+        }
+
+        currentNode = currentNode.parentNode;
+    }
+
+    return {selector: tagNames.reverse().join(" > ").toLowerCase(), childNodeIndex: textNodeIndex};
+}
+
+function childNodeIndexOf(parentNode, childNode) {
+    var childNodes = parentNode.childNodes;
+    for (var i = 0, l = childNodes.length; i < l; i++) {
+        if (childNodes[i] === childNode) { return i; }
+    }
+}
+
+function computedNthIndex(childElement) {
+    var childNodes = childElement.parentNode.childNodes,
+        tagName = childElement.tagName,
+        elementsWithSameTag = 0;
+
+    for (var i = 0, l = childNodes.length; i < l; i++) {
+        if (childNodes[i] === childElement) { return elementsWithSameTag + 1; }
+        if (childNodes[i].tagName === tagName) { elementsWithSameTag++; }
+    }
+}
+
+function find(result) {
+    var element = document.querySelector(result.selector);
+    if (!element) { throw new Error('Unable to find element with selector: ' + result.selector); }
+    return element.childNodes[result.childNodeIndex];
 }
