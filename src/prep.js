@@ -11,10 +11,6 @@ var current_user = ''
 var sidebar_update_highlight = false
 var target_hololink_host = "http://127.0.0.1:8000/"
 
-var hololink_toolbar_container = document.createElement('div');
-hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
-document.body.appendChild(hololink_toolbar_container);
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.action == 'content_script_change_status'){
         if (request.message == 'hololink_doesnt_have_this_article'){
@@ -36,6 +32,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         console.log(csrf_token, session_id)
     }
 });
+
+var hololink_toolbar_container = document.createElement('div');
+hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
+document.body.appendChild(hololink_toolbar_container);
 
 // Inject css into current page
 highlight_style_href = chrome.runtime.getURL("src/highlight/highlight.css")
@@ -162,7 +162,7 @@ function render_highlight(selection){
 
         highlight.push(data);
         sidebar_update_highlight = true
-        console.log(highlight_text)
+        console.log(data)
         post_highligh_to_hololink(data)
 
         //clean selection
@@ -261,6 +261,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
+            console.log(highlight)
+
+            for (i=0; i<highlight.length; i++){
+                
+
+                var restore_range_object = deserialize(highlight[i].range_object)
+                const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight[i].id_on_page});
+
+
+            }
 
             close_sidebar_if_user_click_outside();
 
