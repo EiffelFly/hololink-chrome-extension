@@ -154,15 +154,15 @@ function render_highlight(){
         var data = {
             "id_on_page": highlight_id_on_page,
             "text": highlight_text,
-            "page_url": [current_page_url],
-            "page_title": [current_page_title],
+            "page_url": current_page_url,
+            "page_title": current_page_title,
             "comment":'',
-            "highlighted_by":current_user,
         };
 
         highlight.push(data);
         sidebar_update_highlight = true
-        post_highligh_to_hololink(data)
+        console.log(highlight_text)
+        // post_highligh_to_hololink(data)
 
         //clean selection
         if (window.getSelection) {
@@ -183,6 +183,7 @@ function getSelectionText() {
     } else if (window.getSelection) {
         if (window.getSelection().getRangeAt(0).commonAncestorContainer){
             text = window.getSelection().getRangeAt(0).commonAncestorContainer.innerText
+            console.log(window.getSelection().getRangeAt(0))
         }
     }
     return text;
