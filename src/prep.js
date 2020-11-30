@@ -142,8 +142,7 @@ function render_highlight(selection){
         var current_page_url = window.location.href;
         var current_page_title = document.title;
         console.log(range)
-        var serialize_test = serialize(range)
-        console.log(deserialize(serialize_test))
+        var serialized_range_object = serialize(range)
 
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
@@ -158,6 +157,7 @@ function render_highlight(selection){
             "page_url": current_page_url,
             "page_title": current_page_title,
             "comment":'',
+            "range_object":serialized_range_object
         };
 
         highlight.push(data);
@@ -292,9 +292,11 @@ function close_sidebar_if_user_click_outside(){
 }
 
 /* 
+* ----------------------------------------------------------------------------------------------------------------
 * Need to refactor to module later
 * Treora / dom-highlight-range
 * https://github.com/Treora/dom-highlight-range
+* ----------------------------------------------------------------------------------------------------------------
 */
 
 
@@ -399,8 +401,10 @@ function removeHighlight(highlightElement) {
 }
 
 /*
+ * ----------------------------------------------------------------------------------------------------------------
  * Using tildeio / range-serializer
  * https://github.com/tildeio/range-serializer
+ * ----------------------------------------------------------------------------------------------------------------
  */
 
 function serialize(range) {
