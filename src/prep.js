@@ -86,15 +86,15 @@ console.log('selection sanity check')
 
 // Lets listen to mouseup DOM events.
 document.addEventListener('mouseup', function (e) {
-    var selection = document.getSelection && document.getSelection();
+    const selection = document.getSelection && document.getSelection();
     var position = calaculate_tooltip_position()
-    console.log(e)
+
     if (selection.toString().length > 0 && !$('.hololink-toolbar-inner').length) {
         render_tooltip(position.x, position.y);
         hololink_toolbar_container.appendChild(hololink_toolbar_inner);
         console.log('inside')
         $('#hololink_toolbar_highlight').on('click', function(){
-            render_highlight();
+            render_highlight(selection);
 
             //close hololink-toolbar bubble
             if ($('.hololink-toolbar-inner').length){
@@ -135,21 +135,20 @@ function render_annotation(){
 
 };
 
-function render_highlight(){
-    var selection = document.getSelection && document.getSelection();
+function render_highlight(selection){
     //console.log('sss', selection.anchorNode, selection.getRangeAt(0).commonAncestorContainer.innerText)
     if (!selection.isCollapsed) {
-        
         const range = selection.getRangeAt(0);
         var datetime = Date.now();
         var current_page_url = window.location.href;
         var current_page_title = document.title;
 
+        // get selection text and insert it in sidebar, we need to access all necessary selection data before
+        // we highlight it
+        var highlight_text = getSelectionText(selection)
+
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id_on_page});
-
-        //get selection text and insert it in sidebar
-        var highlight_text = getSelectionText()
 
         var data = {
             "id_on_page": highlight_id_on_page,
@@ -162,7 +161,7 @@ function render_highlight(){
         highlight.push(data);
         sidebar_update_highlight = true
         console.log(highlight_text)
-        // post_highligh_to_hololink(data)
+        post_highligh_to_hololink(data)
 
         //clean selection
         if (window.getSelection) {
@@ -174,17 +173,14 @@ function render_highlight(){
 };
 
 // this function can get the user selected text including in textarea
-function getSelectionText() {
+function getSelectionText(selection) {
     var text = "";
     var active_element = document.activeElement;
     var active_element_tag_name = active_element ? active_element.tagName.toLowerCase() : null;
     if (active_element_tag_name == "textarea") {
         text = active_element.value.slice(active_element.selectionStart, active_element.selectionEnd);
-    } else if (window.getSelection) {
-        if (window.getSelection().getRangeAt(0).commonAncestorContainer){
-            text = window.getSelection().getRangeAt(0).commonAncestorContainer.innerText
-            console.log(window.getSelection().getRangeAt(0))
-        }
+    } else if (selection) {
+        text = selection.toString()
     }
     return text;
 }
