@@ -250,27 +250,60 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             close_sidebar_img.attr('height', 20)
             close_sidebar_img.attr('src', `${x_img_path}`)
 
-            trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
-            var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
-            delere_highlight_img.attr('width', 20)
-            delere_highlight_img.attr('height', 20)
-            delere_highlight_img.attr('src', `${trashcan_img_path}`)
-
-
             $(shadow).find('#close_hololink_sidebar').on('click', function(){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
             console.log(highlight)
 
-            for (i=0; i<highlight.length; i++){
-                
+            var sidebar_highlight_content = ''
 
+            // restore highlight from hololink data
+            for (i=0; i<highlight.length; i++){
                 var restore_range_object = deserialize(highlight[i].range_object)
                 const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight[i].id_on_page});
-
-
+                var highlight_content = `
+                    <div style="padding: 0 20px 20px 20px;">
+                        <div class="card highlight-annotation shadow" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight[i].id_on_page}">
+                            <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
+                                <div class="col d-flex" style="margin-right: auto;">
+                                    <div class="highlight-user">
+                                        ${highlight[i].highlighted_by_username}
+                                    </div>
+                                </div>
+                                <div class="col d-flex">
+                                    <div style="margin-left: auto;">
+                                        2020/11/26
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="card shadow-sm highlight-content">
+                                    <div class="row">
+                                        ${highlight[i].text}
+                                    </div>
+                                    <div class="row d-flex" style="margin-top: 10px;">
+                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight[i].id_on_page}" style="display: flex;"><img class="delete-hololink-highlight-img" style="margin-left:auto"></button>
+                                    </div>
+                                </div>  
+                            </div>
+                        </div>
+                    </div>
+                `
+                sidebar_highlight_content = sidebar_highlight_content + highlight_content
             }
+
+            console.log(sidebar_highlight_content)
+            var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
+            highlight_annotation_container.html(sidebar_highlight_content)
+
+            trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
+            var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
+            delere_highlight_img.attr('width', 20)
+            delere_highlight_img.attr('height', 20)
+            delere_highlight_img.attr('src', `${trashcan_img_path}`)
+
+            //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
 
             close_sidebar_if_user_click_outside();
 

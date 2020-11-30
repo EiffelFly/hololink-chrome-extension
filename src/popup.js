@@ -15,7 +15,7 @@ $(function(){
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             console.log('ensuring',tabs[0].id)
             ensure_content_script_is_running(tabs[0].id, {"action": "open_sidebar"});
-            // window.close();
+            //window.close();
         });
     });
 
