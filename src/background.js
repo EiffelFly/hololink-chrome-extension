@@ -20,7 +20,7 @@ function ErrorsHandler(response){
     return response
 }
 
-function gotPeojectsListHandler(response){
+function got_user_data_of_current_page_handler(response){
     if (!response.ok){
         console.log('ERROR: ' + response)
         chrome.runtime.sendMessage({'action':'gotProjectsList', 'result':'failed'})
@@ -111,10 +111,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     }
 });
 
-function get_user_data_from_hololink(request){
-
-}
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == "loadUserProjects"){
         get_user_basic_data_of_current_page(request)
@@ -188,7 +184,7 @@ function get_user_basic_data_of_current_page(request){
                     };
 
                     fetch(request.target_url, requestOptions)
-                        .then(gotPeojectsListHandler)   
+                        .then(got_user_data_of_current_page_handler)   
                 } 
          
             });
