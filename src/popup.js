@@ -111,7 +111,6 @@ $(function(){
 
 // This function will ping the target content_script first, if it is running then send message, or excute the content_script on current tab
 function ensure_content_script_is_running(tabId, message, callback){
-    console.log('activate')
     chrome.tabs.sendMessage(tabId, {ping: true}, function(response){
         if(response && response.pong) { // Content script is ready
             chrome.tabs.sendMessage(tabId, message, callback);

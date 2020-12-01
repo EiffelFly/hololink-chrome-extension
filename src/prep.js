@@ -10,6 +10,7 @@ var hololink_have_this_article = true
 var current_user = ''
 var sidebar_update_highlight = false
 var target_hololink_host = "http://127.0.0.1:8000/"
+var page_highlighted = false
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.action == 'content_script_change_status'){
@@ -231,7 +232,6 @@ const shadowRoot = hololink_sidebar_container.attachShadow({mode: 'open'});
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == 'open_sidebar'){
-        console.log('receive msg', highlight)
         $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
             //$(data).appendTo($('.hololink-sidebar-inner'));
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
@@ -255,16 +255,22 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
-            console.log(highlight)
+            //console.log(highlight)
 
             var sidebar_highlight_content = ''
 
             // restore highlight from hololink data
             for (i=0; i<highlight.length; i++){
-                var restore_range_object = deserialize(highlight[i].range_object)
+
+                //console.log(highlight[i])
+                
 
                 //once we restore the highlight, the custom class we add on DOM will mass up original selector we save 
-                const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight[i].id_on_page});
+                if (page_highlighted == false){
+                    var restore_range_object = deserialize(highlight[i].range_object)
+                    const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight[i].id_on_page});
+                }
+                
                 var highlight_content = `
                     <div style="padding: 0 20px 20px 20px;">
                         <div class="card highlight-annotation shadow" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight[i].id_on_page}">
@@ -296,7 +302,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 sidebar_highlight_content = sidebar_highlight_content + highlight_content
             }
 
-            console.log(sidebar_highlight_content)
+            //console.log(sidebar_highlight_content)
             var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
             highlight_annotation_container.html(sidebar_highlight_content)
 
@@ -309,6 +315,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
 
             close_sidebar_if_user_click_outside();
+
+            page_highlighted = true
 
         });
     }
@@ -353,8 +361,7 @@ function highlightRange(range, tagName, attributes = {}) {
     }
 
     console.log('original', range)
-    
-    
+
     temp_range_object = serialize(range)
 
     // First put all nodes in an array (splits start and end nodes if needed)
@@ -392,8 +399,8 @@ function highlightRange(range, tagName, attributes = {}) {
     var startNode = find(temp_range_object.start)
     var endNode = find(temp_range_object.end)
 
-    range.setStart(startNode, 0);
-    range.setEnd(endNode, 0);
+    //range.setStart(startNode, 0);
+    //range.setEnd(endNode, 0);
 
     console.log(temp_range_object, range)
 }
