@@ -376,7 +376,7 @@ function highlightRange(range, tagName, attributes = {}) {
     
 
 
-    console.log(temp_range_object, range)
+   
     // TODO: find a way to restore DOM tree
     // We reorder page's DOM, this will mass up a lot of things, we need to restore it.
     //range_object.setStart(range_object.startContainer, range_object.startOffset)
@@ -386,12 +386,16 @@ function highlightRange(range, tagName, attributes = {}) {
     // range.setStart(startNode, temp_range_object.start.offset);
     // range.setEnd(endNode, temp_range_object.end.offset);
 
-    //var startNode = find(temp_range_object.start)
-    //var endNode = find(temp_range_object.end)
+    // this will help us find target new highlight node
+    temp_range_object.start.selector = temp_range_object.start.selector + " > hololink-highlight"
+    temp_range_object.end.selector = temp_range_object.end.selector + " > hololink-highlight"
+    var startNode = find(temp_range_object.start)
+    var endNode = find(temp_range_object.end)
 
-    //console.log(startNode, endNode)
+    range.setStart(startNode, 0);
+    range.setEnd(endNode, 0);
 
-    return removeHighlights;
+    console.log(temp_range_object, range)
 }
 
 // Return an array of the text nodes in the range. Split the start and end nodes if required.
