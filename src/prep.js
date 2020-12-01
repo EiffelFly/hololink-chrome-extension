@@ -151,6 +151,8 @@ function render_highlight(selection){
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id_on_page});
 
+        // TODO: find a solution to insert custom element but not affect the DOM tree
+
         var data = {
             "id_on_page": highlight_id_on_page,
             "text": highlight_text,
@@ -229,7 +231,7 @@ const shadowRoot = hololink_sidebar_container.attachShadow({mode: 'open'});
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == 'open_sidebar'){
-        console.log('receive msg')
+        console.log('receive msg', highlight)
         $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
             //$(data).appendTo($('.hololink-sidebar-inner'));
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
@@ -243,7 +245,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
             var inner = $(shadow).find('.hololink-sidebar-inner');
             inner.html(data);
-
             x_img_path = chrome.extension.getURL("img/x.svg")
             var close_sidebar_img = $(shadow).find('.close-hololink-sidebar-img');
             close_sidebar_img.attr('width', 20)
@@ -261,6 +262,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             // restore highlight from hololink data
             for (i=0; i<highlight.length; i++){
                 var restore_range_object = deserialize(highlight[i].range_object)
+
+                //once we restore the highlight, the custom class we add on DOM will mass up original selector we save 
                 const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight[i].id_on_page});
                 var highlight_content = `
                     <div style="padding: 0 20px 20px 20px;">
@@ -348,7 +351,11 @@ function highlightRange(range, tagName, attributes = {}) {
     if (range.collapsed){
         return;
     }
+
+    console.log('original', range)
     
+    const range_object = range
+
     // First put all nodes in an array (splits start and end nodes if needed)
     const nodes = textNodesInRange(range);
     
@@ -366,6 +373,13 @@ function highlightRange(range, tagName, attributes = {}) {
             removeHighlight(highlightElements[highlightIdx]);
         }
     }
+
+    console.log(range_object)
+    // TODO: find a way to restore DOM tree
+    // We reorder page's DOM, this will mass up a lot of things, we need to restore it.
+    //range_object.setStart(range_object.startContainer, range_object.startOffset)
+    //range_object.setEnd(range_object.endContainer, range_object.endOffset)
+
     return removeHighlights;
 }
 
@@ -420,6 +434,12 @@ function textNodesInRange(range) {
 
 // Replace [node] with <tagName ...attributes>[node]</tagName>
 function wrapNodeInHighlight(node, tagName, attributes) {
+
+    // Ensure this isn't being called multiple times and creating multiple nested highlights
+    if (node.parentNode.nodeName.toLocaleLowerCase() == tagName){
+        throw new Error('Prevent create nested highlight');
+    }
+
     const highlightElement = node.ownerDocument.createElement(tagName);
     Object.keys(attributes).forEach(key => {
         highlightElement.setAttribute(key, attributes[key]);
