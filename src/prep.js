@@ -149,7 +149,7 @@ function render_highlight(selection){
         var highlight_text = getSelectionText(selection)
 
         highlight_id_on_page = generate_url(datetime, current_page_url)
-        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', id:highlight_id_on_page});
+        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
 
         // TODO: find a solution to insert custom element but not affect the DOM tree
 
@@ -354,7 +354,8 @@ function highlightRange(range, tagName, attributes = {}) {
 
     console.log('original', range)
     
-    const range_object = range
+    
+    temp_range_object = serialize(range)
 
     // First put all nodes in an array (splits start and end nodes if needed)
     const nodes = textNodesInRange(range);
@@ -365,7 +366,6 @@ function highlightRange(range, tagName, attributes = {}) {
         const highlightElement = wrapNodeInHighlight(nodes[nodeIdx], tagName, attributes);
         highlightElements.push(highlightElement);
     }
-
     // Return a function that cleans up the highlightElements.
     function removeHighlights() {
         // Remove each of the created highlightElements.
@@ -373,12 +373,23 @@ function highlightRange(range, tagName, attributes = {}) {
             removeHighlight(highlightElements[highlightIdx]);
         }
     }
+    
 
-    console.log(range_object)
+
+    console.log(temp_range_object, range)
     // TODO: find a way to restore DOM tree
     // We reorder page's DOM, this will mass up a lot of things, we need to restore it.
     //range_object.setStart(range_object.startContainer, range_object.startOffset)
     //range_object.setEnd(range_object.endContainer, range_object.endOffset)
+    // var startNode = find(temp_range_object.start)
+    // var endNode = find(temp_range_object.end)
+    // range.setStart(startNode, temp_range_object.start.offset);
+    // range.setEnd(endNode, temp_range_object.end.offset);
+
+    //var startNode = find(temp_range_object.start)
+    //var endNode = find(temp_range_object.end)
+
+    //console.log(startNode, endNode)
 
     return removeHighlights;
 }
