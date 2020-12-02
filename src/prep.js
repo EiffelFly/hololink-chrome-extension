@@ -11,6 +11,10 @@ var current_user = ''
 var sidebar_update_highlight = false
 var target_hololink_host = "http://127.0.0.1:8000/"
 var page_highlighted = false
+var highlight_page_when_create = true
+var sidebar_highlight_content = ''
+
+console.log(highlight_page_when_create)
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.action == 'content_script_change_status'){
@@ -22,6 +26,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         current_user = request.user;
         csrf_token = request.csrf_token;
         session_id = request.session_id;
+
+        // restore highlight when page is created
+        for (i=0; i<highlight.length; i++){        
+            console.log(highlight[i])
+            assemble_sidebar_highlight_content(highlight[i])
+            deserialize_range_object_and_highlight(highlight[i]);
+        }
+
+        highlight_page_when_create = false;
     }
 });
 
@@ -220,6 +233,47 @@ function calaculate_tooltip_position(){
     }
 };
 
+function assemble_sidebar_highlight_content(highlight_target){
+    // restore highlight from hololink data
+    var highlight_content = `
+        <div style="padding: 0 20px 20px 20px;">
+            <div class="card highlight-annotation shadow" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight_target.id_on_page}">
+                <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
+                    <div class="col d-flex" style="margin-right: auto;">
+                        <div class="highlight-user">
+                            ${highlight_target.highlighted_by_username}
+                        </div>
+                    </div>
+                    <div class="col d-flex">
+                        <div style="margin-left: auto;">
+                            2020/11/26
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card shadow-sm highlight-content">
+                        <div class="row">
+                            ${highlight_target.text}
+                        </div>
+                        <div class="row d-flex" style="margin-top: 10px;">
+                            <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="display: flex;"><img class="delete-hololink-highlight-img" style="margin-left:auto"></button>
+                        </div>
+                    </div>  
+                </div>
+            </div>
+        </div>
+    `
+    sidebar_highlight_content = sidebar_highlight_content + highlight_content
+}
+
+
+function deserialize_range_object_and_highlight(highlight){
+    if (page_highlighted == false){
+        var restore_range_object = deserialize(highlight.range_object)
+        const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight.id_on_page});
+    }
+}
+
 //'open' mode to access shadow dom elements from outisde the shadow root.
 const hololink_sidebar_container = document.createElement('div');
 hololink_sidebar_container.setAttribute('class', 'hololink-sidebar-container')
@@ -255,52 +309,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
-            //console.log(highlight)
-
-            var sidebar_highlight_content = ''
-
-            // restore highlight from hololink data
-            for (i=0; i<highlight.length; i++){
-
-                //console.log(highlight[i])
-                
-
-                //once we restore the highlight, the custom class we add on DOM will mass up original selector we save 
-                if (page_highlighted == false){
-                    var restore_range_object = deserialize(highlight[i].range_object)
-                    const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight[i].id_on_page});
-                }
-                
-                var highlight_content = `
-                    <div style="padding: 0 20px 20px 20px;">
-                        <div class="card highlight-annotation shadow" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight[i].id_on_page}">
-                            <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
-                                <div class="col d-flex" style="margin-right: auto;">
-                                    <div class="highlight-user">
-                                        ${highlight[i].highlighted_by_username}
-                                    </div>
-                                </div>
-                                <div class="col d-flex">
-                                    <div style="margin-left: auto;">
-                                        2020/11/26
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="card shadow-sm highlight-content">
-                                    <div class="row">
-                                        ${highlight[i].text}
-                                    </div>
-                                    <div class="row d-flex" style="margin-top: 10px;">
-                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight[i].id_on_page}" style="display: flex;"><img class="delete-hololink-highlight-img" style="margin-left:auto"></button>
-                                    </div>
-                                </div>  
-                            </div>
-                        </div>
-                    </div>
-                `
-                sidebar_highlight_content = sidebar_highlight_content + highlight_content
-            }
+            sidebar_highlight_content = ''
 
             //console.log(sidebar_highlight_content)
             var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
@@ -380,18 +389,24 @@ function highlightRange(range, tagName, attributes = {}) {
             removeHighlight(highlightElements[highlightIdx]);
         }
     }
+
+    /*
+     * TODO: need to find a solution that will recover range object after we changed the DOM
+     * The method we use right now can only work on some webs (we can't use this mehtod on daudo)
+     */
    
     // range object get messed up by our DOM changes, we have to restore it.
     // this will help us find target new highlight node 
-    temp_range_object.start.selector = temp_range_object.start.selector + " > hololink-highlight"
-    temp_range_object.end.selector = temp_range_object.end.selector + " > hololink-highlight"
-    var startNode = find(temp_range_object.start)
-    var endNode = find(temp_range_object.end)
+    // temp_range_object.start.selector = temp_range_object.start.selector + " > hololink-highlight"
+    // temp_range_object.end.selector = temp_range_object.end.selector + " > hololink-highlight"
+    // var startNode = find(temp_range_object.start)
+    // var endNode = find(temp_range_object.end)
 
-    range.setStart(startNode, 0);
-    range.setEnd(endNode, 0);
+    // console.log(temp_range_object, startNode, endNode)
 
-    console.log(temp_range_object, range, endNode)
+    // range.setStart(startNode);
+    // range.setEnd(endNode);
+    
 }
 
 // Return an array of the text nodes in the range. Split the start and end nodes if required.
