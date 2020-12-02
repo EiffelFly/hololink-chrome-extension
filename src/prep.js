@@ -27,6 +27,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         csrf_token = request.csrf_token;
         session_id = request.session_id;
 
+        sidebar_highlight_content = ''
+
         // restore highlight when page is created
         for (i=0; i<highlight.length; i++){        
             console.log(highlight[i])
@@ -309,10 +311,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
-            sidebar_highlight_content = ''
-
             //console.log(sidebar_highlight_content)
             var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
+            highlight_annotation_container.html('')
             highlight_annotation_container.html(sidebar_highlight_content)
 
             trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
