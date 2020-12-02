@@ -10,11 +10,8 @@ var hololink_have_this_article = true
 var current_user = ''
 var sidebar_update_highlight = false
 var target_hololink_host = "http://127.0.0.1:8000/"
-var page_highlighted = false
-var highlight_page_when_create = true
 var sidebar_highlight_content = ''
-
-console.log(highlight_page_when_create)
+var page_got_highlighted_when_created = false
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.action == 'content_script_change_status'){
@@ -36,7 +33,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             deserialize_range_object_and_highlight(highlight[i]);
         }
 
-        highlight_page_when_create = false;
+        page_got_highlighted_when_created = true;
     }
 });
 
@@ -247,7 +244,7 @@ function assemble_sidebar_highlight_content(highlight_target){
                         </div>
                     </div>
                     <div class="col d-flex">
-                        <div style="margin-left: auto;">
+                        <div class="highligh-time" style="margin-left: auto;">
                             2020/11/26
                         </div>
                     </div>
@@ -266,11 +263,12 @@ function assemble_sidebar_highlight_content(highlight_target){
         </div>
     `
     sidebar_highlight_content = sidebar_highlight_content + highlight_content
+    //console.log(sidebar_highlight_content)
 }
 
 
 function deserialize_range_object_and_highlight(highlight){
-    if (page_highlighted == false){
+    if (page_got_highlighted_when_created == false){
         var restore_range_object = deserialize(highlight.range_object)
         const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight.id_on_page});
     }
@@ -311,9 +309,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
-            //console.log(sidebar_highlight_content)
+            console.log(sidebar_highlight_content , highlight)
+            
             var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
-            highlight_annotation_container.html('')
             highlight_annotation_container.html(sidebar_highlight_content)
 
             trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
@@ -325,8 +323,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
 
             close_sidebar_if_user_click_outside();
-
-            page_highlighted = true
 
         });
     }
