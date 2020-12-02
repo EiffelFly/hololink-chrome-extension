@@ -12,6 +12,9 @@ var sidebar_update_highlight = false
 var target_hololink_host = "http://127.0.0.1:8000/"
 var sidebar_highlight_content = ''
 var page_got_highlighted_when_created = false
+var loading_user_data = true
+
+
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.action == 'content_script_change_status'){
@@ -28,12 +31,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
         // restore highlight when page is created
         for (i=0; i<highlight.length; i++){        
-            console.log(highlight[i])
+            //console.log(highlight[i])
             assemble_sidebar_highlight_content(highlight[i])
             deserialize_range_object_and_highlight(highlight[i]);
         }
 
         page_got_highlighted_when_created = true;
+        loading_user_data = false
+
     }
 });
 
@@ -61,6 +66,15 @@ highlight_style_container.setAttribute('href', highlight_style_href);
 
 var hololink_toolbar_inner = document.createElement('div');
 hololink_toolbar_inner.setAttribute('class', 'hololink-toolbar-inner');
+
+// setup toolbar spinner
+var hololink_toolbar_inner_with_spinner = document.createElement('div');
+hololink_toolbar_inner.setAttribute('class', 'hololink-toolbar-inner-with-spinner');
+
+// we use loading animation from here
+// https://loading.io/css/
+hololink_toolbar_inner.innerHTML = "<div class='lds-ellipsis'><div></div><div></div><div></div><div></div></div>"
+
 
 var highlight_button = document.createElement('button');
 highlight_button.setAttribute('class', 'hololink-toolbar-button');
@@ -102,25 +116,30 @@ document.addEventListener('mouseup', function (e) {
     var position = calaculate_tooltip_position()
 
     if (selection.toString().length > 0 && !$('.hololink-toolbar-inner').length) {
-        render_tooltip(position.x, position.y);
-        hololink_toolbar_container.appendChild(hololink_toolbar_inner);
-        console.log('inside')
-        $('#hololink_toolbar_highlight').on('click', function(){
-            render_highlight(selection);
+        if (loading_user_data == false){
+            render_tooltip(position.x, position.y);
+            hololink_toolbar_container.appendChild(hololink_toolbar_inner);
+            console.log('inside')
+            $('#hololink_toolbar_highlight').on('click', function(){
+                render_highlight(selection);
 
-            //close hololink-toolbar bubble
-            if ($('.hololink-toolbar-inner').length){
-                $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
-            }
+                //close hololink-toolbar bubble
+                if ($('.hololink-toolbar-inner').length){
+                    $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
+                }
 
-            $('.hololink-toolbar-tooltip').remove()
+                $('.hololink-toolbar-tooltip').remove()
 
-        });
+            });
 
-        // Force tooltip to close after use clicked toolbar button
-        $('#hololink_toolbar_annotate').on('click', function(){
-            render_annotation();
-        });
+            // Force tooltip to close after use clicked toolbar button
+            $('#hololink_toolbar_annotate').on('click', function(){
+                render_annotation();
+            });
+        } else {
+
+        }
+        
     }
     $('.hololink-toolbar-button').tooltip({
         template: '<div class="hololink-toolbar-tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
@@ -209,9 +228,9 @@ function post_highligh_to_hololink(data){
 
 function generate_url(target_id, page_url){
     if (page_url.substr(-1) != '/'){
-        return `${page_url}/#${target_id}`
+        return `${page_url}/@${current_user}/#${target_id}`
     } else {
-        return `${page_url}#${target_id}`
+        return `${page_url}@${current_user}/#${target_id}`
     }
 }
 
@@ -238,21 +257,23 @@ function assemble_sidebar_highlight_content(highlight_target){
         <div style="padding: 0 20px 20px 20px;">
             <div class="card highlight-annotation shadow" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight_target.id_on_page}">
                 <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
-                    <div class="col d-flex" style="margin-right: auto;">
+                    <div class="col d-flex" style="margin: auto auto auto 0 ;">
                         <div class="highlight-user">
                             ${highlight_target.highlighted_by_username}
                         </div>
                     </div>
                     <div class="col d-flex">
-                        <div class="highligh-time" style="margin-left: auto;">
+                        <div class="highlight-time" style="margin: auto 0 auto auto;">
                             2020/11/26
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="card shadow-sm highlight-content">
+                <div class="row d-flex">
+                    <div class="card shadow-sm highlight-content flex-grow-1">
                         <div class="row">
-                            ${highlight_target.text}
+                            <div class="">
+                                ${highlight_target.text}
+                            </div>
                         </div>
                         <div class="row d-flex" style="margin-top: 10px;">
                             <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="display: flex;"><img class="delete-hololink-highlight-img" style="margin-left:auto"></button>
@@ -309,7 +330,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                 $(shadow).find('.hololink-sidebar').remove();
             });
 
-            console.log(sidebar_highlight_content , highlight)
+            //console.log(sidebar_highlight_content , highlight)
             
             var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
             highlight_annotation_container.html(sidebar_highlight_content)
