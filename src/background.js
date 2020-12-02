@@ -225,44 +225,43 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
 
 // Take consideration on onCreated event, but it's too unreliable
 // [Improvement] - Need to find solution to limit request 
-chrome.tabs.onUpdated.addListener(function(){
+chrome.tabs.onUpdated.addListener(function(tab_id, change_info, tab){
     //check whether user logged in
-    
-    chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
-        if (cookie){
-            session_id = cookie
-            chrome.browserAction.setPopup({"popup":"popup.html"})
-            //window.location.href="popup.html";
-            console.log('user already logged in');  
-        }
-        else{
-            //window.location.href="popup_login.html";
-            chrome.browserAction.setPopup({"popup":"popup_login.html"})
-            console.log('user not log in'); 
-        } 
-    });
-     
-    //get csrf_token
-    chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
-        csrf_token = cookie;
-        console.log(csrf_token)
-    });
-    
-})
+    if (change_info.status == 'complete'){
+        chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
+            if (cookie){
+                session_id = cookie
+                chrome.browserAction.setPopup({"popup":"popup.html"})
+                //window.location.href="popup.html";
+                console.log('user already logged in');  
+            }
+            else{
+                //window.location.href="popup_login.html";
+                chrome.browserAction.setPopup({"popup":"popup_login.html"})
+                console.log('user not log in'); 
+            } 
+        });
+         
+        //get csrf_token
+        chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
+            csrf_token = cookie;
+            console.log(csrf_token)
+        });
 
-chrome.tabs.onCreated.addListener(function(){
-    //send csrf_token and session_id to content_script
-    chrome.tabs.query({active: true, currentWindow: true}, function(tab) {
-        current_page_title = tab[0].title;
-        current_page_url = tab[0].url;
-        request = {
-            page_url:current_page_url,
-            page_title:current_page_title,
-            target_url:target_hololink_host+'api/broswer-extension-data/'
-        }
-        get_user_basic_data_of_current_page(request)
-    });
-});
+        // send csrf_token and session_id to content_script
+        // and get basic data of current page
+        chrome.tabs.query({active: true, currentWindow: true}, function(tab) {
+            current_page_title = tab[0].title;
+            current_page_url = tab[0].url;
+            request = {
+                page_url:current_page_url,
+                page_title:current_page_title,
+                target_url:target_hololink_host+'api/broswer-extension-data/'
+            }
+            get_user_basic_data_of_current_page(request)
+        });
+    }
+})
 
 /*
 chrome.tabs.onCreated.addListener(function(){
