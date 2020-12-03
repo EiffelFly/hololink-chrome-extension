@@ -45,13 +45,15 @@ function got_user_data_of_current_page_handler(response){
             console.log(json)
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                 // send warning to content_script that Hololink doesn't have this article
-
-                if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
-                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user, csrf_token:csrf_token, session_id:session_id});
-                } else if (json.highlight.length) {
+                if (json.highlight.length){
+                    if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
+                        chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user, csrf_token:csrf_token, session_id:session_id});
+                    } else if (json.highlight.length) {
+                        chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id});
+                    }
+                } else {
                     chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id});
-                }
-                
+                } 
             });
             
             
