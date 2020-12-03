@@ -113,7 +113,11 @@ $(function(){
 function ensure_content_script_is_running(tabId, message, callback){
     chrome.tabs.sendMessage(tabId, {ping: true}, function(response){
         if(response && response.pong) { // Content script is ready
-            chrome.tabs.sendMessage(tabId, message, callback);
+            chrome.tabs.sendMessage(tabId, message, function(response){
+                if (response.message == "successfully open sidebar"){
+                    window.close();
+                }
+            });
         } else { // No listener on the other end
             chrome.tabs.executeScript(tabId, {file: "prep.js"}, function(){
                 if(chrome.runtime.lastError) {
@@ -121,7 +125,11 @@ function ensure_content_script_is_running(tabId, message, callback){
                     throw Error("Unable to inject script into tab " + tabId);
                 }
                 // OK, now it's injected and ready
-                chrome.tabs.sendMessage(tabId, message, callback);
+                chrome.tabs.sendMessage(tabId, message, function(response){
+                    if (response.message == "successfully open sidebar"){
+                        window.close();
+                    }
+                });
             });
         }
     });

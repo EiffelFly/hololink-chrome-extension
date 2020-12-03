@@ -406,9 +406,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
 
             //close_sidebar_if_user_click_outside();
-
+            sendResponse({message:"successfully open sidebar"})
         });
     }
+    return true
 });
 
 
