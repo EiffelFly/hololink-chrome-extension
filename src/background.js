@@ -45,6 +45,7 @@ function got_user_data_of_current_page_handler(response){
             console.log(json)
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                 // send warning to content_script that Hololink doesn't have this article
+
                 if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
                     chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user, csrf_token:csrf_token, session_id:session_id});
                 } else if (json.highlight.length) {
@@ -82,7 +83,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         
                         var raw = JSON.stringify({
                             "name": request.data.data_title,
-                            "content": request.data.data,
+                            "content": request.data.page_text,
                             "from_url": request.data.data_url,
                             "recommended": request.data.recommendation,
                             "projects": request.data.data_projects,
@@ -101,6 +102,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             
                         fetch(request.data.target_url, requestOptions)
                             .then(ErrorsHandler)
+                            .then(sendResponse({message:"mission_complete"}))
                             .then(response => response.text())
                             .then(result => console.log(result))
                             .catch(error => console.log('error', error));                  
@@ -109,6 +111,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             }
         });
     }
+    return true
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){

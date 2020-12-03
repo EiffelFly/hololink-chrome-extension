@@ -197,7 +197,7 @@ chrome.runtime.onMessage.addListener(function(request,sender){
     if (request.action == "gotText"){
         fullData = {
             query: "postData",
-            data: request.source,
+            page_text: request.source,
             target_url: target_hololink_host+"api/articles/",
             data_url: url,
             data_title:  title,
@@ -271,9 +271,9 @@ chrome.runtime.onMessage.addListener(function(request,sender){
 
 /* 呼叫 Text-Clipper */
 function callTextClipper(){
-    chrome.tabs.executeScript(null, {file:"src/getHtml.js"}, function(){
+    chrome.tabs.executeScript(null, {file:"src/getHtml.js"}, function(response){
         // If you try and inject into an extensions page or the webstore/NTP you'll get an error
-        console.log("let's go")
+        console.log("let's go", response)
         if (chrome.runtime.lastError){
             console.log('There was an error injecting script : \n' + chrome.runtime.lastError.message)
         }

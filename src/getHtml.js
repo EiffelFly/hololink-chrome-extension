@@ -2,6 +2,8 @@
  Contribute https://github.com/ZachSaucier/Just-Read/blob/b6b209ff566239b359b15d651b6716fb5fcf7f4d/content_script.js#L1191
  */
 
+var target_hololink_host = "http://127.0.0.1:8000/"
+
 function findContentContainer(){
     //countMaxNum-Method
     // flow: find MaxNum<p> -> select outer layer from MaxNum<p> until reach 40% total words-> clone selected word -> delete unneccessay element -> export
@@ -110,11 +112,10 @@ function findContentContainer(){
     data = data.replace(/(\r\n|\n|\r)/gm, "");
 
     return data;
-}
-
-console.log('begin process')
+};
 
 // 呼叫上述 function 並且將資料丟回去
 chrome.runtime.sendMessage({action: "gotText",source: findContentContainer()}, function(){
     console.log('begin text clipping process');
 })
+
