@@ -39,6 +39,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             deserialize_range_object_and_highlight(highlight[i]);
         }
 
+        console.log(highlight)
+
         page_got_highlighted_when_created = true;
         content_script_status = 'complete'
         console.log(content_script_status, current_page_title)
@@ -133,14 +135,23 @@ function render_toolbar(){
             position_toolbar(position.x, position.y);
             hololink_toolbar_container.appendChild(hololink_toolbar_inner);
             $('#hololink_toolbar_highlight').on('click', function(){
-                render_highlight(selection);
+
+                var highlight = render_highlight(selection);
+                assemble_sidebar_highlight_content(highlight)
+
+                var hololink_sidebar = find_element_in_sidebar_shadow_root('.highlight-annotation-container')
+                
+                // when sidebar open, we have to insert the highlight content into sidebar right away 
+                if (hololink_sidebar.length){
+                    hololink_sidebar.html(sidebar_highlight_content)
+                }
 
                 //close hololink-toolbar bubble
                 if ($('.hololink-toolbar-inner').length){
                     $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
                 }
                 
-                // Force tooltip to close after use clicked toolbar button
+                // Force tooltip to close after user clicked toolbar button
                 $('.hololink-toolbar-tooltip').remove()
             });
 
@@ -220,6 +231,7 @@ function render_highlight(selection){
             }
         }
     }
+    return data
 };
 
 // this function can get the user selected text including in textarea
@@ -331,6 +343,12 @@ function assemble_sidebar_highlight_content(highlight_target){
     //console.log(sidebar_highlight_content)
 }
 
+function find_element_in_sidebar_shadow_root(element){
+    shadow = $('.hololink-sidebar-container')[0].shadowRoot
+    target_element = $(shadow).find(`${element}`);
+    return target_element
+}
+
 
 function deserialize_range_object_and_highlight(highlight){
     if (page_got_highlighted_when_created == false){
@@ -387,7 +405,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
             //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
 
-            close_sidebar_if_user_click_outside();
+            //close_sidebar_if_user_click_outside();
 
         });
     }
