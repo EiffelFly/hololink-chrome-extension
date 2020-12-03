@@ -12,12 +12,13 @@ var sidebar_update_highlight = false
 var target_hololink_host = "http://127.0.0.1:8000/"
 var sidebar_highlight_content = ''
 var page_got_highlighted_when_created = false
-var loading_user_data = true
-
-
+var content_script_status = 'loading'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if(request.action == 'content_script_change_status'){
+
+        content_script_status = 'loading'
+
         if (request.message == 'hololink_doesnt_have_this_article'){
             hololink_have_this_article = false
         } else {
@@ -37,7 +38,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         }
 
         page_got_highlighted_when_created = true;
-        loading_user_data = false
+        content_script_status = 'complete'
+        console.log(content_script_status)
+
+        if ($('.hololink-toolbar-inner-with-spinner').length) {
+            $('.hololink-toolbar-container').find('.hololink-toolbar-inner-with-spinner').remove();
+            render_toolbar()
+        }
 
     }
 });
@@ -69,11 +76,11 @@ hololink_toolbar_inner.setAttribute('class', 'hololink-toolbar-inner');
 
 // setup toolbar spinner
 var hololink_toolbar_inner_with_spinner = document.createElement('div');
-hololink_toolbar_inner.setAttribute('class', 'hololink-toolbar-inner-with-spinner');
+hololink_toolbar_inner_with_spinner.setAttribute('class', 'hololink-toolbar-inner-with-spinner');
 
 // we use loading animation from here
 // https://loading.io/css/
-hololink_toolbar_inner.innerHTML = "<div class='lds-ellipsis'><div></div><div></div><div></div><div></div></div>"
+hololink_toolbar_inner_with_spinner.innerHTML = "<div class='lds-ellipsis'><div></div><div></div><div></div><div></div></div>"
 
 
 var highlight_button = document.createElement('button');
@@ -112,14 +119,17 @@ console.log('selection sanity check')
 
 // Lets listen to mouseup DOM events.
 document.addEventListener('mouseup', function (e) {
+    render_toolbar();
+}, false);
+
+function render_toolbar(){
     const selection = document.getSelection && document.getSelection();
     var position = calaculate_tooltip_position()
 
     if (selection.toString().length > 0 && !$('.hololink-toolbar-inner').length) {
-        if (loading_user_data == false){
-            render_tooltip(position.x, position.y);
+        if (content_script_status == 'complete'){
+            position_toolbar(position.x, position.y);
             hololink_toolbar_container.appendChild(hololink_toolbar_inner);
-            console.log('inside')
             $('#hololink_toolbar_highlight').on('click', function(){
                 render_highlight(selection);
 
@@ -127,17 +137,18 @@ document.addEventListener('mouseup', function (e) {
                 if ($('.hololink-toolbar-inner').length){
                     $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
                 }
-
+                
+                // Force tooltip to close after use clicked toolbar button
                 $('.hololink-toolbar-tooltip').remove()
-
             });
 
-            // Force tooltip to close after use clicked toolbar button
+            
             $('#hololink_toolbar_annotate').on('click', function(){
                 render_annotation();
             });
-        } else {
-
+        } else if (content_script_status == 'loading') {
+            position_toolbar(position.x, position.y);
+            hololink_toolbar_container.appendChild(hololink_toolbar_inner_with_spinner);
         }
         
     }
@@ -145,20 +156,21 @@ document.addEventListener('mouseup', function (e) {
         template: '<div class="hololink-toolbar-tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
         trigger : 'hover',
         html: true,
-    })
-
-}, false);
+    });
+};
 
 // Close the hololink-toolbar bubble when we click on the screen.
 $(window).on('mousedown', function(e){
     // check if click event occured inside the hololink-toolbar-container
     target_array = Array.from(e.target.classList)
-    const check_array_exist_target_class = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner'].indexOf(r) >= 0 )
+    const check_pointer_target_exist_target_class = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner', 'hololink-toolbar-inner-with-spinner'].indexOf(r) >= 0 )
 
-    if ($('.hololink-toolbar-inner').length){
-        if (!check_array_exist_target_class){
+    if ($('.hololink-toolbar-inner').length ){
+        if (!check_pointer_target_exist_target_class){
             $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
         }
+    } else if ($('.hololink-toolbar-inner-with-spinner').length) {
+        $('.hololink-toolbar-container').find('.hololink-toolbar-inner-with-spinner').remove();
     }
 });
 
@@ -235,9 +247,15 @@ function generate_url(target_id, page_url){
 }
 
 // Move that bubble to the appropriate location.
-function render_tooltip(x, y) {
-    hololink_toolbar_inner.style.left = x + 'px';
-    hololink_toolbar_inner.style.top = y + 'px';
+function position_toolbar(x, y) {
+    if (content_script_status == 'complete'){
+        hololink_toolbar_inner.style.left = x + 'px';
+        hololink_toolbar_inner.style.top = y + 'px';
+    } else {
+        hololink_toolbar_inner_with_spinner.style.left = x + 'px';
+        hololink_toolbar_inner_with_spinner.style.top = y + 'px';
+    }
+    
 }
 
 function calaculate_tooltip_position(){
