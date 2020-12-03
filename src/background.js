@@ -20,6 +20,13 @@ function ErrorsHandler(response){
     return response
 }
 
+function send_response_to_content_script(response){
+    if (response.ok) {
+        console.log(response)
+        return sendResponse({message:"mission_complete"})
+    }
+}
+
 function got_user_data_of_current_page_handler(response){
     if (!response.ok){
         console.log('ERROR: ' + response)
@@ -104,7 +111,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             
                         fetch(request.data.target_url, requestOptions)
                             .then(ErrorsHandler)
-                            .then(sendResponse({message:"mission_complete"}))
+                            .then(response => (response.ok)? sendResponse({message:"mission_complete"}): sendResponse({message:"mission_failed"}))
                             .then(response => response.text())
                             .then(result => console.log(result))
                             .catch(error => console.log('error', error));                  
