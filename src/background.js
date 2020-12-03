@@ -227,6 +227,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
 // [Improvement] - Need to find solution to limit request 
 chrome.tabs.onUpdated.addListener(function(tab_id, change_info, tab){
     //check whether user logged in
+    console.log(change_info)
     if (change_info.status == 'complete'){
         chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
             if (cookie){
@@ -251,6 +252,7 @@ chrome.tabs.onUpdated.addListener(function(tab_id, change_info, tab){
         // send csrf_token and session_id to content_script
         // and get basic data of current page
         chrome.tabs.query({active: true, currentWindow: true}, function(tab) {
+            console.log(tab)
             current_page_title = tab[0].title;
             current_page_url = tab[0].url;
             request = {
