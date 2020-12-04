@@ -1,6 +1,6 @@
 
 // current task: activate sidebar and scroll
-// TODO: 
+// TODO: make highlight listener correct
 
 var csrf_token
 var session_id
@@ -245,7 +245,7 @@ function assemble_sidebar_highlight_content(highlight_target){
     // restore highlight from hololink data
     var highlight_content = `
         <div style="padding: 0 20px 20px 20px;">
-            <div class="card highlight-annotation shadow" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight_target.id_on_page}">
+            <div class="card highlight-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight_target.id_on_page}">
                 <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
                     <div class="col d-flex" style="margin: auto auto auto 0 ;">
                         <div class="highlight-user">
@@ -339,7 +339,6 @@ $(window).on('mousedown', function(e){
 });
 
 async function open_sidebar(){
-
     // In order to make this async function much simpler, we use sync ajax instead of $.get(url, function(){})
     jQuery.ajax({
         url: chrome.extension.getURL("hololink-sidebar.html"),
@@ -379,19 +378,17 @@ async function open_sidebar(){
     });
 };
 
-function scoll_to_highlight_at_sidebar(element){
-    console.log(element)
-    shadow = $('.hololink-sidebar-container')[0].shadowRoot
-
-    var target_element = $(shadow).find(`#${element.target.id}`)
-    var target_window = $(shadow).find('.highlight-annotation-container')
-    
-    var target_element_offset = get_better_offect(true, target_element, target_window)
-    console.log(target_element_offset)
-    //.scrollIntoView()
-
-    $(shadow).find('.highlight-annotation-container').animate({
-        scrollTop: target_element_offset}, 1000);
+function scoll_to_highlight_and_forcus_at_sidebar(element){
+    var shadow = $('.hololink-sidebar-container')[0].shadowRoot;
+    var target_element = $(shadow).find(`#${element.target.id}`);
+    var target_window = $(shadow).find('.highlight-annotation-container');
+    var target_element_offset = get_better_offect(true, target_element, target_window);
+    target_window.animate({
+        scrollTop: target_element_offset
+    }, 500);
+    target_element.focus();
+    target_element.toggleClass('hovered')
+    console.log('dd')
 }
 
 /**
@@ -425,13 +422,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
         // add click listener to activate sidebar when user click highlight
         $('.hololink-highlight').on('click', function(e){
+            console.log('ff')
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
             var hololink_sidebar = $(shadow).find('.hololink-sidebar')
             if(!hololink_sidebar.length){
                 open_sidebar()
-                    .then(scoll_to_highlight_at_sidebar(e))
+                    .then(scoll_to_highlight_and_forcus_at_sidebar(e))
             } else {
-                scoll_to_highlight_at_sidebar(e)
+                scoll_to_highlight_and_forcus_at_sidebar(e)
             }
             
         })

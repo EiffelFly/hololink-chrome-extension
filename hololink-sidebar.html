@@ -36,9 +36,18 @@
         opacity: 0.5;
     }
 
+    .highlight-annotation{
+        box-shadow: rgba(10, 10, 10, 0.1) 0px 0px 0px 1px, rgba(10, 10, 10, 0.1) 0px 2px 4px;
+    }
+
+    .highlight-annotation.hovered {
+        box-shadow: rgba(10, 10, 10, 0.3) 1px 2px 4px 1px;
+        transition: box-shadow 0.3s ease-in;
+    }
+
     .highlight-annotation:hover .highlight-content{
         background-color: #D1F2EB;
-        transition: background-color 0.3s ease-in;
+        transition: background-color 0.3s ease-in;        
     }
 
     .highlight-annotation:hover .delete-hololink-highlight{
