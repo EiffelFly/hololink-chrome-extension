@@ -1,5 +1,6 @@
 
-// current task: upload highlight to main
+// current task: activate sidebar and scroll
+// TODO: 
 
 var csrf_token
 var session_id
@@ -120,20 +121,7 @@ function render_toolbar(){
     });
 };
 
-// Close the hololink-toolbar bubble when we click on the screen.
-$(window).on('mousedown', function(e){
-    // check if click event occured inside the hololink-toolbar-container
-    target_array = Array.from(e.target.classList)
-    const check_pointer_target_exist_target_class = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner', 'hololink-toolbar-inner-with-spinner'].indexOf(r) >= 0 )
 
-    if ($('.hololink-toolbar-inner').length ){
-        if (!check_pointer_target_exist_target_class){
-            $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
-        }
-    } else if ($('.hololink-toolbar-inner-with-spinner').length) {
-        $('.hololink-toolbar-container').find('.hololink-toolbar-inner-with-spinner').remove();
-    }
-});
 
 function render_annotation(){
 
@@ -322,19 +310,33 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return true; 
     }
 });
+// Close the hololink-toolbar amd sidebar when we click on the screen.
+$(window).on('mousedown', function(e){
+    // check if click event occured inside the hololink-toolbar-container
+    var target_array = Array.from(e.target.classList)
+    const check_click_exist_target_class_for_toolbar = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner', 'hololink-toolbar-inner-with-spinner'].indexOf(r) >= 0 )
+    const check_click_exist_target_class_for_sidebar = target_array.some( r => ['hololink-sidebar-container', 'hololink-highlight'].indexOf(r) >= 0 )
 
-function close_sidebar_if_user_click_outside(){
+    if ($('.hololink-toolbar-inner').length ){
+        if (!check_click_exist_target_class_for_toolbar){
+            $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
+        }
+    } else if ($('.hololink-toolbar-inner-with-spinner').length) {
+        $('.hololink-toolbar-container').find('.hololink-toolbar-inner-with-spinner').remove();
+    }
+
     // Close sidebar if user's click event triggered outside the sidebar.
+    var shadow = $('.hololink-sidebar-container')[0].shadowRoot
+    var hololink_sidebar = $(shadow).find('.hololink-sidebar')
 
-    $(window).on('click', function(e){
-        if(!$(e.target).is('.hololink-sidebar-container')){
-            //console.log('uee')
+    if (hololink_sidebar.length){
+        if (!check_click_exist_target_class_for_sidebar){
             if (lock_sidebar == false){
-                $(shadow).find('.hololink-sidebar').remove();
+                hololink_sidebar.remove();
             }
         }
-    });
-}
+    } 
+});
 
 async function open_sidebar(){
     $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
@@ -370,8 +372,6 @@ async function open_sidebar(){
         delere_highlight_img.attr('src', `${trashcan_img_path}`)
 
         //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
-
-        close_sidebar_if_user_click_outside();
     });
 };
 
@@ -380,7 +380,7 @@ function scoll_to_highlight_at_sidebar(element){
     shadow = $('.hololink-sidebar-container')[0].shadowRoot
     $(shadow).find('.highlight-annotation-container').animate({
         scrollTop: $(`#${element.target.id}`).offset().top
-    }, 2000);
+    }, 1000);
 }
 
 /**
