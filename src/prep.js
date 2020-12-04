@@ -226,7 +226,7 @@ function post_highligh_to_hololink(highlight){
     
 };
 
-function generate_url(target_id, page_url){
+function generate_url(target_id){
     if (page_url.substr(-1) != '/'){
         return `${page_url}/@${current_user}/#${target_id}`
     } else {
@@ -377,6 +377,14 @@ async function open_sidebar(){
 
         close_sidebar_if_user_click_outside();
     });
+};
+
+function scoll_to_highlight_at_sidebar(element){
+    console.log(element)
+    shadow = $('.hololink-sidebar-container')[0].shadowRoot
+    $(shadow).find('.highlight-annotation-container').animate({
+        scrollTop: $(`#${element.target.id}`).offset().top
+    }, 2000);
 }
 
 /**
@@ -409,7 +417,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         }
 
         // add click listener to activate sidebar when user click highlight
-        $('.hololink-highlight').on('click', function(){
+        $('.hololink-highlight').on('click', function(e){
+            shadow = $('.hololink-sidebar-container')[0].shadowRoot
+            var hololink_sidebar = $(shadow).find('.hololink-sidebar')
+            if(!hololink_sidebar.length){
+                open_sidebar()
+                    .then(scoll_to_highlight_at_sidebar(e))
+            } else {
+                scoll_to_highlight_at_sidebar(e)
+            }
             
         })
 
