@@ -16,52 +16,6 @@ var content_script_status = 'loading'
 var current_page_url = window.location.href;
 var current_page_title = document.title;
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if(request.action == 'content_script_change_status'){
-
-        content_script_status = 'loading'
-
-        if (request.message == 'hololink_doesnt_have_this_article'){
-            hololink_have_this_article = false
-        } else {
-            highlight = request.highlight
-        }
-        current_user = request.user;
-        csrf_token = request.csrf_token;
-        session_id = request.session_id;
-
-        sidebar_highlight_content = ''
-
-        // restore highlight when page is created
-        for (i=0; i<highlight.length; i++){        
-            //console.log(highlight[i])
-            assemble_sidebar_highlight_content(highlight[i])
-            deserialize_range_object_and_highlight(highlight[i]);
-        }
-
-        console.log(highlight)
-
-        page_got_highlighted_when_created = true;
-        content_script_status = 'complete'
-        console.log(content_script_status, current_page_title)
-
-        if ($('.hololink-toolbar-inner-with-spinner').length) {
-            $('.hololink-toolbar-container').find('.hololink-toolbar-inner-with-spinner').remove();
-            render_toolbar()
-        }
-
-    }
-});
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (request.action == 'change_csrftoken_and_sessionid'){
-        console.log('received')
-        csrf_token = request.csrf_token;
-        session_id = request.session_id;
-        console.log(csrf_token, session_id)
-    }
-});
-
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
@@ -119,12 +73,6 @@ hololink_toolbar_inner.appendChild(highlight_button);
 hololink_toolbar_inner.appendChild(annotate_button);
 
 
-console.log('selection sanity check')
-
-// Lets listen to mouseup DOM events.
-document.addEventListener('mouseup', function (e) {
-    render_toolbar();
-}, false);
 
 function render_toolbar(){
     const selection = document.getSelection && document.getSelection();
@@ -207,6 +155,8 @@ function render_highlight(selection){
 
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
+
+        console.log(removeHighlights)
 
         // TODO: find a solution to insert custom element but not affect the DOM tree
 
@@ -332,7 +282,7 @@ function assemble_sidebar_highlight_content(highlight_target){
                             </div>
                         </div>
                         <div class="row d-flex" style="margin-top: 10px;">
-                            <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="display: flex;"><img class="delete-hololink-highlight-img" style="margin-left:auto"></button>
+                            <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>
                         </div>
                     </div>  
                 </div>
@@ -367,51 +317,6 @@ const shadowRoot = hololink_sidebar_container.attachShadow({mode: 'open'});
 //hololink_sidebar_inner.setAttribute('class', 'hololink-sidebar-inner')
 //shadowRoot.appendChild(hololink_sidebar_inner)
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (request.action == 'open_sidebar'){
-        $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
-            //$(data).appendTo($('.hololink-sidebar-inner'));
-            shadow = $('.hololink-sidebar-container')[0].shadowRoot
-
-            jquery_path = chrome.extension.getURL("src/jquery-3.5.1.min.js")
-
-            shadow.innerHTML = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
-            integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-            <script src=${jquery_path}></script>
-            <div class="hololink-sidebar-inner"></div>`
-
-            var inner = $(shadow).find('.hololink-sidebar-inner');
-            inner.html(data);
-            x_img_path = chrome.extension.getURL("img/x.svg")
-            var close_sidebar_img = $(shadow).find('.close-hololink-sidebar-img');
-            close_sidebar_img.attr('width', 20)
-            close_sidebar_img.attr('height', 20)
-            close_sidebar_img.attr('src', `${x_img_path}`)
-
-            $(shadow).find('#close_hololink_sidebar').on('click', function(){
-                $(shadow).find('.hololink-sidebar').remove();
-            });
-
-            //console.log(sidebar_highlight_content , highlight)
-            
-            var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
-            highlight_annotation_container.html(sidebar_highlight_content)
-
-            trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
-            var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
-            delere_highlight_img.attr('width', 20)
-            delere_highlight_img.attr('height', 20)
-            delere_highlight_img.attr('src', `${trashcan_img_path}`)
-
-            //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
-
-            //close_sidebar_if_user_click_outside();
-            sendResponse({message:"successfully open sidebar"})
-        });
-    }
-    return true
-});
-
 
 // callback for ensure_content_script_is_runnung
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -434,6 +339,107 @@ function close_sidebar_if_user_click_outside(){
         }
     });
 }
+
+async function open_sidebar(){
+    $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
+        //$(data).appendTo($('.hololink-sidebar-inner'));
+        shadow = $('.hololink-sidebar-container')[0].shadowRoot
+
+        jquery_path = chrome.extension.getURL("src/jquery-3.5.1.min.js")
+
+        shadow.innerHTML = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <script src=${jquery_path}></script>
+        <div class="hololink-sidebar-inner"></div>`
+
+        var inner = $(shadow).find('.hololink-sidebar-inner');
+        inner.html(data);
+        x_img_path = chrome.extension.getURL("img/x.svg")
+        var close_sidebar_img = $(shadow).find('.close-hololink-sidebar-img');
+        close_sidebar_img.attr('width', 20)
+        close_sidebar_img.attr('height', 20)
+        close_sidebar_img.attr('src', `${x_img_path}`)
+
+        $(shadow).find('#close_hololink_sidebar').on('click', function(){
+            $(shadow).find('.hololink-sidebar').remove();
+        });
+        
+        var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
+        highlight_annotation_container.html(sidebar_highlight_content)
+
+        trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
+        var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
+        delere_highlight_img.attr('width', 20)
+        delere_highlight_img.attr('height', 20)
+        delere_highlight_img.attr('src', `${trashcan_img_path}`)
+
+        //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
+
+        close_sidebar_if_user_click_outside();
+    });
+}
+
+/**
+ * Listener 
+ * 1. content_script_change_status - when tabs updated, this will be fired
+ * 2. open_sidebar - when user push open sidebar button 
+ * 3. mouseup event - to render hololink toolbar
+ */
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if(request.action == 'content_script_change_status'){
+
+        content_script_status = 'loading'
+
+        if (request.message == 'hololink_doesnt_have_this_article'){
+            hololink_have_this_article = false
+        } else {
+            highlight = request.highlight
+        }
+        current_user = request.user;
+        csrf_token = request.csrf_token;
+        session_id = request.session_id;
+
+        sidebar_highlight_content = ''
+
+        // restore highlight when page is created
+        for (i=0; i<highlight.length; i++){        
+            //console.log(highlight[i])
+            assemble_sidebar_highlight_content(highlight[i])
+            deserialize_range_object_and_highlight(highlight[i]);            
+        }
+
+        // add click listener to activate sidebar when user click highlight
+        $('.hololink-highlight').on('click', function(){
+            
+        })
+
+        console.log(highlight)
+
+        page_got_highlighted_when_created = true;
+        content_script_status = 'complete'
+        console.log(content_script_status, current_page_title)
+
+        if ($('.hololink-toolbar-inner-with-spinner').length) {
+            $('.hololink-toolbar-container').find('.hololink-toolbar-inner-with-spinner').remove();
+            render_toolbar()
+        }
+
+    }
+});
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.action == 'open_sidebar'){
+        open_sidebar()
+            .then(sendResponse({message:"successfully open sidebar"}))   
+            .then(console.log)
+    }
+    return true
+});
+
+document.addEventListener('mouseup', function (e) {
+    render_toolbar();
+}, false);
+
 
 /* 
 * ----------------------------------------------------------------------------------------------------------------
@@ -470,6 +476,8 @@ function highlightRange(range, tagName, attributes = {}) {
             removeHighlight(highlightElements[highlightIdx]);
         }
     }
+
+    return removeHighlights
 
     /*
      * TODO: need to find a solution that will recover range object after we changed the DOM
