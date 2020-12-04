@@ -264,7 +264,7 @@ function assemble_sidebar_highlight_content(highlight_target){
                 <div class="row d-flex">
                     <div class="card shadow-sm highlight-content flex-grow-1">
                         <div class="row">
-                            <div class="">
+                            <div>
                                 ${highlight_target.text}
                             </div>
                         </div>
@@ -377,22 +377,26 @@ async function open_sidebar(){
             delere_highlight_img.attr('src', `${trashcan_img_path}`)
 
             // when user click highlight in sidebar, focus highlight text in main document 
-            $('.highlight-annotation').on('click', function(e){
-                var target_element = $(`.hololink-highlight #${e.target.id}`)
+            $(shadow).find('.highlight-annotation, .highlight-user, .highlight-time, .highlight-content').on('click', function(e){
+                if (!e.target.id){
+                    e.target.id = $(this).closest('.highlight-annotation').attr('id')
+                    console.log(e.target.id )
+                }
+
+                var target_element = $(shadow).find(`[id=${e.target.id}]`)
                 var target_element_offset = get_better_offect(false, target_element)
                 $(window).animate({
                     scrollTop: target_element_offset
                 }, 1000);
 
-                console.log(e)
+                //console.log(e)
 
                 // remove all hovered element
                 $('.hololink-highlight').removeClass('hovered')
                 $(shadow).find('.highlight-annotation').removeClass('hovered')
 
-                target_element.focus();
                 target_element.toggleClass('hovered')
-                $(`#${element.target.id}`).toggleClass('hovered')
+                $(`hololink-highlight[id=${e.target.id}]`).toggleClass('hovered')
 
             }); 
 
