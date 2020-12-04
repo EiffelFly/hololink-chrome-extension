@@ -375,9 +375,26 @@ async function open_sidebar(){
             delere_highlight_img.attr('width', 20)
             delere_highlight_img.attr('height', 20)
             delere_highlight_img.attr('src', `${trashcan_img_path}`)
-            console.log(data)
 
-            
+            // when user click highlight in sidebar, focus highlight text in main document 
+            $('.highlight-annotation').on('click', function(e){
+                var target_element = $(`.hololink-highlight #${e.target.id}`)
+                var target_element_offset = get_better_offect(false, target_element)
+                $(window).animate({
+                    scrollTop: target_element_offset
+                }, 1000);
+
+                console.log(e)
+
+                // remove all hovered element
+                $('.hololink-highlight').removeClass('hovered')
+                $(shadow).find('.highlight-annotation').removeClass('hovered')
+
+                target_element.focus();
+                target_element.toggleClass('hovered')
+                $(`#${element.target.id}`).toggleClass('hovered')
+
+            }); 
 
         },
         async:false
@@ -395,10 +412,15 @@ function scoll_to_highlight_and_forcus_at_sidebar(element){
     
     // remove all hovered element
     $(shadow).find('.highlight-annotation').removeClass('hovered')
+    $('.hololink-highlight').removeClass('hovered')
 
-    target_element.focus();
+    //target_element.focus();
     target_element.toggleClass('hovered')
-    console.log('dd')
+    // because we highlight a selection with one id, in order to avoid some error, 
+    // we have to specific attribute and class
+    $(`hololink-highlight[id=${element.target.id}]`).toggleClass('hovered')
+
+    console.log('dd',$(`hololink-highlight[id=${element.target.id}]`))
 
 }
 
