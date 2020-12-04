@@ -383,20 +383,23 @@ async function open_sidebar(){
                     console.log(e.target.id )
                 }
 
-                var target_element = $(shadow).find(`[id=${e.target.id}]`)
-                var target_element_offset = get_better_offect(false, target_element)
-                $(window).animate({
-                    scrollTop: target_element_offset
-                }, 1000);
+                var target_element = $(`hololink-highlight[id=${e.target.id}]`)
+                var target_element_offset = get_better_offect(true, target_element) - ($(window).height() - target_element.outerHeight(true))/2
 
-                //console.log(e)
+                
+                window.scrollTo({
+                    top:target_element_offset, 
+                    behavior:'smooth'
+                });
+
+                console.log(target_element, target_element_offset, target_element.offset().top, ($(window).height() - target_element.outerHeight(true))/2)
+                console.log($(window), $(window).height())
 
                 // remove all hovered element
                 $('.hololink-highlight').removeClass('hovered')
                 $(shadow).find('.highlight-annotation').removeClass('hovered')
 
                 target_element.toggleClass('hovered')
-                $(`hololink-highlight[id=${e.target.id}]`).toggleClass('hovered')
 
             }); 
 
