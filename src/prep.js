@@ -227,11 +227,7 @@ function post_highligh_to_hololink(highlight){
 };
 
 function generate_url(target_id){
-    if (page_url.substr(-1) != '/'){
-        return `${page_url}/@${current_user}/#${target_id}`
-    } else {
-        return `${page_url}@${current_user}/#${target_id}`
-    }
+    return `${current_user}-${target_id}`
 }
 
 // Move that bubble to the appropriate location.
