@@ -144,6 +144,9 @@ function render_highlight(selection){
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
 
+
+
+
         console.log(removeHighlights)
 
         // TODO: find a solution to insert custom element but not affect the DOM tree
@@ -373,6 +376,9 @@ async function open_sidebar(){
             delere_highlight_img.attr('height', 20)
             delere_highlight_img.attr('src', `${trashcan_img_path}`)
             console.log(data)
+
+            
+
         },
         async:false
     });
@@ -386,9 +392,14 @@ function scoll_to_highlight_and_forcus_at_sidebar(element){
     target_window.animate({
         scrollTop: target_element_offset
     }, 500);
+    
+    // remove all hovered element
+    $(shadow).find('.highlight-annotation').removeClass('hovered')
+
     target_element.focus();
     target_element.toggleClass('hovered')
     console.log('dd')
+
 }
 
 /**
