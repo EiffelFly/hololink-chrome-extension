@@ -339,48 +339,59 @@ $(window).on('mousedown', function(e){
 });
 
 async function open_sidebar(){
-    $.get(chrome.extension.getURL("hololink-sidebar.html"), function (data) {
-        //$(data).appendTo($('.hololink-sidebar-inner'));
-        shadow = $('.hololink-sidebar-container')[0].shadowRoot
 
-        jquery_path = chrome.extension.getURL("src/jquery-3.5.1.min.js")
+    // In order to make this async function much simpler, we use sync ajax instead of $.get(url, function(){})
+    jQuery.ajax({
+        url: chrome.extension.getURL("hololink-sidebar.html"),
+        success: function(data) {
+            shadow = $('.hololink-sidebar-container')[0].shadowRoot
 
-        shadow.innerHTML = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
-        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-        <script src=${jquery_path}></script>
-        <div class="hololink-sidebar-inner"></div>`
+            jquery_path = chrome.extension.getURL("src/jquery-3.5.1.min.js")
 
-        var inner = $(shadow).find('.hololink-sidebar-inner');
-        inner.html(data);
-        x_img_path = chrome.extension.getURL("img/x.svg")
-        var close_sidebar_img = $(shadow).find('.close-hololink-sidebar-img');
-        close_sidebar_img.attr('width', 20)
-        close_sidebar_img.attr('height', 20)
-        close_sidebar_img.attr('src', `${x_img_path}`)
+            shadow.innerHTML = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
+            integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+            <script src=${jquery_path}></script>
+            <div class="hololink-sidebar-inner"></div>`
 
-        $(shadow).find('#close_hololink_sidebar').on('click', function(){
-            $(shadow).find('.hololink-sidebar').remove();
-        });
-        
-        var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
-        highlight_annotation_container.html(sidebar_highlight_content)
+            var inner = $(shadow).find('.hololink-sidebar-inner');
+            inner.html(data);
+            x_img_path = chrome.extension.getURL("img/x.svg")
+            var close_sidebar_img = $(shadow).find('.close-hololink-sidebar-img');
+            close_sidebar_img.attr('width', 20)
+            close_sidebar_img.attr('height', 20)
+            close_sidebar_img.attr('src', `${x_img_path}`)
 
-        trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
-        var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
-        delere_highlight_img.attr('width', 20)
-        delere_highlight_img.attr('height', 20)
-        delere_highlight_img.attr('src', `${trashcan_img_path}`)
+            $(shadow).find('#close_hololink_sidebar').on('click', function(){
+                $(shadow).find('.hololink-sidebar').remove();
+            });
+            
+            var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
+            highlight_annotation_container.html(sidebar_highlight_content)
 
-        //sidebar_top_divider.parentNode.insertBefore(sidebar_highlight_content, sidebar_top_divider.nextSibling)
+            trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
+            var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
+            delere_highlight_img.attr('width', 20)
+            delere_highlight_img.attr('height', 20)
+            delere_highlight_img.attr('src', `${trashcan_img_path}`)
+            console.log(data)
+        },
+        async:false
     });
 };
 
 function scoll_to_highlight_at_sidebar(element){
     console.log(element)
     shadow = $('.hololink-sidebar-container')[0].shadowRoot
+
+    var target_element = $(shadow).find(`#${element.target.id}`)
+    var target_window = $(shadow).find('.highlight-annotation-container')
+    
+    var target_element_offset = get_better_offect(true, target_element, target_window)
+    console.log(target_element_offset)
+    //.scrollIntoView()
+
     $(shadow).find('.highlight-annotation-container').animate({
-        scrollTop: $(`#${element.target.id}`).offset().top
-    }, 1000);
+        scrollTop: target_element_offset}, 1000);
 }
 
 /**
@@ -452,6 +463,40 @@ document.addEventListener('mouseup', function (e) {
     render_toolbar();
 }, false);
 
+/*
+function: betterOffset
+ref: https://stackoverflow.com/a/46677056/14058520
+hint: Allows you to calculate dynamic and static offset whether they are in a div container with overscroll or not.
+
+            name:           type:               option:         notes:
+@param      s (static)      boolean             required        default: true | set false for dynamic
+@param      e (element)     string or object    required
+@param      v (viewer)      string or object    optional        If you leave this out, it will use $(window) by default. What I am calling the 'viewer' is the thing that scrolls (i.e. The element with "overflow-y:scroll;" style.).
+
+@return                  numeric
+*/
+function get_better_offect(s, e, v) {
+    // Set Defaults
+    s = (typeof s == 'boolean') ? s : true;
+    e = (typeof e == 'object') ? e : $(e);
+    if (v != undefined) {v = (typeof v == 'object') ? v : $(v);} else {v = false;}
+
+    // Set Variables
+    var w = $(window),              // window object
+        wp = w.scrollTop(),         // window position
+        eo = e.offset().top;        // element offset
+    if (v) {
+        var vo = v.offset().top,    // viewer offset
+            vp = v.scrollTop();     // viewer position
+    }
+
+    // Calculate
+    if (s) {
+        return (v) ? (eo - vo) + vp : eo;
+    } else {
+        return (v) ? eo - vo : eo - wp;
+    }
+}
 
 /* 
 * ----------------------------------------------------------------------------------------------------------------
