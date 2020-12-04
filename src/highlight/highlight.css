@@ -6,3 +6,8 @@
     cursor: pointer;
 }
 
+.hololink-highlight.hovered {
+    background-color: #CDD7FB;
+    transition: all 0.1s;
+    cursor: pointer;
+}

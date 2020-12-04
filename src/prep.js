@@ -392,8 +392,6 @@ async function open_sidebar(){
                     behavior:'smooth'
                 });
 
-                console.log(target_element, target_element_offset, target_element.offset().top, ($(window).height() - target_element.outerHeight(true))/2)
-                console.log($(window), $(window).height())
 
                 // remove all hovered element
                 $('.hololink-highlight').removeClass('hovered')
