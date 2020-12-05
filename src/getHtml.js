@@ -92,6 +92,13 @@ function findContentContainer(){
         deleteImages[0].parentNode.removeChild(deleteImages[0]);
     }
 
+    //刪除 medium noscript tag
+    var deleteMediumNoScriptTag = clone_selectedContainer.getElementsByTagName('noscript');
+    while(deleteMediumNoScriptTag[0]){
+        console.log(deleteMediumNoScriptTag[0])
+        deleteMediumNoScriptTag[0].parentNode.removeChild(deleteMediumNoScriptTag[0]);
+    }
+
     //刪除影片
     var deleteVideos = clone_selectedContainer.getElementsByTagName('video');
 
@@ -103,11 +110,21 @@ function findContentContainer(){
     var deletestylesheet = clone_selectedContainer.getElementsByTagName('style');
 
     while(deletestylesheet[0]){
-        console.log(deletestylesheet[0]);
         deletestylesheet[0].parentNode.removeChild(deletestylesheet[0]);
+    }
+
+    // 刪除按鍵
+    var deleteButton = clone_selectedContainer.getElementsByTagName('button');
+    console.log('button',deleteButton)
+    while(deleteButton[0]){
+        console.log('jddjd',deleteButton[0])
+        deleteButton[0].parentNode.removeChild(deleteButton[0]);
     }
     
     var data = clone_selectedContainer.innerText
+    var array = data.split("\\s{2,}");
+
+    console.log(clone_selectedContainer, data, array)
     
     data = data.replace(/(\r\n|\n|\r)/gm, "");
 
