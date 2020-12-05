@@ -92,6 +92,17 @@ function findContentContainer(){
         deleteImages[0].parentNode.removeChild(deleteImages[0]);
     }
 
+    var deleteFigures = clone_selectedContainer.getElementsByTagName('figure');
+    while(deleteFigures[0]){
+        deleteFigures[0].parentNode.removeChild(deleteFigures[0]);
+    }
+
+    // 刪除 iframe
+    var deleteIFrames = clone_selectedContainer.getElementsByTagName('iframe');
+    while(deleteIFrames[0]){
+        deleteIFrames[0].parentNode.removeChild(deleteIFrames[0]);
+    }
+
     //刪除 medium noscript tag
     var deleteMediumNoScriptTag = clone_selectedContainer.getElementsByTagName('noscript');
     while(deleteMediumNoScriptTag[0]){
@@ -116,6 +127,7 @@ function findContentContainer(){
     // 刪除按鍵
     var deleteButton = clone_selectedContainer.getElementsByTagName('button');
     console.log('button',deleteButton)
+
     while(deleteButton[0]){
         console.log('jddjd',deleteButton[0])
         deleteButton[0].parentNode.removeChild(deleteButton[0]);
@@ -185,7 +197,7 @@ function rebuild_target_container_to_hololink_preference(targer_container){
         console.log('error',error)
     }
 
-    console.log(targer_container)
+    console.log(targer_container.innerHTML)
 
 
     //while(currentNode) {
