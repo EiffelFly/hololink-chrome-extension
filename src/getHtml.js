@@ -136,22 +136,70 @@ function findContentContainer(){
 
 function rebuild_target_container_to_hololink_preference(targer_container){
 
-    console.log(targer_container)
-    
+    /*
+    //\\var target_all_element = targer_container.querySelectorAll("*")
+    //target_all_element.classList.add("hololink-selected-element");
 
+    //for (var i = 0; i < target_all_element.length; i++) {
+    //    target_all_element[i].classList.add('hololink-selected-element');
+    //}
+
+    //console.log(target_all_element)
+    if (targer_container.childNodes.length > 1){
+        var target_nodes_list = targer_container.childNodes
+    } else {
+        if (targer_container.childNodes.childNodes > 1){
+            var target_nodes_list = targer_container.childNodes.childNodes
+        }
+    }
+    console.log(target_nodes_list)
+   
+    for (var i = 0; i < target_nodes_list.length; i++) {
+        // some website 
+        if (target_nodes_list[i].textContent && !/\S+/.test(target_nodes_list[i].textContent)){
+
+        }
+        console.log(target_nodes_list[i].className)
+        //target_nodes_list[i].classList.className += " hololink-selected-element";
+    }
+    */
+    
+    
     treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
     var currentNode = treeWalker.currentNode;
-
-
-    while(currentNode) {
-        // if currentNode is newlines, space we ignore it
-        if (/\s+/.test(currentNode.textContent)){
-            console.log('ohhoho',currentNode);
-        }
-        console.log(currentNode.textContent);
-        
-        currentNode = treeWalker.nextNode();
+    
+    // remove unnecessary element
+    try {
+        targer_container.innerHTML = targer_container.innerHTML.replace(/(id|class|onclick|ondblclick|accesskey|data|dynsrc|tabindex)="[\w- ]+"/g, "")
+            .replace( / style=[ \w="-:\/\/:#;]+/ig, "" )  // style="xxxx"
+            .replace( /label=[\u4e00-\u9fa5 \w="-:\/\/:#;]+"/ig, "" )  // label="xxxx"
+            .replace( /data[-\w]*=[ \w=\-.:\/\/?!;+"]+"[ ]?/ig, "" )   // data="xxx" || data-xxx="xxx"
+            .replace( /href="javascript:[\w()"]+/ig, "" )              // href="javascript:xxx"
+            //.replace( /<figure[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figure >
+            //.replace( /<\/figure>/ig, "" ) // </figure>
+            .replace( /<figcaption[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figcaption >
+            .replace( /<\/figcaption>/ig, "" )                         // </figcaption>
     }
+
+    catch(error) {
+        console.log('error',error)
+    }
+
+    console.log(targer_container)
+
+
+    //while(currentNode) {
+        // if currentNode is newlines, space we ignore it
+    //    if (/\S+/.test(currentNode.textContent)){
+    //        if (currentNode.parentNode){
+    //            console.log('ohhoho',currentNode.parentNode.parentNode);
+    //        }
+            
+    //    } 
+        
+        
+    //    currentNode = treeWalker.nextNode();
+    //}
     
 
 }
