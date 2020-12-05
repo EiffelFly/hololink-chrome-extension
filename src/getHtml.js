@@ -122,7 +122,9 @@ function findContentContainer(){
     }
     
     var data = clone_selectedContainer.innerText
-    var array = data.split("\\s{2,}");
+
+    // this line can split data with newlines
+    var array = data.split(/\r\n|\r|\n/);
 
     console.log(clone_selectedContainer, data, array)
     
