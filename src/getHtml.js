@@ -110,6 +110,13 @@ function findContentContainer(){
         deleteMediumNoScriptTag[0].parentNode.removeChild(deleteMediumNoScriptTag[0]);
     }
 
+    // 刪除 svg
+    var deleteSvgs = clone_selectedContainer.getElementsByTagName('svg');
+    while(deleteSvgs[0]){
+        console.log(deleteSvgs[0])
+        deleteSvgs[0].parentNode.removeChild(deleteSvgs[0]);
+    }
+
     //刪除影片
     var deleteVideos = clone_selectedContainer.getElementsByTagName('video');
 
@@ -179,7 +186,7 @@ function rebuild_target_container_to_hololink_preference(targer_container){
     
     treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
     var currentNode = treeWalker.currentNode;
-    
+    console.log(targer_container)
     // remove unnecessary element
     try {
         targer_container.innerHTML = targer_container.innerHTML.replace(/(id|class|onclick|ondblclick|accesskey|data|dynsrc|tabindex)="[\w- ]+"/g, "")
