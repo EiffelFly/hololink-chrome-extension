@@ -183,7 +183,7 @@ function rebuild_target_container_to_hololink_preference(targer_container){
     // remove unnecessary element
     try {
         targer_container.innerHTML = targer_container.innerHTML.replace(/(id|class|onclick|ondblclick|accesskey|data|dynsrc|tabindex)="[\w- ]+"/g, "")
-            .replace( / style=[ \w="-:\/\/:#;]+/ig, "" )  // style="xxxx"
+            .replace( /style=[ \w="-:\/\/:#;]+/ig, "" )  // style="xxxx"
             .replace( /label=[\u4e00-\u9fa5 \w="-:\/\/:#;]+"/ig, "" )  // label="xxxx"
             .replace( /data[-\w]*=[ \w=\-.:\/\/?!;+"]+"[ ]?/ig, "" )   // data="xxx" || data-xxx="xxx"
             .replace( /href="javascript:[\w()"]+/ig, "" )              // href="javascript:xxx"
@@ -191,6 +191,7 @@ function rebuild_target_container_to_hololink_preference(targer_container){
             //.replace( /<\/figure>/ig, "" ) // </figure>
             .replace( /<figcaption[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figcaption >
             .replace( /<\/figcaption>/ig, "" )                         // </figcaption>
+            .replace( /color=[ \w="-:\/\/:#;]+/ig, "" )  // color="xxxx"
     }
 
     catch(error) {
