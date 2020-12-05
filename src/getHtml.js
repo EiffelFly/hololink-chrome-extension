@@ -123,15 +123,39 @@ function findContentContainer(){
     
     var data = clone_selectedContainer.innerText
 
-    // this line can split data with newlines
+    // this line can split target container inner text with newlines
     var array = data.split(/\r\n|\r|\n/);
 
-    console.log(clone_selectedContainer, data, array)
+    //console.log(clone_selectedContainer, data, array)
+    rebuild_target_container_to_hololink_preference(clone_selectedContainer)
     
     data = data.replace(/(\r\n|\n|\r)/gm, "");
 
     return data;
 };
+
+function rebuild_target_container_to_hololink_preference(targer_container){
+
+    console.log(targer_container)
+    
+
+    treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
+    var currentNode = treeWalker.currentNode;
+
+
+    while(currentNode) {
+        // if currentNode is newlines, space we ignore it
+        if (/\s+/.test(currentNode.textContent)){
+            console.log('ohhoho',currentNode);
+        }
+        console.log(currentNode.textContent);
+        
+        currentNode = treeWalker.nextNode();
+    }
+    
+
+}
+
 
 // 呼叫上述 function 並且將資料丟回去
 chrome.runtime.sendMessage({action: "gotText",source: findContentContainer()}, function(){
