@@ -139,6 +139,9 @@ function findContentContainer(){
         console.log('jddjd',deleteButton[0])
         deleteButton[0].parentNode.removeChild(deleteButton[0]);
     }
+
+
+
     
     var targetPageText = cloneSelectedContainer.innerText;
     var targetPageHtml = rebuild_target_container_to_hololink_preference(cloneSelectedContainer);
@@ -155,8 +158,10 @@ function findContentContainer(){
 
 function rebuild_target_container_to_hololink_preference(targer_container){
 
+    
+
     /*
-    //\\var target_all_element = targer_container.querySelectorAll("*")
+    var target_all_element = targer_container.querySelectorAll("*")
     //target_all_element.classList.add("hololink-selected-element");
 
     //for (var i = 0; i < target_all_element.length; i++) {
@@ -184,9 +189,9 @@ function rebuild_target_container_to_hololink_preference(targer_container){
     */
     
     
-    treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
-    var currentNode = treeWalker.currentNode;
-    console.log(targer_container)
+    //treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
+    //var currentNode = treeWalker.currentNode;
+    //console.log(targer_container)
     // remove unnecessary element
     try {
         targer_container.innerHTML = targer_container.innerHTML.replace(/(id|class|onclick|ondblclick|accesskey|data|dynsrc|tabindex)="[\w- ]+"/g, "")
@@ -194,8 +199,8 @@ function rebuild_target_container_to_hololink_preference(targer_container){
             .replace( /label=[\u4e00-\u9fa5 \w="-:\/\/:#;]+"/ig, "" )  // label="xxxx"
             .replace( /data[-\w]*=[ \w=\-.:\/\/?!;+"]+"[ ]?/ig, "" )   // data="xxx" || data-xxx="xxx"
             .replace( /href="javascript:[\w()"]+/ig, "" )              // href="javascript:xxx"
-            //.replace( /<figure[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figure >
-            //.replace( /<\/figure>/ig, "" ) // </figure>
+            .replace( /<figure[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figure >
+            .replace( /<\/figure>/ig, "" ) // </figure>
             .replace( /<figcaption[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figcaption >
             .replace( /<\/figcaption>/ig, "" )                         // </figcaption>
             .replace( /color=[ \w="-:\/\/:#;]+/ig, "" )  // color="xxxx"
@@ -206,6 +211,14 @@ function rebuild_target_container_to_hololink_preference(targer_container){
     }
 
     console.log(targer_container.innerHTML)
+
+    // remove all empty container
+    var target_empty_elements = targer_container.querySelectorAll("*:empty")
+
+    console.log(target_empty_elements)
+    target_empty_elements.forEach(function (target) {
+        target.parentNode.removeChild(target)
+    })
 
     return targer_container.innerHTML
 
