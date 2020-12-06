@@ -1,6 +1,7 @@
 
 // current task: activate sidebar and scroll
 // TODO: make highlight listener correct
+// TODO: yahoo news, toolbar css get override
 
 var csrf_token
 var session_id

@@ -61,9 +61,9 @@ function findContentContainer(){
 
     
     // clone selectedContainer to delete and export
-    var clone_selectedContainer = selectedContainer.cloneNode(true);
+    var cloneSelectedContainer = selectedContainer.cloneNode(true);
 
-    var deleteObjects =  clone_selectedContainer.querySelectorAll("[data-simple-delete]");
+    var deleteObjects =  cloneSelectedContainer.querySelectorAll("[data-simple-delete]");
     //這裡反而不能用下面那種 While 的寫法，不然會出現 parentNode = null 的狀況，因為取回的結構有些不太一樣
     //<p id="weather_text" data-simple-delete="true">臺北市  25-32  ℃</p> 
 
@@ -78,7 +78,7 @@ function findContentContainer(){
     // 有些網頁會把 script 寫進 innerhtml。另外這裡如果用 for 迴圈來寫，因為getElementsByTagName拿回來的是 Nodelist 而不是 Array 
     // 所以每當你移除其中的一個元素時 Nodelist 都會更新，而原有的元素會擠進 [0] 導致你再也取不到它
 
-    var deleteScripts = clone_selectedContainer.getElementsByTagName('script');
+    var deleteScripts = cloneSelectedContainer.getElementsByTagName('script');
 
     while(deleteScripts[0]){
         console.log(deleteScripts[0]);
@@ -86,53 +86,53 @@ function findContentContainer(){
     }
 
     //刪除圖片
-    var deleteImages = clone_selectedContainer.getElementsByTagName('img');
+    var deleteImages = cloneSelectedContainer.getElementsByTagName('img');
 
     while(deleteImages[0]){
         deleteImages[0].parentNode.removeChild(deleteImages[0]);
     }
 
-    var deleteFigures = clone_selectedContainer.getElementsByTagName('figure');
+    var deleteFigures = cloneSelectedContainer.getElementsByTagName('figure');
     while(deleteFigures[0]){
         deleteFigures[0].parentNode.removeChild(deleteFigures[0]);
     }
 
     // 刪除 iframe
-    var deleteIFrames = clone_selectedContainer.getElementsByTagName('iframe');
+    var deleteIFrames = cloneSelectedContainer.getElementsByTagName('iframe');
     while(deleteIFrames[0]){
         deleteIFrames[0].parentNode.removeChild(deleteIFrames[0]);
     }
 
     //刪除 medium noscript tag
-    var deleteMediumNoScriptTag = clone_selectedContainer.getElementsByTagName('noscript');
+    var deleteMediumNoScriptTag = cloneSelectedContainer.getElementsByTagName('noscript');
     while(deleteMediumNoScriptTag[0]){
         console.log(deleteMediumNoScriptTag[0])
         deleteMediumNoScriptTag[0].parentNode.removeChild(deleteMediumNoScriptTag[0]);
     }
 
     // 刪除 svg
-    var deleteSvgs = clone_selectedContainer.getElementsByTagName('svg');
+    var deleteSvgs = cloneSelectedContainer.getElementsByTagName('svg');
     while(deleteSvgs[0]){
         console.log(deleteSvgs[0])
         deleteSvgs[0].parentNode.removeChild(deleteSvgs[0]);
     }
 
     //刪除影片
-    var deleteVideos = clone_selectedContainer.getElementsByTagName('video');
+    var deleteVideos = cloneSelectedContainer.getElementsByTagName('video');
 
     while(deleteVideos[0]){
         deleteVideos[0].parentNode.removeChild(deleteVideos[0]);
     }
     
     //有些網頁會在 body 裡放置 dynamic css 
-    var deletestylesheet = clone_selectedContainer.getElementsByTagName('style');
+    var deletestylesheet = cloneSelectedContainer.getElementsByTagName('style');
 
     while(deletestylesheet[0]){
         deletestylesheet[0].parentNode.removeChild(deletestylesheet[0]);
     }
 
     // 刪除按鍵
-    var deleteButton = clone_selectedContainer.getElementsByTagName('button');
+    var deleteButton = cloneSelectedContainer.getElementsByTagName('button');
     console.log('button',deleteButton)
 
     while(deleteButton[0]){
@@ -140,15 +140,15 @@ function findContentContainer(){
         deleteButton[0].parentNode.removeChild(deleteButton[0]);
     }
     
-    var data = clone_selectedContainer.innerText
-
-    // this line can split target container inner text with newlines
-    var array = data.split(/\r\n|\r|\n/);
-
-    //console.log(clone_selectedContainer, data, array)
-    rebuild_target_container_to_hololink_preference(clone_selectedContainer)
+    var targetPageText = cloneSelectedContainer.innerText;
+    var targetPageHtml = rebuild_target_container_to_hololink_preference(cloneSelectedContainer);
+    targetPageText = targetPageText.replace(/(\r\n|\n|\r|\t)/gm, "");
     
-    data = data.replace(/(\r\n|\n|\r)/gm, "");
+    var data = {
+        "targetPageText":targetPageText,
+        "targetPageHtml":targetPageHtml
+    }
+    
 
     return data;
 };
@@ -207,6 +207,7 @@ function rebuild_target_container_to_hololink_preference(targer_container){
 
     console.log(targer_container.innerHTML)
 
+    return targer_container.innerHTML
 
     //while(currentNode) {
         // if currentNode is newlines, space we ignore it

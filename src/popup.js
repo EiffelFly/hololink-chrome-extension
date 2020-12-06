@@ -205,11 +205,12 @@ chrome.runtime.onMessage.addListener(function(request,sender){
     if (request.action == "gotText"){
         fullData = {
             query: "postData",
-            page_text: request.source,
-            target_url: target_hololink_host+"api/articles/",
-            data_url: url,
-            data_title:  title,
-            data_projects: userSelectedProjectsId,
+            targetPageText: request.source.targetPageText,
+            targetPageHtml: request.source.targetPageHtml,
+            hololinkUrl: target_hololink_host+"api/articles/",
+            targetPageUrl: url,
+            targetPageTitle: title,
+            userSelectedProjects: userSelectedProjectsId,
         }
         
         if ($('#check_recommendation').is(":checked")){

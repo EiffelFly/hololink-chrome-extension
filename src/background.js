@@ -89,13 +89,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                         myHeaders.append("Cookie", `sessionid=${session_id}; csrftoken=${csrf_token}`);
                         myHeaders.append("X-Requested-With", "XMLHttpRequest");
                         console.log(myHeaders)
+
+                        console.log(request.data)
         
                         var raw = JSON.stringify({
-                            "name": request.data.data_title,
-                            "content": request.data.page_text,
-                            "from_url": request.data.data_url,
+                            "name": request.data.targetPageTitle,
+                            "content": request.data.targetPageText,
+                            "from_url": request.data.targetPageUrl,
                             "recommended": request.data.recommendation,
-                            "projects": request.data.data_projects,
+                            "projects": request.data.userSelectedProjects,
+                            "article_html": request.data.targetPageHtml,
                         });
 
                         console.log(raw)
@@ -109,7 +112,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
                             mode:'cors'
                         };
             
-                        fetch(request.data.target_url, requestOptions)
+                        fetch(request.data.hololinkUrl, requestOptions)
                             .then(ErrorsHandler)
                             .then(response => (response.ok)? sendResponse({message:"mission_complete"}): sendResponse({message:"mission_failed"}))
                             .then(response => response.text())
