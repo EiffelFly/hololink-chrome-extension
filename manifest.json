@@ -29,6 +29,7 @@
     "content_scripts":[
         {
             "matches":["http://*/*", "https://*/*"],
+            "exclude_globs":["https://hololink.co/*", "http://hololink.co/*" ,"http://127.0.0.1:8000/*"],
             "js":["src/jquery-3.5.1.min.js", "src/bootstrap.bundle.min.js", "src/prep.js"],
             "css":["src/prep.css"],
             "run_at": "document_end",
