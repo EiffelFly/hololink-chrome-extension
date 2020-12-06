@@ -220,9 +220,86 @@ function rebuild_target_container_to_hololink_preference(targer_container){
         target.parentNode.removeChild(target)
     })
 
+    //console.log(targer_container)
+    // reconstruct target_container to avoid some issue that parentNode is null 
+    var persudoContentNode = document.createElement('div');
+    persudoContentNode.appendChild(targer_container)
+    console.log(persudoContentNode)
+
+    //walk through selected content, find text node, check whether tagname is p, if not we change it to p
+    var treeWalker=document.createTreeWalker(persudoContentNode,NodeFilter.SHOW_TEXT,null,false);
+    var currentNode = treeWalker.currentNode;
+    //console.log(targer_container)
+    while(currentNode) {
+        //if currentNode is newlines, space we delete it
+        if (/\S+/.test(currentNode.textContent)){
+            if (currentNode.parentNode){
+                
+                var currentNodeContainer = currentNode.parentNode
+                console.log(currentNodeContainer.tagName)
+                if (currentNodeContainer.tagName.toLowerCase()=='div'){
+                    console.log(currentNodeContainer)
+                    pElement = document.createElement('p');
+                    pElement.innerHTML = currentNodeContainer.innerHTML;
+                    if(currentNodeContainer.parentNode){
+                        currentNodeContainer.parentNode.replaceChild(pElement, currentNodeContainer);
+                    } else{
+                        console.log('fffff',currentNodeContainer)
+                    }
+                    
+                    
+                    //treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
+                    //currentNode = treeWalker.nextNode();
+                }
+            }
+            
+            
+            //if (!currentNodeContainer.tagName=='p'){
+            //    pElement = document.createElement('p');
+            //    pElement.innerHTML = currentNodeContainer.innerHTML;
+            //    currentNodeContainer.parentNode.replaceChild(pElement, currentNodeContainer);
+            //    console.log(currentNodeContainer)
+            //}
+        }
+        currentNode = treeWalker.nextNode();
+        console.log(treeWalker.nextNode())
+    }
+
+
+    console.log(targer_container)
+
     return targer_container.innerHTML
 
-    //while(currentNode) {
+
+    
+
+}
+
+
+// 呼叫上述 function 並且將資料丟回去
+chrome.runtime.sendMessage({action: "gotText",source: findContentContainer()}, function(){
+    console.log('begin text clipping process');
+})
+
+    /* walk through selected content, find text node, check whether tagname is p, if not we change it to p
+    var treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
+    var currentNode = treeWalker.currentNode;
+    while(currentNode) {
+        //if currentNode is newlines, space we delete it
+        if (/\S+/.test(currentNode.textContent)){
+            var currentNodeContainer = currentNode.parentNode
+            console.log(currentNode)
+            //if (!currentNodeContainer.tagName=='p'){
+            //    pElement = document.createElement('p');
+            //    pElement.innerHTML = currentNodeContainer.innerHTML;
+            //    currentNodeContainer.parentNode.replaceChild(pElement, currentNodeContainer);
+            //    console.log(currentNodeContainer)
+            //}
+        }
+        currentNode = treeWalker.nextNode();
+    }
+    */    
+   //while(currentNode) {
         // if currentNode is newlines, space we ignore it
     //    if (/\S+/.test(currentNode.textContent)){
     //        if (currentNode.parentNode){
@@ -234,13 +311,3 @@ function rebuild_target_container_to_hololink_preference(targer_container){
         
     //    currentNode = treeWalker.nextNode();
     //}
-    
-
-}
-
-
-// 呼叫上述 function 並且將資料丟回去
-chrome.runtime.sendMessage({action: "gotText",source: findContentContainer()}, function(){
-    console.log('begin text clipping process');
-})
-
