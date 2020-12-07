@@ -13,7 +13,7 @@ function findContentContainer(){
         
     // 接下來要找到哪個部分存了最多文字，要把這些片段挑出來挑出來
 
-    var pTagWithMostWords = document.body,
+    var elementWithMostWords = []
         countHightestWord = 0;
 
     //如果沒有 <p> 則要找 <div> 
@@ -29,8 +29,8 @@ function findContentContainer(){
                 var countWords = containerInnerText.length;
                 if (countWords > countHightestWord){
                    countHightestWord = countWords;
-                   pTagWithMostWords = wordsContainers[i];
-                   console.log(countHightestWord);
+                   elementWithMostWords.unshift(wordsContainers[i]);
+                   console.log(countHightestWord, elementWithMostWords);
                 };
             };
         }
@@ -43,24 +43,26 @@ function findContentContainer(){
 
     };
 
-    var selectedContainer = pTagWithMostWords,
+    var selectedContainer = elementWithMostWords[0],
         countSelectedWords = countHightestWord;
     
+    //find_container_with_most_words()
+
     console.log(selectedContainer)
     //從最多字的 <p> 一圈一圈向外拓，直到圈起了 2/5 的總字數
-    while (countSelectedWords/countTotlaWordsOnPage < 0.1
+    while (countSelectedWords/countTotlaWordsOnPage < 0.4
     && selectedContainer != document.body
     && selectedContainer.parentNode.innerText){ //這一圈裡必須要有字
         selectedContainer = selectedContainer.parentNode; //向外擴一圈
         countSelectedWords = selectedContainer.innerText.length;
     };
 
+
     //如果機器找到的最後一層是 <p> 則我們要自動向外再選一層
     if (selectedContainer.tagName === "P"){
         selectedContainer = selectedContainer.parentNode;
     };
 
-    
     // clone selectedContainer to delete and export
     var cloneSelectedContainer = selectedContainer.cloneNode(true);
 
@@ -82,7 +84,7 @@ function findContentContainer(){
     var deleteScripts = cloneSelectedContainer.getElementsByTagName('script');
 
     while(deleteScripts[0]){
-        console.log(deleteScripts[0]);
+        //console.log(deleteScripts[0]);
         deleteScripts[0].parentNode.removeChild(deleteScripts[0]);
     }
 
@@ -120,7 +122,7 @@ function findContentContainer(){
     // 刪除 svg
     var deleteSvgs = cloneSelectedContainer.getElementsByTagName('svg');
     while(deleteSvgs[0]){
-        console.log(deleteSvgs[0])
+        //console.log(deleteSvgs[0])
         deleteSvgs[0].parentNode.removeChild(deleteSvgs[0]);
     }
 
@@ -140,10 +142,10 @@ function findContentContainer(){
 
     // 刪除按鍵
     var deleteButton = cloneSelectedContainer.getElementsByTagName('button');
-    console.log('button',deleteButton)
+    //console.log('button',deleteButton)
 
     while(deleteButton[0]){
-        console.log('jddjd',deleteButton[0])
+        //console.log('jddjd',deleteButton[0])
         deleteButton[0].parentNode.removeChild(deleteButton[0]);
     }
 
@@ -159,7 +161,7 @@ function findContentContainer(){
     restructureToFlatContainer(cloneSelectedContainer);
     removeHololinkHighlightTag(cloneSelectedContainer);
 
-    console.log(cloneSelectedContainer.innerHTML)
+    //console.log(cloneSelectedContainer.innerHTML)
 
     targetPageText = targetPageText.replace(/(\r\n|\n|\r|\t)/gm, "");
     
@@ -203,7 +205,7 @@ function removeHololinkHighlightTag(target){
 function removeEmptyElement(target){
     var target_empty_elements = target.querySelectorAll("*:empty")
     target_empty_elements.forEach(function(target){
-        console.log(target)
+        //console.log(target)
         target.parentNode.removeChild(target)
     });
 }
@@ -216,7 +218,7 @@ function unWrapElement(target){
         docFrag.appendChild(child);
 	}
     // replace wrapper with document fragment
-    console.log(target)
+    //console.log(target)
     if (target.parentNode){
         target.parentNode.replaceChild(docFrag, target);
     }
@@ -229,18 +231,18 @@ function restructureToFlatContainer(target){
         'dl','dt','fieldset','footer','form','h1','h2','h3','h4','h5','h6','header','li','main','nav','ol','p',
         'pre','table','tfoot','ul'
     ]
-    console.log('first', target.childNodes)
+    //console.log('first', target.childNodes)
     notFlatItIndicator.push('hololink-highlight')
     notFlatItIndicator.push('memex-highlight')
     
     if (target.childNodes.length > 0){
-        console.log('have_childs')
+        //console.log('have_childs')
         var flatIt = true;
         for (var n = 0; n < target.childNodes.length; n ++) {
             var child = target.childNodes[n];
             // cleanup comment node and empty text node
             if (child.nodeType === 8 || (child.nodeType === 3 && !/\S/.test(child.nodeValue))) {
-                console.log('empty or comment',child)
+                //console.log('empty or comment',child)
                 target.removeChild(child);
                 n --;
             } else if(child.nodeType === 1) {
@@ -252,17 +254,17 @@ function restructureToFlatContainer(target){
                         target.removeChild(child);
                         n --;
                     } else {
-                        console.log('recursive', child)
+                        //console.log('recursive', child)
                         restructureToFlatContainer(child);
                     }
                 }
             } else if (child.nodeType === 3 && /\S/.test(child.nodeValue)){
-                console.log('text',child)
+                //console.log('text',child)
                 flatIt = false
             }
         }
         if (flatIt == true){
-            console.log('letflat', target)
+            //console.log('letflat', target)
             unWrapElement(target)
         }
     }
