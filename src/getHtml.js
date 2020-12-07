@@ -1,3 +1,6 @@
+// TODO: check why can't we still remove some nodes
+
+
 /**
  Contribute https://github.com/ZachSaucier/Just-Read/blob/b6b209ff566239b359b15d651b6716fb5fcf7f4d/content_script.js#L1191
  */
@@ -50,7 +53,7 @@ function findContentContainer(){
 
     console.log(selectedContainer)
     //從最多字的 <p> 一圈一圈向外拓，直到圈起了 2/5 的總字數
-    while (countSelectedWords/countTotlaWordsOnPage < 0.4
+    while (countSelectedWords/countTotlaWordsOnPage < 0.2
     && selectedContainer != document.body
     && selectedContainer.parentNode.innerText){ //這一圈裡必須要有字
         selectedContainer = selectedContainer.parentNode; //向外擴一圈
@@ -172,6 +175,10 @@ function findContentContainer(){
 
     return data;
 };
+
+function changeTextNodeTagToP(){
+
+}
 
 function removeAttribute(targer_container){
 
