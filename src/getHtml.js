@@ -154,26 +154,19 @@ function findContentContainer(){
         //console.log('jddjd',deleteButton[0])
         deleteButton[0].parentNode.removeChild(deleteButton[0]);
     }
-
-
-
-    
     var targetPageText = cloneSelectedContainer.innerText;
 
-    console.log('before',cloneSelectedContainer)
-
-    //removeAttribute(cloneSelectedContainer);
+    // some attribute may not be deleted
+    removeAttribute(cloneSelectedContainer);
     removeElementAttributesAndEmptyElement(cloneSelectedContainer);
     restructureToFlatContainer(cloneSelectedContainer);
     removeHololinkHighlightTag(cloneSelectedContainer);
-
-    console.log(cloneSelectedContainer)
 
     targetPageText = targetPageText.replace(/(\r\n|\n|\r|\t)/gm, "");
     
     var data = {
         "targetPageText":targetPageText,
-        "targetPageHtml":targetPageHtml
+        "targetPageHtml":cloneSelectedContainer.innerHTML
     }
     
 
@@ -186,6 +179,7 @@ function removeAttribute(targer_container){
     try {
         targer_container.innerHTML = targer_container.innerHTML.replace(/(id|class|onclick|ondblclick|accesskey|data|dynsrc|tabindex)="[\w- ]+"/g, "")
             .replace( /style=[ \w="-:\/\/:#;]+/ig, "" )  // style="xxxx"
+            .replace( /class=[\u4e00-\u9fa5 \w="-:\/\/:#;]+"/ig, "" )  // class="xxxx"
             .replace( /label=[\u4e00-\u9fa5 \w="-:\/\/:#;]+"/ig, "" )  // label="xxxx"
             .replace( /data[-\w]*=[ \w=\-.:\/\/?!;+"]+"[ ]?/ig, "" )   // data="xxx" || data-xxx="xxx"
             .replace( /href="javascript:[\w()"]+/ig, "" )              // href="javascript:xxx"
@@ -215,12 +209,13 @@ function removeHololinkHighlightTag(target){
 function removeElementAttributesAndEmptyElement(target){
     var target_elements = target.querySelectorAll("*")
     target_elements.forEach(function(element){
-        if (element.innerHTML && element.innerHTML === ""){
-            console.log(target)
+        if (element.childNodes.length == 0){
+            console.log(element)
             element.parentNode.removeChild(element)
         } else {
             for (i=0; i < element.attributes.length; i++ ){
                 if (element.attributes[i].nodeName.toLowerCase() !== "href"){
+                    console.log(element.attributes[i].nodeName)
                     element.removeAttribute(element.attributes[i].nodeName); 
                 }
             }
@@ -289,7 +284,10 @@ function restructureToFlatContainer(target){
     }
 };
 // 呼叫上述 function 並且將資料丟回去
+
 chrome.runtime.sendMessage({action: "gotText",source: findContentContainer()}, function(){
     console.log('begin text clipping process');
 })
+
+
 
