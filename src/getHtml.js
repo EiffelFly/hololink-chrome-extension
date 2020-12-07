@@ -46,6 +46,7 @@ function findContentContainer(){
     var selectedContainer = pTagWithMostWords,
         countSelectedWords = countHightestWord;
     
+    console.log(selectedContainer)
     //從最多字的 <p> 一圈一圈向外拓，直到圈起了 2/5 的總字數
     while (countSelectedWords/countTotlaWordsOnPage < 0.1
     && selectedContainer != document.body
@@ -153,10 +154,10 @@ function findContentContainer(){
 
     
 
-    remove_attribute(cloneSelectedContainer);
-    remove_empty_element(cloneSelectedContainer);
+    removeAttribute(cloneSelectedContainer);
+    removeEmptyElement(cloneSelectedContainer);
     restructureToFlatContainer(cloneSelectedContainer);
-    removeHololinkHighlightTag(cloneSelectedContainer)
+    removeHololinkHighlightTag(cloneSelectedContainer);
 
     console.log(cloneSelectedContainer.innerHTML)
 
@@ -171,7 +172,7 @@ function findContentContainer(){
     return data;
 };
 
-function remove_attribute(targer_container){
+function removeAttribute(targer_container){
 
     // remove unnecessary attribute
     try {
@@ -199,7 +200,7 @@ function removeHololinkHighlightTag(target){
     }
 }
 
-function remove_empty_element(target){
+function removeEmptyElement(target){
     var target_empty_elements = target.querySelectorAll("*:empty")
     target_empty_elements.forEach(function(target){
         console.log(target)
