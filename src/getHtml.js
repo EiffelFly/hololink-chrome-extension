@@ -88,6 +88,12 @@ function findContentContainer(){
         deleteScripts[0].parentNode.removeChild(deleteScripts[0]);
     }
 
+    //delete form
+    var deleteForm = cloneSelectedContainer.getElementsByTagName('form');
+    while(deleteForm[0]){
+        deleteForm[0].parentNode.removeChild(deleteForm[0]);
+    }
+
     //刪除圖片
     var deleteImages = cloneSelectedContainer.getElementsByTagName('img');
 
@@ -154,14 +160,14 @@ function findContentContainer(){
     
     var targetPageText = cloneSelectedContainer.innerText;
 
-    
+    console.log('before',cloneSelectedContainer)
 
-    removeAttribute(cloneSelectedContainer);
-    removeEmptyElement(cloneSelectedContainer);
+    //removeAttribute(cloneSelectedContainer);
+    removeElementAttributesAndEmptyElement(cloneSelectedContainer);
     restructureToFlatContainer(cloneSelectedContainer);
     removeHololinkHighlightTag(cloneSelectedContainer);
 
-    //console.log(cloneSelectedContainer.innerHTML)
+    console.log(cloneSelectedContainer)
 
     targetPageText = targetPageText.replace(/(\r\n|\n|\r|\t)/gm, "");
     
@@ -187,7 +193,11 @@ function removeAttribute(targer_container){
             //.replace( /<\/figure>/ig, "" ) // </figure>
             //.replace( /<figcaption[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figcaption >
             //.replace( /<\/figcaption>/ig, "" )                         // </figcaption>
-            .replace( /color=[ \w="-:\/\/:#;]+/ig, "" )  // color="xxxx"
+            .replace( /color=[ \w="-:\/\/:#;]+"/ig, "" )  // color="xxxx"
+            .replace( /valign=[ \w="-:\/\/:#;]+"/ig, "")  // valign="xxxx"
+            .replace( /align=[ \w="-:\/\/:#;]+"/ig, "")  // align="xxxx"
+            .replace( /size=[ \w="-:\/\/:#;]+"/ig, "")  // size="xxxx"
+            .replace( /border=[ \w="-:\/\/:#;]+"/ig, "")  // border="xxxx"
     }
 
     catch(error) {
@@ -202,11 +212,20 @@ function removeHololinkHighlightTag(target){
     }
 }
 
-function removeEmptyElement(target){
-    var target_empty_elements = target.querySelectorAll("*:empty")
-    target_empty_elements.forEach(function(target){
-        //console.log(target)
-        target.parentNode.removeChild(target)
+function removeElementAttributesAndEmptyElement(target){
+    var target_elements = target.querySelectorAll("*")
+    target_elements.forEach(function(element){
+        if (element.innerHTML && element.innerHTML === ""){
+            console.log(target)
+            element.parentNode.removeChild(element)
+        } else {
+            for (i=0; i < element.attributes.length; i++ ){
+                if (element.attributes[i].nodeName.toLowerCase() !== "href"){
+                    element.removeAttribute(element.attributes[i].nodeName); 
+                }
+            }
+        }
+        
     });
 }
 
