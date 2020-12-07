@@ -97,6 +97,12 @@ function findContentContainer(){
         deleteFigures[0].parentNode.removeChild(deleteFigures[0]);
     }
 
+    // remove figure caption
+    var deleteFigcaption = cloneSelectedContainer.getElementsByTagName('figcaption');
+    while(deleteFigcaption[0]){
+        deleteFigcaption[0].parentNode.removeChild(deleteFigcaption[0]);
+    }
+
     // 刪除 iframe
     var deleteIFrames = cloneSelectedContainer.getElementsByTagName('iframe');
     while(deleteIFrames[0]){
@@ -144,7 +150,16 @@ function findContentContainer(){
 
     
     var targetPageText = cloneSelectedContainer.innerText;
-    var targetPageHtml = rebuild_target_container_to_hololink_preference(cloneSelectedContainer);
+
+    
+
+    remove_attribute(cloneSelectedContainer);
+    remove_empty_element(cloneSelectedContainer);
+    restructureToFlatContainer(cloneSelectedContainer);
+    removeHololinkHighlightTag(cloneSelectedContainer)
+
+    console.log(cloneSelectedContainer.innerHTML)
+
     targetPageText = targetPageText.replace(/(\r\n|\n|\r|\t)/gm, "");
     
     var data = {
@@ -156,158 +171,103 @@ function findContentContainer(){
     return data;
 };
 
-function rebuild_target_container_to_hololink_preference(targer_container){
+function remove_attribute(targer_container){
 
-    
-
-    /*
-    var target_all_element = targer_container.querySelectorAll("*")
-    //target_all_element.classList.add("hololink-selected-element");
-
-    //for (var i = 0; i < target_all_element.length; i++) {
-    //    target_all_element[i].classList.add('hololink-selected-element');
-    //}
-
-    //console.log(target_all_element)
-    if (targer_container.childNodes.length > 1){
-        var target_nodes_list = targer_container.childNodes
-    } else {
-        if (targer_container.childNodes.childNodes > 1){
-            var target_nodes_list = targer_container.childNodes.childNodes
-        }
-    }
-    console.log(target_nodes_list)
-   
-    for (var i = 0; i < target_nodes_list.length; i++) {
-        // some website 
-        if (target_nodes_list[i].textContent && !/\S+/.test(target_nodes_list[i].textContent)){
-
-        }
-        console.log(target_nodes_list[i].className)
-        //target_nodes_list[i].classList.className += " hololink-selected-element";
-    }
-    */
-    
-    
-    //treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
-    //var currentNode = treeWalker.currentNode;
-    //console.log(targer_container)
-    // remove unnecessary element
+    // remove unnecessary attribute
     try {
         targer_container.innerHTML = targer_container.innerHTML.replace(/(id|class|onclick|ondblclick|accesskey|data|dynsrc|tabindex)="[\w- ]+"/g, "")
             .replace( /style=[ \w="-:\/\/:#;]+/ig, "" )  // style="xxxx"
             .replace( /label=[\u4e00-\u9fa5 \w="-:\/\/:#;]+"/ig, "" )  // label="xxxx"
             .replace( /data[-\w]*=[ \w=\-.:\/\/?!;+"]+"[ ]?/ig, "" )   // data="xxx" || data-xxx="xxx"
             .replace( /href="javascript:[\w()"]+/ig, "" )              // href="javascript:xxx"
-            .replace( /<figure[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figure >
-            .replace( /<\/figure>/ig, "" ) // </figure>
-            .replace( /<figcaption[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figcaption >
-            .replace( /<\/figcaption>/ig, "" )                         // </figcaption>
+            //.replace( /<figure[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figure >
+            //.replace( /<\/figure>/ig, "" ) // </figure>
+            //.replace( /<figcaption[ -\w*= \w=\-.:\/\/?!;+"]*>/ig, "" ) // <figcaption >
+            //.replace( /<\/figcaption>/ig, "" )                         // </figcaption>
             .replace( /color=[ \w="-:\/\/:#;]+/ig, "" )  // color="xxxx"
     }
 
     catch(error) {
         console.log('error',error)
     }
-
-    console.log(targer_container.innerHTML)
-
-    // remove all empty container
-    var target_empty_elements = targer_container.querySelectorAll("*:empty")
-
-    console.log(target_empty_elements)
-    target_empty_elements.forEach(function (target) {
-        target.parentNode.removeChild(target)
-    })
-
-    //console.log(targer_container)
-    // reconstruct target_container to avoid some issue that parentNode is null 
-    var persudoContentNode = document.createElement('div');
-    persudoContentNode.appendChild(targer_container)
-    console.log(persudoContentNode)
-
-    //walk through selected content, find text node, check whether tagname is p, if not we change it to p
-    var treeWalker=document.createTreeWalker(persudoContentNode,NodeFilter.SHOW_TEXT,null,false);
-    var currentNode = treeWalker.currentNode;
-    //console.log(targer_container)
-    while(currentNode) {
-        //if currentNode is newlines, space we delete it
-        if (/\S+/.test(currentNode.textContent)){
-            if (currentNode.parentNode){
-                
-                var currentNodeContainer = currentNode.parentNode
-                console.log(currentNodeContainer.tagName)
-                if (currentNodeContainer.tagName.toLowerCase()=='div'){
-                    console.log(currentNodeContainer)
-                    pElement = document.createElement('p');
-                    pElement.innerHTML = currentNodeContainer.innerHTML;
-                    if(currentNodeContainer.parentNode){
-                        currentNodeContainer.parentNode.replaceChild(pElement, currentNodeContainer);
-                    } else{
-                        console.log('fffff',currentNodeContainer)
-                    }
-                    
-                    
-                    //treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
-                    //currentNode = treeWalker.nextNode();
-                }
-            }
-            
-            
-            //if (!currentNodeContainer.tagName=='p'){
-            //    pElement = document.createElement('p');
-            //    pElement.innerHTML = currentNodeContainer.innerHTML;
-            //    currentNodeContainer.parentNode.replaceChild(pElement, currentNodeContainer);
-            //    console.log(currentNodeContainer)
-            //}
-        }
-        currentNode = treeWalker.nextNode();
-        console.log(treeWalker.nextNode())
-    }
-
-
-    console.log(targer_container)
-
-    return targer_container.innerHTML
-
-
-    
-
 }
 
+function removeHololinkHighlightTag(target){
+    var hololinkHighlight = target.querySelectorAll("hololink-highlight")
+    for (var n=0; n < hololinkHighlight.length; n ++){
+        unWrapElement(hololinkHighlight[n])
+    }
+}
 
+function remove_empty_element(target){
+    var target_empty_elements = target.querySelectorAll("*:empty")
+    target_empty_elements.forEach(function(target){
+        console.log(target)
+        target.parentNode.removeChild(target)
+    });
+}
+
+function unWrapElement(target){
+    // place childNodes in document fragment
+	var docFrag = document.createDocumentFragment();
+	while (target.firstChild) {
+		var child = target.removeChild(target.firstChild);
+        docFrag.appendChild(child);
+	}
+    // replace wrapper with document fragment
+    console.log(target)
+    if (target.parentNode){
+        target.parentNode.replaceChild(docFrag, target);
+    }
+	
+}
+
+function restructureToFlatContainer(target){
+    var notFlatItIndicator = ['span', 'a', 'b', 'abbr', 'acronym','bdo','big','br','cite','code','dfn','em','i',
+        'kbd','label','map','q','span','strong','time','address','article','aside','blockquote','canvas','dd',
+        'dl','dt','fieldset','footer','form','h1','h2','h3','h4','h5','h6','header','li','main','nav','ol','p',
+        'pre','table','tfoot','ul'
+    ]
+    console.log('first', target.childNodes)
+    notFlatItIndicator.push('hololink-highlight')
+    notFlatItIndicator.push('memex-highlight')
+    
+    if (target.childNodes.length > 0){
+        console.log('have_childs')
+        var flatIt = true;
+        for (var n = 0; n < target.childNodes.length; n ++) {
+            var child = target.childNodes[n];
+            // cleanup comment node and empty text node
+            if (child.nodeType === 8 || (child.nodeType === 3 && !/\S/.test(child.nodeValue))) {
+                console.log('empty or comment',child)
+                target.removeChild(child);
+                n --;
+            } else if(child.nodeType === 1) {
+                if (notFlatItIndicator.indexOf(child.tagName.toLowerCase()) >= 0){
+                    //console.log(child)
+                    flatIt = false
+                } else if (child.tagName.toLowerCase() === 'div' || 'section'){
+                    if (child.innerHTML === ''){
+                        target.removeChild(child);
+                        n --;
+                    } else {
+                        console.log('recursive', child)
+                        restructureToFlatContainer(child);
+                    }
+                }
+            } else if (child.nodeType === 3 && /\S/.test(child.nodeValue)){
+                console.log('text',child)
+                flatIt = false
+            }
+        }
+        if (flatIt == true){
+            console.log('letflat', target)
+            unWrapElement(target)
+        }
+    }
+};
 // 呼叫上述 function 並且將資料丟回去
 chrome.runtime.sendMessage({action: "gotText",source: findContentContainer()}, function(){
     console.log('begin text clipping process');
 })
 
-    /* walk through selected content, find text node, check whether tagname is p, if not we change it to p
-    var treeWalker=document.createTreeWalker(targer_container,NodeFilter.SHOW_TEXT,null,false);
-    var currentNode = treeWalker.currentNode;
-    while(currentNode) {
-        //if currentNode is newlines, space we delete it
-        if (/\S+/.test(currentNode.textContent)){
-            var currentNodeContainer = currentNode.parentNode
-            console.log(currentNode)
-            //if (!currentNodeContainer.tagName=='p'){
-            //    pElement = document.createElement('p');
-            //    pElement.innerHTML = currentNodeContainer.innerHTML;
-            //    currentNodeContainer.parentNode.replaceChild(pElement, currentNodeContainer);
-            //    console.log(currentNodeContainer)
-            //}
-        }
-        currentNode = treeWalker.nextNode();
-    }
-    */    
-   //while(currentNode) {
-        // if currentNode is newlines, space we ignore it
-    //    if (/\S+/.test(currentNode.textContent)){
-    //        if (currentNode.parentNode){
-    //            console.log('ohhoho',currentNode.parentNode.parentNode);
-    //        }
-            
-    //    } 
-        
-        
-    //    currentNode = treeWalker.nextNode();
-    //}
