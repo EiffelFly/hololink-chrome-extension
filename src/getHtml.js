@@ -2,6 +2,7 @@
 // TODO: some website don't use p, div but font, like http://www.paulgraham.com/index.html
 // TODO: if we the container have most words is outside the main div, we will get fucked! like: https://www.researchmfg.com/2020/05/different_pcb_pcba/
 
+
 /**
  Contribute https://github.com/ZachSaucier/Just-Read/blob/b6b209ff566239b359b15d651b6716fb5fcf7f4d/content_script.js#L1191
  */
@@ -161,7 +162,6 @@ function findContentContainer(){
      * Get/Store and Remove some Wikipedia element
      */
 
-    console.log(window.location.href)
     wikiDomainRegex = /https?:\/\/(.+?\.)?wikipedia\.org/
     if (wikiDomainRegex.test(window.location.href)){
         var selectWikiInfoBox = cloneSelectedContainer.getElementsByClassName('infobox vcard');
@@ -212,29 +212,58 @@ function findContentContainer(){
 
     
 
-    
-
-    var targetPageText = cloneSelectedContainer.innerText;
-
     // some attribute may not be deleted
     removeAttribute(cloneSelectedContainer);
     removeElementAttributesAndEmptyElement(cloneSelectedContainer);
     restructureToFlatContainer(cloneSelectedContainer);
     removeHololinkHighlightTag(cloneSelectedContainer);
 
+    // In case we will face some parentNode = null issue, we wrap the container first
+    var finalContainer = document.createElement('div');
+    finalContainer.appendChild(cloneSelectedContainer)
+    console.log('fffff',finalContainer.innerHTML)
+    wrapTextNodeInP(finalContainer);
+    removeElementAttributesAndEmptyElement(finalContainer);
+    
+
+    var targetPageText = finalContainer.innerText;
+
     targetPageText = targetPageText.replace(/(\r\n|\n|\r|\t)/gm, "");
     
     var data = {
         "targetPageText":targetPageText,
-        "targetPageHtml":cloneSelectedContainer.innerHTML
+        "targetPageHtml":finalContainer.innerHTML
     }
     
-    console.log(cloneSelectedContainer.innerHTML)
+    console.log(finalContainer.innerHTML)
 
     return data;
 };
 
-function changeTextNodeTagToP(){
+function wrapTextNodeInP(target){
+    var textTreeWalker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+    var nodeList = []
+    var currentNode = textTreeWalker.currentNode;
+    while(currentNode) {
+        nodeList.push(currentNode);
+        currentNode = textTreeWalker.nextNode();
+    }
+    for (var i = 0, max = nodeList.length; i < max; i++) {
+        var textNode = nodeList[i].parentNode
+        if (textNode){
+            if (textNode.tagName.toLowerCase() === 'div'){
+                var wrapper = document.createElement('p');
+                wrapper.innerHTML = textNode.innerHTML;
+                if (textNode.parentNode){
+                    console.log(textNode)
+                    textNode.parentNode.insertBefore(wrapper, textNode);
+                    textNode.parentNode.removeChild(textNode);
+                } else {
+                    console.log("ERROR: we dont's have any parentNode when wrapping text node in p tag")
+                }
+            }
+        }
+    };
 
 }
 
