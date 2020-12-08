@@ -1,5 +1,6 @@
 // TODO: check why can't we still remove some nodes
-
+// TODO: some website don't use p, div but font, like http://www.paulgraham.com/index.html
+// TODO: if we the container have most words is outside the main div, we will get fucked! like: https://www.researchmfg.com/2020/05/different_pcb_pcba/
 
 /**
  Contribute https://github.com/ZachSaucier/Just-Read/blob/b6b209ff566239b359b15d651b6716fb5fcf7f4d/content_script.js#L1191
@@ -8,21 +9,22 @@
 var target_hololink_host = "http://127.0.0.1:8000/"
 
 function findContentContainer(){
+    console.log(document.body)
     //countMaxNum-Method
     // flow: find MaxNum<p> -> select outer layer from MaxNum<p> until reach 40% total words-> clone selected word -> delete unneccessay element -> export
     var countTotlaWordsOnPage = document.body.innerText.length, 
         // 一篇網站內容中文字大多由 p 表示
-        wordsContainers = document.body.querySelectorAll("p");
+        // 找找看 font。舊型網站常用
+        // TODO: 需要找到更好的做法
+        //如果沒有 <p> 則要找 <div><font>
+        wordsContainers = document.body.querySelectorAll("div, font, p");
         
     // 接下來要找到哪個部分存了最多文字，要把這些片段挑出來挑出來
 
     var elementWithMostWords = []
         countHightestWord = 0;
 
-    //如果沒有 <p> 則要找 <div> 
-    if(wordsContainers.length === 0) {
-        wordsContainers = document.body.querySelectorAll("div");
-    };
+    console.log(wordsContainers)
     
     // 開始找擁有最多字的 <p>
     for (var i = 0; i < wordsContainers.length; i++){
@@ -74,7 +76,7 @@ function findContentContainer(){
     //<p id="weather_text" data-simple-delete="true">臺北市  25-32  ℃</p> 
 
     for (var i = 0, max = deleteObjects.length; i < max; i++) {
-        console.log(deleteObjects[i]);
+        //console.log(deleteObjects[i]);
         deleteObjects[i].parentNode.removeChild(deleteObjects[i]);
     };
     
@@ -124,7 +126,7 @@ function findContentContainer(){
     //刪除 medium noscript tag
     var deleteMediumNoScriptTag = cloneSelectedContainer.getElementsByTagName('noscript');
     while(deleteMediumNoScriptTag[0]){
-        console.log(deleteMediumNoScriptTag[0])
+        //console.log(deleteMediumNoScriptTag[0])
         deleteMediumNoScriptTag[0].parentNode.removeChild(deleteMediumNoScriptTag[0]);
     }
 
@@ -151,12 +153,67 @@ function findContentContainer(){
 
     // 刪除按鍵
     var deleteButton = cloneSelectedContainer.getElementsByTagName('button');
-    //console.log('button',deleteButton)
-
     while(deleteButton[0]){
-        //console.log('jddjd',deleteButton[0])
         deleteButton[0].parentNode.removeChild(deleteButton[0]);
     }
+
+    /**
+     * Get/Store and Remove some Wikipedia element
+     */
+
+    console.log(window.location.href)
+    wikiDomainRegex = /https?:\/\/(.+?\.)?wikipedia\.org/
+    if (wikiDomainRegex.test(window.location.href)){
+        var selectWikiInfoBox = cloneSelectedContainer.getElementsByClassName('infobox vcard');
+        var wikiInfoBox = []
+        while(selectWikiInfoBox[0]){
+            wikiInfoBox.push(selectWikiInfoBox[0].cloneNode(true))
+            selectWikiInfoBox[0].parentNode.removeChild(selectWikiInfoBox[0]);
+        }
+
+        var deleteWikiJumpLink = cloneSelectedContainer.getElementsByClassName('mw-jump-link');
+        while(deleteWikiJumpLink[0]){
+            deleteWikiJumpLink[0].parentNode.removeChild(deleteWikiJumpLink[0]);
+        }
+
+        var deleteWikiEditSection = cloneSelectedContainer.getElementsByClassName('mw-editsection');
+        while(deleteWikiEditSection[0]){
+            deleteWikiEditSection[0].parentNode.removeChild(deleteWikiEditSection[0]);
+        }
+
+        var deleteWikiSiteNotice = cloneSelectedContainer.querySelectorAll('#siteNotice');
+        for (var i = 0, max = deleteWikiSiteNotice.length; i < max; i++) {
+            deleteWikiSiteNotice[i].parentNode.removeChild(deleteWikiSiteNotice[i]);
+        };
+
+        var deleteWikiCatLinks = cloneSelectedContainer.querySelectorAll('#catlinks');
+        for (var i = 0, max = deleteWikiCatLinks.length; i < max; i++) {
+            deleteWikiCatLinks[i].parentNode.removeChild(deleteWikiCatLinks[i]);
+        };
+
+        var deleteWikiMBox = cloneSelectedContainer.querySelectorAll('[class^="mbox-"]');
+        for (var i = 0, max = deleteWikiMBox.length; i < max; i++) {
+            //console.log(deleteObjects[i]);
+            deleteWikiMBox[i].parentNode.removeChild(deleteWikiMBox[i]);
+        };
+        
+        var deleteWikiNavigationBar = cloneSelectedContainer.querySelectorAll('.toc[role="navigation"]');
+        for (var i = 0, max = deleteWikiNavigationBar.length; i < max; i++) {
+            //console.log(deleteObjects[i]);
+            deleteWikiNavigationBar[i].parentNode.removeChild(deleteWikiNavigationBar[i]);
+        };
+
+        var deleteWikiNavBox = cloneSelectedContainer.getElementsByClassName('navbox');
+        while(deleteWikiNavBox[0]){
+            deleteWikiNavBox[0].parentNode.removeChild(deleteWikiNavBox[0]);
+        }
+
+    }
+
+    
+
+    
+
     var targetPageText = cloneSelectedContainer.innerText;
 
     // some attribute may not be deleted
@@ -172,6 +229,7 @@ function findContentContainer(){
         "targetPageHtml":cloneSelectedContainer.innerHTML
     }
     
+    console.log(cloneSelectedContainer.innerHTML)
 
     return data;
 };
@@ -217,12 +275,12 @@ function removeElementAttributesAndEmptyElement(target){
     var target_elements = target.querySelectorAll("*")
     target_elements.forEach(function(element){
         if (element.childNodes.length == 0){
-            console.log(element)
+            //console.log(element)
             element.parentNode.removeChild(element)
         } else {
             for (i=0; i < element.attributes.length; i++ ){
                 if (element.attributes[i].nodeName.toLowerCase() !== "href"){
-                    console.log(element.attributes[i].nodeName)
+                    //console.log(element.attributes[i].nodeName)
                     element.removeAttribute(element.attributes[i].nodeName); 
                 }
             }
