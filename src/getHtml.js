@@ -233,7 +233,7 @@ function findContentContainer(){
     }
 
     /**
-     * Remove: udn-global specific element
+     * Remove: udn-global and udn specific element
      */
 
     udnGlobalDomainRegex = /https?:\/\/(.+?\.)?global\.udn/
@@ -248,7 +248,42 @@ function findContentContainer(){
         while(deleteSubscribe[0]){
             deleteSubscribe[0].parentNode.removeChild(deleteSubscribe[0]);
         }
+
+        
     }
+
+    udnDomainRegex = /https?:\/\/(.+?\.)?udn\.com/
+    if (udnDomainRegex.test(currentPageHref)){
+        deleteSocialBar = cloneSelectedContainer.getElementsByClassName('social_bar');
+        while(deleteSocialBar[0]){
+            deleteSocialBar[0].parentNode.removeChild(deleteSocialBar[0]);
+        }
+        deleteSharePush = cloneSelectedContainer.getElementsByClassName('shareBar__info--push');
+        while(deleteSharePush[0]){
+            console.log('deleteSharePush', deleteSharePush)
+            deleteSharePush[0].parentNode.removeChild(deleteSharePush[0]);
+        }
+        var deleteStoryTags = cloneSelectedContainer.querySelectorAll('#story_tags');
+        for (var i = 0, max = deleteStoryTags.length; i < max; i++) {
+            console.log('deleteStoryTags', deleteStoryTags)
+            deleteStoryTags[i].parentNode.removeChild(deleteStoryTags[i]);
+        };
+    }
+    
+    
+
+    /**
+     * Remove: ltn specific element
+     */
+    LtnDomainRegex = /https?:\/\/(.+?\.)?ltn\.com/
+    if (LtnDomainRegex.test(currentPageHref)){
+        var deleteLtnAppPromotion = cloneSelectedContainer.getElementsByClassName('appE1121');
+        while(deleteLtnAppPromotion[0]){
+            deleteLtnAppPromotion[0].parentNode.removeChild(deleteLtnAppPromotion[0]);
+        }
+    }
+    
+
 
     // some attribute may not be deleted
     removeAttribute(cloneSelectedContainer);
