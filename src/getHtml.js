@@ -8,7 +8,7 @@
  */
 
 var target_hololink_host = "http://127.0.0.1:8000/"
-var selectedTextThreshhold = 0.2
+var selectedTextThreshhold = 0.1
 var currentPageHref = window.location.href
 
 
@@ -28,11 +28,16 @@ function findContentContainer(){
     //countMaxNum-Method
     // flow: find MaxNum<p> -> select outer layer from MaxNum<p> until reach 40% total words-> clone selected word -> delete unneccessay element -> export
     var countTotlaWordsOnPage = document.body.innerText.length, 
-        // 一篇網站內容中文字大多由 p 表示
-        // 找找看 font。舊型網站常用
-        // TODO: 需要找到更好的做法
-        //如果沒有 <p> 則要找 <div><font>
-        wordsContainers = document.body.querySelectorAll("div, font, p");
+        
+    // 一篇網站內容中文字大多由 p 表示
+    // 找找看 font。舊型網站常用
+     // TODO: 需要找到更好的做法
+    //如果沒有 <p> 則要找 <div><font>
+    wordsContainers = document.body.querySelectorAll("p");
+
+    if (wordsContainers.length == 0){
+        wordsContainers = document.body.querySelectorAll("div, font");
+    }
         
     // 接下來要找到哪個部分存了最多文字，要把這些片段挑出來挑出來
 
@@ -68,14 +73,17 @@ function findContentContainer(){
     
     //find_container_with_most_words()
 
-    console.log(selectedContainer)
+    
     //從最多字的 <p> 一圈一圈向外拓，直到圈起了 2/5 的總字數
-    while (countSelectedWords/countTotlaWordsOnPage < selectedTextThreshhold
+    while (countSelectedWords/countTotlaWordsOnPage < 0.01
     && selectedContainer != document.body
     && selectedContainer.parentNode.innerText){ //這一圈裡必須要有字
         selectedContainer = selectedContainer.parentNode; //向外擴一圈
         countSelectedWords = selectedContainer.innerText.length;
+        console.log(selectedContainer, countSelectedWords)
     };
+
+    console.log('rrrr',selectedContainer)
 
 
     //如果機器找到的最後一層是 <p> 則我們要自動向外再選一層
@@ -224,7 +232,23 @@ function findContentContainer(){
 
     }
 
-    
+    /**
+     * Remove: udn-global specific element
+     */
+
+    udnGlobalDomainRegex = /https?:\/\/(.+?\.)?global\.udn/
+    if (udnGlobalDomainRegex.test(currentPageHref)){
+        // remove whatsapp share button
+        var deleteWhatsappShareButton = cloneSelectedContainer.getElementsByClassName('social_bar');
+        while(deleteWhatsappShareButton[0]){
+            deleteWhatsappShareButton[0].parentNode.removeChild(deleteWhatsappShareButton[0]);
+        }
+
+        var deleteSubscribe = cloneSelectedContainer.getElementsByClassName('area');
+        while(deleteSubscribe[0]){
+            deleteSubscribe[0].parentNode.removeChild(deleteSubscribe[0]);
+        }
+    }
 
     // some attribute may not be deleted
     removeAttribute(cloneSelectedContainer);
@@ -269,7 +293,7 @@ function wrapTextNodeInP(target){
                 var wrapper = document.createElement('p');
                 wrapper.innerHTML = textNode.innerHTML;
                 if (textNode.parentNode){
-                    console.log(textNode)
+                    //console.log(textNode)
                     textNode.parentNode.insertBefore(wrapper, textNode);
                     textNode.parentNode.removeChild(textNode);
                 } else {
