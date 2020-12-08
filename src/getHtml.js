@@ -258,14 +258,20 @@ function findContentContainer(){
         while(deleteSocialBar[0]){
             deleteSocialBar[0].parentNode.removeChild(deleteSocialBar[0]);
         }
+        deleteShareBar = cloneSelectedContainer.getElementsByClassName('shareBar');
+        while(deleteShareBar[0]){
+            deleteShareBar[0].parentNode.removeChild(deleteShareBar[0]);
+        }
         deleteSharePush = cloneSelectedContainer.getElementsByClassName('shareBar__info--push');
         while(deleteSharePush[0]){
-            console.log('deleteSharePush', deleteSharePush)
             deleteSharePush[0].parentNode.removeChild(deleteSharePush[0]);
+        }
+        deleteTagsBox = cloneSelectedContainer.getElementsByClassName('tabsbox');
+        while(deleteTagsBox[0]){
+            deleteTagsBox[0].parentNode.removeChild(deleteTagsBox[0]);
         }
         var deleteStoryTags = cloneSelectedContainer.querySelectorAll('#story_tags');
         for (var i = 0, max = deleteStoryTags.length; i < max; i++) {
-            console.log('deleteStoryTags', deleteStoryTags)
             deleteStoryTags[i].parentNode.removeChild(deleteStoryTags[i]);
         };
     }
