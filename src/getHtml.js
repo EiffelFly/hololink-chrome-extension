@@ -8,8 +8,22 @@
  */
 
 var target_hololink_host = "http://127.0.0.1:8000/"
+var selectedTextThreshhold = 0.2
+var currentPageHref = window.location.href
+
 
 function findContentContainer(){
+
+    // dynamically change selectedTextThreshhold depended on domain
+
+    // udn-global
+    if (/https?:\/\/(.+?\.)?global\.udn/.test(currentPageHref)){
+        console.log('change')
+        selectedTextThreshhold = 0.05
+    }
+
+
+
     console.log(document.body)
     //countMaxNum-Method
     // flow: find MaxNum<p> -> select outer layer from MaxNum<p> until reach 40% total words-> clone selected word -> delete unneccessay element -> export
@@ -56,7 +70,7 @@ function findContentContainer(){
 
     console.log(selectedContainer)
     //從最多字的 <p> 一圈一圈向外拓，直到圈起了 2/5 的總字數
-    while (countSelectedWords/countTotlaWordsOnPage < 0.2
+    while (countSelectedWords/countTotlaWordsOnPage < selectedTextThreshhold
     && selectedContainer != document.body
     && selectedContainer.parentNode.innerText){ //這一圈裡必須要有字
         selectedContainer = selectedContainer.parentNode; //向外擴一圈
@@ -163,7 +177,7 @@ function findContentContainer(){
      */
 
     wikiDomainRegex = /https?:\/\/(.+?\.)?wikipedia\.org/
-    if (wikiDomainRegex.test(window.location.href)){
+    if (wikiDomainRegex.test(currentPageHref)){
         var selectWikiInfoBox = cloneSelectedContainer.getElementsByClassName('infobox vcard');
         var wikiInfoBox = []
         while(selectWikiInfoBox[0]){
