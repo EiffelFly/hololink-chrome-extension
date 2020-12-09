@@ -16,7 +16,9 @@ var sidebar_highlight_content = ''
 var page_got_highlighted_when_created = false
 var content_script_status = 'loading'
 var current_page_url = window.location.href;
-var current_page_title = document.title;
+var current_page_title = document.title; // this will change sometimes, like stratechery. So we send this info via background script.
+
+
 
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
@@ -442,6 +444,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         content_script_status = 'loading'
 
         if (request.message == 'hololink_doesnt_have_this_article'){
+            console.log(request)
             hololink_have_this_article = false
         } else {
             highlight = request.highlight
@@ -449,6 +452,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         current_user = request.user;
         csrf_token = request.csrf_token;
         session_id = request.session_id;
+        current_page_title = request.current_page_title
+        current_page_url = request.current_page_url
 
         sidebar_highlight_content = ''
 

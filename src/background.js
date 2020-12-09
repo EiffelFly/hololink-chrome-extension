@@ -54,12 +54,12 @@ function got_user_data_of_current_page_handler(response){
                 // send warning to content_script that Hololink doesn't have this article
                 if (json.highlight.length){
                     if (json.highlight[0].message && json.highlight[0].message == "Hololink doesn't have this article"){
-                        chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user, csrf_token:csrf_token, session_id:session_id});
+                        chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_doesnt_have_this_article", user:json.user, csrf_token:csrf_token, session_id:session_id, current_page_title:current_page_title, current_page_url:current_page_url});
                     } else if (json.highlight.length) {
-                        chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id});
+                        chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id, current_page_title:current_page_title, current_page_url:current_page_url});
                     }
                 } else {
-                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id});
+                    chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id, current_page_title:current_page_title, current_page_url:current_page_url});
                 } 
             });
             
@@ -242,7 +242,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details){
 // [Improvement] - Need to find solution to limit request 
 chrome.tabs.onUpdated.addListener(function(tab_id, change_info, tab){
     //check whether user logged in
-    console.log(change_info)
+    console.log('check tab update info', change_info)
     if (change_info.status == 'complete'){
         chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
             if (cookie){
