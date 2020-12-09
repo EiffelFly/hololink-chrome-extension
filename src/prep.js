@@ -1,7 +1,8 @@
 
-// current task: activate sidebar and scroll
+// current task: show highlight on hololink page
 // TODO: make highlight listener correct
 // TODO: yahoo news, toolbar css get override
+
 
 var csrf_token
 var session_id
@@ -454,10 +455,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         current_page_url = request.current_page_url
 
         sidebar_highlight_content = ''
-
         // restore highlight when page is created
-        for (i=0; i<highlight.length; i++){        
-            //console.log(highlight[i])
+        for (var i=0; i<highlight.length; i++){        
+            console.log(highlight.length)
             assemble_sidebar_highlight_content(highlight[i])
             deserialize_range_object_and_highlight(highlight[i]);            
         }
