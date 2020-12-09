@@ -75,7 +75,7 @@ function findContentContainer(){
 
     
     //從最多字的 <p> 一圈一圈向外拓，直到圈起了 2/5 的總字數
-    while (countSelectedWords/countTotlaWordsOnPage < 0.01
+    while (countSelectedWords/countTotlaWordsOnPage < selectedTextThreshhold
     && selectedContainer != document.body
     && selectedContainer.parentNode.innerText){ //這一圈裡必須要有字
         selectedContainer = selectedContainer.parentNode; //向外擴一圈
@@ -288,6 +288,38 @@ function findContentContainer(){
             deleteLtnAppPromotion[0].parentNode.removeChild(deleteLtnAppPromotion[0]);
         }
     }
+    
+    /**
+     * Remove: stratechery element
+     */
+
+    strateCheryDomaninRegex = /https?:\/\/(.+?\.)?stratechery\.com/
+    if (strateCheryDomaninRegex.test(currentPageHref)){
+        var deletePrimaryContainer = cloneSelectedContainer.getElementsByClassName('menu-primary-container');
+        while(deletePrimaryContainer[0]){
+            deletePrimaryContainer[0].parentNode.removeChild(deleteLtnAppPromotion[0]);
+        }
+        var deletePodcastLinks = cloneSelectedContainer.getElementsByClassName('podcastlinks');
+        while(deletePodcastLinks[0]){
+            deletePodcastLinks[0].parentNode.removeChild(deletePodcastLinks[0]);
+        }
+        var deleteShare = cloneSelectedContainer.getElementsByClassName('sharedaddy');
+        while(deleteShare[0]){
+            deleteShare[0].parentNode.removeChild(deleteShare[0]);
+        }
+        var deleteFootnote = cloneSelectedContainer.getElementsByClassName('bigfoot-footnote__container');
+        while(deleteFootnote[0]){
+            console.log(deleteFootnote)
+            deleteFootnote[0].parentNode.removeChild(deleteFootnote[0]);
+        }
+        var deleteFootnoteLink = cloneSelectedContainer.getElementsByClassName('footnote-link');
+        while(deleteFootnoteLink[0]){
+            console.log(deleteFootnoteLink)
+            deleteFootnoteLink[0].parentNode.removeChild(deleteFootnoteLink[0]);
+        }
+    }
+    
+    
     
 
 
