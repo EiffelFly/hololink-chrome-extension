@@ -18,8 +18,6 @@ var content_script_status = 'loading'
 var current_page_url = window.location.href;
 var current_page_title = document.title; // this will change sometimes, like stratechery. So we send this info via background script.
 
-
-
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
 document.body.appendChild(hololink_toolbar_container);
@@ -200,12 +198,12 @@ function post_highligh_to_hololink(highlight){
         var userSelectedProjectsId = []
         fullData = {
             query: "postData",
-            page_text: page_text,
-            target_url: target_hololink_host+"api/articles/",
-            data_url: current_page_url,
-            data_title: current_page_title,
-            data_projects: userSelectedProjectsId,
-            recommendation: false 
+            targetPageText: page_text,
+            hololinkUrl: target_hololink_host+"api/articles/",
+            targetPageUrl: current_page_url,
+            targetPageTitle: current_page_title,
+            userSelectedProjects: userSelectedProjectsId,
+            recommendation: false
         }
 
         chrome.runtime.sendMessage({action: "DataReadyForPost",data: fullData}, function(response){
