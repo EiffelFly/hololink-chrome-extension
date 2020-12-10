@@ -687,8 +687,9 @@ function serialize(range) {
     start.offset = range.startOffset;
     var end = generate(range.endContainer);
     end.offset = range.endOffset;
-
-    return {start: start, end: end};
+    var rangeOffsetTop = range.commonAncestorContainer.parentNode.offsetTop
+    console.log(rangeOffsetTop)
+    return {start: start, end: end, offsetTop:rangeOffsetTop};
 }
 
 function deserialize(result) {
