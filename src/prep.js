@@ -146,10 +146,9 @@ function render_highlight(selection){
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
 
+        var highlightParentNodeText = range.commonAncestorContainer.textContent
 
-
-
-        console.log(removeHighlights)
+        console.log(selection.focusOffset, selection.anchorOffset)
 
         // TODO: find a solution to insert custom element but not affect the DOM tree
 
@@ -159,13 +158,14 @@ function render_highlight(selection){
             "page_url": current_page_url,
             "page_title": current_page_title,
             "comment":'',
-            "range_object":serialized_range_object
+            "range_object":serialized_range_object,
+            "highlight_parent_node_text":highlightParentNodeText
         };
 
         highlight.push(data);
         sidebar_update_highlight = true
         console.log(data)
-        post_highligh_to_hololink(data)
+        //post_highligh_to_hololink(data)
 
         //clean selection
         if (window.getSelection) {
