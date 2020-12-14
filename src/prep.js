@@ -143,14 +143,14 @@ function render_highlight(selection){
         // we highlight it
         var highlight_text = getSelectionText(selection)
 
+        // the range object will on textNode before we highlightrange, after that we set range startContainer and endContainer on node
+        // so every setting will change, such as getCaretCharacterOffsetWithin will return the character offset from parentnode including 
+        // selected words, but after we highlightRange, it exclude selected words. to keep every data with same scenario, we stroe data 
+        // after highlightRange
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
 
-        var highlightParentNodeText = range.commonAncestorContainer.textContent
-
-        console.log(selection.focusOffset, selection.anchorOffset)
-
-        // TODO: find a solution to insert custom element but not affect the DOM tree
+        var characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
 
         var data = {
             "id_on_page": highlight_id_on_page,
@@ -159,13 +159,20 @@ function render_highlight(selection){
             "page_title": current_page_title,
             "comment":'',
             "range_object":serialized_range_object,
-            "highlight_parent_node_text":highlightParentNodeText
+            "anchor_point_data":{
+                highlight_parent_node_text:range.commonAncestorContainer.textContent, // TODO: verify this is correct
+                character_offset:characterOffset,
+                range_start_container: range.startContainer.textContent,
+                range_end_container: range.endContainer.textContent,
+                range_start_offset: range.startOffset,
+                range_end_offset: range.endOffset
+            }
         };
 
         highlight.push(data);
         sidebar_update_highlight = true
         console.log(data)
-        //post_highligh_to_hololink(data)
+        post_highligh_to_hololink(data)
 
         //clean selection
         if (window.getSelection) {
@@ -176,6 +183,38 @@ function render_highlight(selection){
     }
     return data
 };
+
+// [Important] necessary function for identify right highlight words on hololink 
+// We use Tim down range-position method to get the character offset of selection
+// the solution is naive, need to find a way cope with line breaks. but if we keep everything as same as original
+// ref: https://stackoverflow.com/questions/4811822/get-a-ranges-start-and-end-offsets-relative-to-its-parent-container
+// ref: https://github.com/timdown/rangy/blob/1e55169d2e4d1d9458c2a87119addf47a8265276/src/modules/inactive/rangy-position.js
+
+function getCaretCharacterOffsetWithin(element){
+    var caretOffset = 0;
+    var doc = element.ownerDocument || element.document;
+    var win = doc.defaultView || doc.parentWindow;
+    var sel;
+    if (typeof win.getSelection != "undefined") {
+        sel = win.getSelection();
+        if (sel.rangeCount > 0) { //  WebKit-specific - https://stackoverflow.com/a/23699875/14058520
+            var range = win.getSelection().getRangeAt(0);
+            var preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(element);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            caretOffset = preCaretRange.toString().length;
+        }
+    } else if ( (sel = doc.selection) && sel.type != "Control") {
+        var textRange = sel.createRange();
+        var preCaretTextRange = doc.body.createTextRange();
+        preCaretTextRange.moveToElementText(element);
+        preCaretTextRange.setEndPoint("EndToEnd", textRange);
+        caretOffset = preCaretTextRange.text.length;
+    }
+    return caretOffset;
+}
+
+
 
 // this function can get the user selected text including in textarea
 function getSelectionText(selection) {
@@ -552,11 +591,6 @@ function highlightRange(range, tagName, attributes = {}) {
     if (range.collapsed){
         return;
     }
-
-    console.log('original', range)
-
-    temp_range_object = serialize(range)
-
     // First put all nodes in an array (splits start and end nodes if needed)
     const nodes = textNodesInRange(range);
     
