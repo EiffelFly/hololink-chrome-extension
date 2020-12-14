@@ -142,16 +142,18 @@ function render_highlight(selection){
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
         var highlight_text = getSelectionText(selection)
+        
 
         // the range object will on textNode before we highlightrange, after that we set range startContainer and endContainer on node
         // so every setting will change, such as getCaretCharacterOffsetWithin will return the character offset from parentnode including 
-        // selected words, but after we highlightRange, it exclude selected words. to keep every data with same scenario, we stroe data 
+        // selected words, but after we highlightRange, it exclude selected words. to keep every data with same scenario, we store data 
         // after highlightRange
+
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
 
-        var characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
-
+        const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
+        console.log(range)
         var data = {
             "id_on_page": highlight_id_on_page,
             "text": highlight_text,
@@ -189,6 +191,8 @@ function render_highlight(selection){
 // the solution is naive, need to find a way cope with line breaks. but if we keep everything as same as original
 // ref: https://stackoverflow.com/questions/4811822/get-a-ranges-start-and-end-offsets-relative-to-its-parent-container
 // ref: https://github.com/timdown/rangy/blob/1e55169d2e4d1d9458c2a87119addf47a8265276/src/modules/inactive/rangy-position.js
+
+// TODO: if someone selection across element, this will failed
 
 function getCaretCharacterOffsetWithin(element){
     var caretOffset = 0;
