@@ -441,7 +441,6 @@ function unWrapElement(target){
     if (target.parentNode){
         target.parentNode.replaceChild(docFrag, target);
     }
-	
 }
 
 function restructureToFlatContainer(target){
