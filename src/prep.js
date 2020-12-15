@@ -90,7 +90,7 @@ function render_toolbar(){
                 var highlight = render_highlight(selection);
                 assemble_sidebar_highlight_content(highlight)
 
-                var hololink_sidebar = find_element_in_sidebar_shadow_root('.highlight-annotation-container')
+                var hololink_sidebar = find_element_in_sidebar_shadow_root('.hololink-annotation-container')
                 
                 // when sidebar open, we have to insert the highlight content into sidebar right away 
                 if (hololink_sidebar.length){
@@ -104,8 +104,8 @@ function render_toolbar(){
                 
                 // Force tooltip to close after user clicked toolbar button
                 $('.hololink-toolbar-tooltip').remove()
-            });
 
+            });
             
             $('#hololink_toolbar_annotate').on('click', function(){
                 render_annotation();
@@ -143,7 +143,7 @@ function render_highlight(selection){
         var highlight_text = getSelectionText(selection)
 
         highlight_id_on_page = generate_url(datetime, current_page_url)
-        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
+        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight_id_on_page});
 
         const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
 
@@ -163,6 +163,19 @@ function render_highlight(selection){
                 range_end_offset: range.endOffset
             }
         };
+
+        $(`hololink-highlight[data-id^='${highlight_id_on_page}']`).on('click', function(e){
+            console.log('ff')
+            shadow = $('.hololink-sidebar-container')[0].shadowRoot
+            var hololink_sidebar = $(shadow).find('.hololink-sidebar')
+            if(!hololink_sidebar.length){
+                open_sidebar()
+                    .then(scoll_to_highlight_and_forcus_at_sidebar(e))
+            } else {
+                scoll_to_highlight_and_forcus_at_sidebar(e)
+            }
+            
+        })
 
         highlight.push(data);
         sidebar_update_highlight = true
@@ -208,8 +221,6 @@ function getCaretCharacterOffsetWithin(element){
     }
     return caretOffset;
 }
-
-
 
 // this function can get the user selected text including in textarea
 function getSelectionText(selection) {
@@ -284,7 +295,7 @@ function assemble_sidebar_highlight_content(highlight_target){
     // restore highlight from hololink data
     var highlight_content = `
         <div style="padding: 0 20px 20px 20px;">
-            <div class="card highlight-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" id="${highlight_target.id_on_page}">
+            <div class="card hololink-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" data-id="${highlight_target.id_on_page}">
                 <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
                     <div class="col d-flex" style="margin: auto auto auto 0 ;">
                         <div class="highlight-user">
@@ -326,7 +337,7 @@ function find_element_in_sidebar_shadow_root(element){
 function deserialize_range_object_and_highlight(highlight){
     if (page_got_highlighted_when_created == false){
         var restore_range_object = deserialize(highlight.range_object)
-        const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', id:highlight.id_on_page});
+        const removeHighlights = highlightRange(restore_range_object, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight.id_on_page});
     }
 }
 
@@ -349,7 +360,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return true; 
     }
 });
-// Close the hololink-toolbar amd sidebar when we click on the screen.
+// Close the hololink-toolbar and sidebar when we click on the screen.
 $(window).on('mousedown', function(e){
     // check if click event occured inside the hololink-toolbar-container
     var target_array = Array.from(e.target.classList)
@@ -403,7 +414,7 @@ async function open_sidebar(){
                 $(shadow).find('.hololink-sidebar').remove();
             });
             
-            var highlight_annotation_container = $(shadow).find('.highlight-annotation-container')
+            var highlight_annotation_container = $(shadow).find('.hololink-annotation-container')
             highlight_annotation_container.html(sidebar_highlight_content)
 
             trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
@@ -413,27 +424,33 @@ async function open_sidebar(){
             delere_highlight_img.attr('src', `${trashcan_img_path}`)
 
             // when user click highlight in sidebar, focus highlight text in main document 
-            $(shadow).find('.highlight-annotation, .highlight-user, .highlight-time, .highlight-content').on('click', function(e){
-                if (!e.target.id){
-                    e.target.id = $(this).closest('.highlight-annotation').attr('id')
-                    console.log(e.target.id )
+            $(shadow).find('.hololink-annotation, .highlight-user, .highlight-time, .highlight-content').on('click', function(element){
+                var targetDataId = element.target.getAttribute('data-id')
+                if (!targetDataId){
+                    targetDataId = $(this).closest('.hololink-annotation').attr('data-id')
+                    console.log(targetDataId)
                 }
 
-                var target_element = $(`hololink-highlight[id=${e.target.id}]`)
+                var target_element = $(`hololink-highlight[data-id='${targetDataId}']`)
                 var target_element_offset = get_better_offect(true, target_element) - ($(window).height() - target_element.outerHeight(true))/2
+                var targetElementAtSideBar = $(shadow).find(`.hololink-annotation[data-id='${targetDataId}']`)
 
-                
                 window.scrollTo({
                     top:target_element_offset, 
                     behavior:'smooth'
                 });
 
-
                 // remove all hovered element
                 $('.hololink-highlight').removeClass('hovered')
-                $(shadow).find('.highlight-annotation').removeClass('hovered')
+                $(shadow).find('.hololink-annotation').removeClass('hovered')
 
                 target_element.toggleClass('hovered')
+
+                // remove hovered element at sidebar
+                $(shadow).find('.hololink-annotation').removeClass('hovered')
+
+                targetElementAtSideBar.toggleClass('hovered')
+                console.log(targetElementAtSideBar)
 
             }); 
 
@@ -444,24 +461,25 @@ async function open_sidebar(){
 
 function scoll_to_highlight_and_forcus_at_sidebar(element){
     var shadow = $('.hololink-sidebar-container')[0].shadowRoot;
-    var target_element = $(shadow).find(`#${element.target.id}`);
-    var target_window = $(shadow).find('.highlight-annotation-container');
+    var targetDataId = element.target.getAttribute('data-id')
+    var target_element = $(shadow).find(`[data-id='${targetDataId}']`);
+    console.log(element.target.id, target_element.show())
+    var target_window = $(shadow).find('.hololink-annotation-container');
     var target_element_offset = get_better_offect(true, target_element, target_window);
+    
     target_window.animate({
         scrollTop: target_element_offset
     }, 500);
     
     // remove all hovered element
-    $(shadow).find('.highlight-annotation').removeClass('hovered')
+    $(shadow).find('.hololink-annotation').removeClass('hovered')
     $('.hololink-highlight').removeClass('hovered')
 
     //target_element.focus();
     target_element.toggleClass('hovered')
     // because we highlight a selection with one id, in order to avoid some error, 
     // we have to specific attribute and class
-    $(`hololink-highlight[id=${element.target.id}]`).toggleClass('hovered')
-
-    console.log('dd',$(`hololink-highlight[id=${element.target.id}]`))
+    $(`hololink-highlight[data-id=${targetDataId}]`).toggleClass('hovered')
 
 }
 
@@ -610,23 +628,6 @@ function highlightRange(range, tagName, attributes = {}) {
     range.setEndAfter(highlightElements[nodes.length - 1])
 
     return removeHighlights
-
-    /*
-     * TODO: need to find a solution that will recover range object after we changed the DOM
-     * The method we use right now can only work on some webs (we can't use this mehtod on daudo)
-     */
-   
-    // range object get messed up by our DOM changes, we have to restore it.
-    // this will help us find target new highlight node 
-    // temp_range_object.start.selector = temp_range_object.start.selector + " > hololink-highlight"
-    // temp_range_object.end.selector = temp_range_object.end.selector + " > hololink-highlight"
-    // var startNode = find(temp_range_object.start)
-    // var endNode = find(temp_range_object.end)
-
-    // console.log(temp_range_object, startNode, endNode)
-
-    // range.setStart(startNode);
-    // range.setEnd(endNode);
     
 }
 
