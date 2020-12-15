@@ -1,14 +1,15 @@
 
-// current task: show highlight on hololink page
-// TODO: make highlight listener correct
+// current task: show highlightsDataArray on hololink page
+// TODO: sort annotation at sidebar
 // TODO: yahoo news, toolbar css get override
+// TODO: if user select and mis-disselect range then immediately click highlight button, it will cause error
 
 
 var csrf_token
 var session_id
 var shadow
 var lock_sidebar = false
-var highlight = []
+var highlightsDataArray = []
 var hololink_have_this_article = true
 var current_user = ''
 var sidebar_update_highlight = false
@@ -87,9 +88,16 @@ function render_toolbar(){
             hololink_toolbar_container.appendChild(hololink_toolbar_inner);
             $('#hololink_toolbar_highlight').on('click', function(){
 
+                // Sort highlights data according to range-startContainer offsetTop and characterOffset
                 var highlight = render_highlight(selection);
-                assemble_sidebar_highlight_content(highlight)
-
+                highlightsDataArray.push(highlight);
+                sortHighlighsDataArray()
+                
+                sidebar_highlight_content = ''
+                for (i=0; i<highlightsDataArray.length; i++){
+                    assemble_sidebar_highlight_content(highlightsDataArray[i])
+                }
+                
                 var hololink_sidebar = find_element_in_sidebar_shadow_root('.hololink-annotation-container')
                 
                 // when sidebar open, we have to insert the highlight content into sidebar right away 
@@ -141,11 +149,12 @@ function render_highlight(selection){
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
         var highlight_text = getSelectionText(selection)
-
+        
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight_id_on_page});
 
         const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
+        const RangeStartContainerOffsetTop = range.startContainer.offsetTop
 
         var data = {
             "id_on_page": highlight_id_on_page,
@@ -157,11 +166,9 @@ function render_highlight(selection){
             "anchor_point_data":{
                 highlight_parent_node_text:range.commonAncestorContainer.textContent, // TODO: verify this is correct
                 character_offset:characterOffset,
-                range_start_container: range.startContainer.textContent,
-                range_end_container: range.endContainer.textContent,
-                range_start_offset: range.startOffset,
-                range_end_offset: range.endOffset
-            }
+                range_start_container_offset_top:RangeStartContainerOffsetTop
+            },
+            "highlighted_by_username":current_user
         };
 
         $(`hololink-highlight[data-id^='${highlight_id_on_page}']`).on('click', function(e){
@@ -177,7 +184,6 @@ function render_highlight(selection){
             
         })
 
-        highlight.push(data);
         sidebar_update_highlight = true
         post_highligh_to_hololink(data)
 
@@ -481,7 +487,30 @@ function scoll_to_highlight_and_forcus_at_sidebar(element){
     // we have to specific attribute and class
     $(`hololink-highlight[data-id=${targetDataId}]`).toggleClass('hovered')
 
-}
+};
+
+function sortHighlighsDataArray(){
+    highlightsDataArray = highlightsDataArray.sort(function(a,b){
+        if (a.anchor_point_data.range_start_container_offset_top > b.anchor_point_data.range_start_container_offset_top){
+            return 1
+        } 
+        if (a.anchor_point_data.range_start_container_offset_top == b.anchor_point_data.range_start_container_offset_top){
+            if (a.anchor_point_data.character_offset > b.anchor_point_data.character_offset){
+                return 1
+            } 
+            if (a.anchor_point_data.character_offset == b.anchor_point_data.character_offset){
+                return 0
+            }
+            return -1
+        }
+        if (a.anchor_point_data.range_start_container_offset_top < b.anchor_point_data.range_start_container_offset_top){
+            return -1
+        } 
+
+    });
+    console.log(highlightsDataArray)
+};
+
 
 /**
  * Listener 
@@ -498,7 +527,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             console.log(request)
             hololink_have_this_article = false
         } else {
-            highlight = request.highlight
+            highlightsDataArray = request.highlight
+            sortHighlighsDataArray()
         }
         current_user = request.user;
         csrf_token = request.csrf_token;
@@ -508,15 +538,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
         sidebar_highlight_content = ''
         // restore highlight when page is created
-        for (var i=0; i<highlight.length; i++){        
-            console.log(highlight.length)
-            assemble_sidebar_highlight_content(highlight[i])
-            deserialize_range_object_and_highlight(highlight[i]);            
+        for (var i=0; i<highlightsDataArray.length; i++){        
+            assemble_sidebar_highlight_content(highlightsDataArray[i])
+            deserialize_range_object_and_highlight(highlightsDataArray[i]);            
         }
 
         // add click listener to activate sidebar when user click highlight
         $('.hololink-highlight').on('click', function(e){
-            console.log('ff')
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
             var hololink_sidebar = $(shadow).find('.hololink-sidebar')
             if(!hololink_sidebar.length){
@@ -528,7 +556,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             
         })
 
-        console.log(highlight)
+        console.log(highlightsDataArray)
 
         page_got_highlighted_when_created = true;
         content_script_status = 'complete'
