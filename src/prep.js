@@ -136,24 +136,17 @@ function render_highlight(selection){
         const range = selection.getRangeAt(0);
         var datetime = Date.now();
         
-        console.log(range)
         var serialized_range_object = serialize(range)
 
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
         var highlight_text = getSelectionText(selection)
-        
-
-        // the range object will on textNode before we highlightrange, after that we set range startContainer and endContainer on node
-        // so every setting will change, such as getCaretCharacterOffsetWithin will return the character offset from parentnode including 
-        // selected words, but after we highlightRange, it exclude selected words. to keep every data with same scenario, we store data 
-        // after highlightRange
 
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-annotation":highlight_id_on_page});
 
         const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
-        console.log(range)
+
         var data = {
             "id_on_page": highlight_id_on_page,
             "text": highlight_text,
@@ -173,7 +166,6 @@ function render_highlight(selection){
 
         highlight.push(data);
         sidebar_update_highlight = true
-        console.log(data)
         post_highligh_to_hololink(data)
 
         //clean selection
@@ -186,13 +178,11 @@ function render_highlight(selection){
     return data
 };
 
-// [Important] necessary function for identify right highlight words on hololink 
+// [Important] necessary function for identify exact highlight words on hololink 
 // We use Tim down range-position method to get the character offset of selection
 // the solution is naive, need to find a way cope with line breaks. but if we keep everything as same as original
 // ref: https://stackoverflow.com/questions/4811822/get-a-ranges-start-and-end-offsets-relative-to-its-parent-container
 // ref: https://github.com/timdown/rangy/blob/1e55169d2e4d1d9458c2a87119addf47a8265276/src/modules/inactive/rangy-position.js
-
-// TODO: if someone selection across element, this will failed
 
 function getCaretCharacterOffsetWithin(element){
     var caretOffset = 0;
@@ -206,6 +196,7 @@ function getCaretCharacterOffsetWithin(element){
             var preCaretRange = range.cloneRange();
             preCaretRange.selectNodeContents(element);
             preCaretRange.setEnd(range.endContainer, range.endOffset);
+            console.log('preCaretRange', preCaretRange, preCaretRange.toString(), range.toString())
             caretOffset = preCaretRange.toString().length;
         }
     } else if ( (sel = doc.selection) && sel.type != "Control") {
@@ -612,6 +603,12 @@ function highlightRange(range, tagName, attributes = {}) {
         }
     }
 
+    // We have messed up range object, in order to make calculation afterward be accurate, 
+    // we have to restore it.
+
+    range.setStartBefore(highlightElements[0]);
+    range.setEndAfter(highlightElements[nodes.length - 1])
+
     return removeHighlights
 
     /*
@@ -679,6 +676,7 @@ function textNodesInRange(range) {
         nodes.push(walker.currentNode);
     while (walker.nextNode() && range.comparePoint(walker.currentNode, 0) !== 1)
         nodes.push(walker.currentNode);
+    
     return nodes;
 }
 
@@ -726,7 +724,6 @@ function serialize(range) {
     var end = generate(range.endContainer);
     end.offset = range.endOffset;
     var rangeOffsetTop = range.commonAncestorContainer.parentNode.offsetTop
-    console.log(rangeOffsetTop)
     return {start: start, end: end, offsetTop:rangeOffsetTop};
 }
 
