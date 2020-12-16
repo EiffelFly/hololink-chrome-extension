@@ -1,8 +1,8 @@
 
 // current task: show highlightsDataArray on hololink page
-// TODO: sort annotation at sidebar
 // TODO: yahoo news, toolbar css get override
 // TODO: if user select and mis-disselect range then immediately click highlight button, it will cause error
+// TODO: make django highlight created_at be the exact same time as we create ID
 
 
 var csrf_token
@@ -319,6 +319,33 @@ function calaculate_tooltip_position(){
 };
 
 function assemble_sidebar_highlight_content(highlight_target){
+
+
+    var highlightDateMilliseconds = highlight_target.id_on_page.split('-')
+    console.log(highlightDateMilliseconds)
+    highlightDateMilliseconds = highlightDateMilliseconds[highlightDateMilliseconds.length - 1 ]
+    var currentDate = Date.now()
+    
+
+    console.log(currentDate, currentDate-highlightDateMilliseconds)
+
+    if (currentDate-highlightDateMilliseconds <= 1000){
+        var highlightDate = 'now'
+    } else if (1000 < currentDate-highlightDateMilliseconds <= 60000){
+        var seconds = Math.round((currentDate-highlightDateMilliseconds)/1000)
+        highlightDate = `${seconds} seconds ago`
+    } else if (60000 < currentDate-highlightDateMilliseconds <= 3600000){
+        var minutes = Math.round((currentDate-highlightDateMilliseconds)/600000)
+        var highlightDate = `${minutes} minutes ago`
+    } else if (3600000 < currentDate-highlightDateMilliseconds <= 86400000){
+        var hours = Math.round((currentDate-highlightDateMilliseconds)/3600000)
+        var highlightDate = `${hours} hours ago`
+    } else {
+        var highlightDate = new Date(highlightDateMilliseconds)
+        highlightDate = highlightDate.toLocaleDateString()
+    }
+
+
     // restore highlight from hololink data
     var highlight_content = `
         <div style="padding: 0 20px 20px 20px;">
@@ -331,7 +358,7 @@ function assemble_sidebar_highlight_content(highlight_target){
                     </div>
                     <div class="col d-flex">
                         <div class="highlight-time" style="margin: auto 0 auto auto;">
-                            2020/11/26
+                            ${highlightDate}
                         </div>
                     </div>
                 </div>
