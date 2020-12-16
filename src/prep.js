@@ -154,7 +154,14 @@ function render_highlight(selection){
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight_id_on_page});
 
         const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
-        const RangeStartContainerOffsetTop = range.startContainer.offsetTop
+
+
+        // Element in overflow container will have 
+
+        const RangeStartContainerOffsetTop = getStaticOffsetFromStaticElement(range.startContainer);
+
+        console.log('check', RangeStartContainerOffsetTop)
+
 
         var data = {
             "id_on_page": highlight_id_on_page,
@@ -196,6 +203,20 @@ function render_highlight(selection){
     }
     return data
 };
+
+// offsetTop property does not actually take the “absolute” position but relative to its parent element that has a relative position.
+// like blockquote's offsetTop will be inaccurate without this function
+// ref: https://medium.com/@alexcambose/js-offsettop-property-is-not-great-and-here-is-why-b79842ef7582
+// USAGE:
+// const someElement = document.getElementById('someElementId');
+// const Y = getStaticOffsetFromStaticElement(someElement);
+// const X = getStaticOffsetFromStaticElement(someElement, true);
+
+const getStaticOffsetFromStaticElement = (element, horizontal = false) => {
+    if(!element) return 0;
+    return getStaticOffsetFromStaticElement(element.offsetParent, horizontal) + (horizontal ? element.offsetLeft : element.offsetTop);
+}
+  
 
 // [Important] necessary function for identify exact highlight words on hololink 
 // We use Tim down range-position method to get the character offset of selection
@@ -438,7 +459,7 @@ async function open_sidebar(){
                 }
 
                 var target_element = $(`hololink-highlight[data-id='${targetDataId}']`)
-                var target_element_offset = get_better_offect(true, target_element) - ($(window).height() - target_element.outerHeight(true))/2
+                var target_element_offset = getOffsetFromElementInOverflowContainer(true, target_element) - ($(window).height() - target_element.outerHeight(true))/2
                 var targetElementAtSideBar = $(shadow).find(`.hololink-annotation[data-id='${targetDataId}']`)
 
                 window.scrollTo({
@@ -461,7 +482,7 @@ async function open_sidebar(){
             }); 
 
         },
-        async:false
+        async:false // make the procedure we query hololink-sidebar.html become sync
     });
 };
 
@@ -471,8 +492,7 @@ function scoll_to_highlight_and_forcus_at_sidebar(element){
     var target_element = $(shadow).find(`[data-id='${targetDataId}']`);
     console.log(element.target.id, target_element.show())
     var target_window = $(shadow).find('.hololink-annotation-container');
-    var target_element_offset = get_better_offect(true, target_element, target_window);
-    
+    var target_element_offset = getOffsetFromElementInOverflowContainer(true, target_element, target_window);    
     target_window.animate({
         scrollTop: target_element_offset
     }, 500);
@@ -595,7 +615,7 @@ hint: Allows you to calculate dynamic and static offset whether they are in a di
 
 @return                  numeric
 */
-function get_better_offect(s, e, v) {
+function getOffsetFromElementInOverflowContainer(s, e, v) {
     // Set Defaults
     s = (typeof s == 'boolean') ? s : true;
     e = (typeof e == 'object') ? e : $(e);
