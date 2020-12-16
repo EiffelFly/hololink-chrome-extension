@@ -331,13 +331,13 @@ function assemble_sidebar_highlight_content(highlight_target){
 
     if (currentDate-highlightDateMilliseconds <= 1000){
         var highlightDate = 'now'
-    } else if (1000 < currentDate-highlightDateMilliseconds <= 60000){
+    } else if (1000 < currentDate-highlightDateMilliseconds && currentDate-highlightDateMilliseconds <= 60000){
         var seconds = Math.round((currentDate-highlightDateMilliseconds)/1000)
-        highlightDate = `${seconds} seconds ago`
-    } else if (60000 < currentDate-highlightDateMilliseconds <= 3600000){
-        var minutes = Math.round((currentDate-highlightDateMilliseconds)/600000)
+        var highlightDate = `${seconds} seconds ago`
+    } else if (60000 < currentDate-highlightDateMilliseconds && currentDate-highlightDateMilliseconds <= 3600000){
+        var minutes = Math.round((currentDate-highlightDateMilliseconds)/60000)
         var highlightDate = `${minutes} minutes ago`
-    } else if (3600000 < currentDate-highlightDateMilliseconds <= 86400000){
+    } else if (3600000 < currentDate-highlightDateMilliseconds && currentDate-highlightDateMilliseconds <= 86400000){
         var hours = Math.round((currentDate-highlightDateMilliseconds)/3600000)
         var highlightDate = `${hours} hours ago`
     } else {
@@ -575,6 +575,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             hololink_have_this_article = false
         } else {
             highlightsDataArray = request.highlight
+            console.log(highlightsDataArray)
             sortHighlighsDataArray()
         }
         current_user = request.user;
