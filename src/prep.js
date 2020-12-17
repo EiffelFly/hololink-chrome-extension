@@ -304,7 +304,6 @@ function position_toolbar(x, y) {
         hololink_toolbar_inner_with_spinner.style.left = x + 'px';
         hololink_toolbar_inner_with_spinner.style.top = y + 'px';
     }
-    
 }
 
 function calaculate_tooltip_position(){
@@ -416,13 +415,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 // Close the hololink-toolbar and sidebar when we click on the screen.
 $(window).on('mousedown', function(e){
-    // check if click event occured inside the hololink-toolbar-container
+    // check if click event occured inside the hololink-toolbar-container or sidebar
     var target_array = Array.from(e.target.classList)
-    const check_click_exist_target_class_for_toolbar = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner', 'hololink-toolbar-inner-with-spinner'].indexOf(r) >= 0 )
-    const check_click_exist_target_class_for_sidebar = target_array.some( r => ['hololink-sidebar-container', 'hololink-highlight'].indexOf(r) >= 0 )
+    const check_click_event_occured_inside_toolbar = target_array.some( r => ['hololink-toolbar-button-img', 'hololink-toolbar-button', 'hololink-toolbar-inner', 'hololink-toolbar-inner-with-spinner'].indexOf(r) >= 0 )
+    const check_click_event_occured_inside_sidebar = target_array.some( r => ['hololink-sidebar-container', 'hololink-highlight'].indexOf(r) >= 0 )
 
     if ($('.hololink-toolbar-inner').length ){
-        if (!check_click_exist_target_class_for_toolbar){
+        if (check_click_event_occured_inside_toolbar == false){
             $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
         }
     } else if ($('.hololink-toolbar-inner-with-spinner').length) {
@@ -434,7 +433,7 @@ $(window).on('mousedown', function(e){
     var hololink_sidebar = $(shadow).find('.hololink-sidebar')
 
     if (hololink_sidebar.length){
-        if (!check_click_exist_target_class_for_sidebar){
+        if (check_click_event_occured_inside_sidebar == false){
             if (lock_sidebar == false){
                 hololink_sidebar.remove();
             }
