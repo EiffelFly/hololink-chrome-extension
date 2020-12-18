@@ -52,7 +52,7 @@ highlight_button.setAttribute('data-toggle', 'tooltip');
 highlight_button.setAttribute('data-placement', 'bottom');
 highlight_button.setAttribute('title', 'Highlight');
 var highlighte_img = document.createElement('img');
-highlight_img_path = chrome.runtime.getURL("img/highlighter.svg");
+var highlight_img_path = chrome.runtime.getURL("img/highlighter.svg");
 highlighte_img.setAttribute('src', highlight_img_path);
 highlighte_img.setAttribute('width', 20);
 highlighte_img.setAttribute('height', 20);
@@ -66,8 +66,8 @@ annotate_button.setAttribute('data-toggle', 'tooltip');
 annotate_button.setAttribute('data-placement', 'bottom');
 annotate_button.setAttribute('title', 'Annotate');
 var annotate_img = document.createElement('img');
-highlight_img_path = chrome.runtime.getURL("img/chat.svg");
-annotate_img.setAttribute('src', highlight_img_path);
+var annotate_img_path = chrome.runtime.getURL("img/chat.svg");
+annotate_img.setAttribute('src', annotate_img_path);
 annotate_img.setAttribute('width', 20);
 annotate_img.setAttribute('height', 20);
 annotate_img.setAttribute('class', 'hololink-toolbar-button-img');
@@ -369,7 +369,10 @@ function assemble_sidebar_highlight_content(highlight_target){
                             </div>
                         </div>
                         <div class="row d-flex" style="margin-top: 10px;">
-                            <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>
+                            <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
+                                <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                            </div>
                         </div>
                     </div>  
                 </div>
@@ -377,7 +380,6 @@ function assemble_sidebar_highlight_content(highlight_target){
         </div>
     `
     sidebar_highlight_content = sidebar_highlight_content + highlight_content
-    //console.log(sidebar_highlight_content)
 }
 
 function find_element_in_sidebar_shadow_root(element){
@@ -470,11 +472,16 @@ async function open_sidebar(){
             var highlight_annotation_container = $(shadow).find('.hololink-annotation-container')
             highlight_annotation_container.html(sidebar_highlight_content)
 
-            trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
-            var delere_highlight_img = $(shadow).find('.delete-hololink-highlight-img');
-            delere_highlight_img.attr('width', 20)
-            delere_highlight_img.attr('height', 20)
-            delere_highlight_img.attr('src', `${trashcan_img_path}`)
+            var trashcan_img_path = chrome.extension.getURL("img/trashcan.svg")
+            var delete_highlight_container = $(shadow).find('.delete-hololink-highlight-img');
+            delete_highlight_container.attr('width', 20)
+            delete_highlight_container.attr('height', 20)
+            delete_highlight_container.attr('src', `${trashcan_img_path}`)
+
+            var annotate_img_container = $(shadow).find('.annotate-hololink-highlight-img');
+            annotate_img_container.attr('width', 20)
+            annotate_img_container.attr('height', 20)
+            annotate_img_container.attr('src', `${annotate_img_path}`)
 
             // when user click highlight in sidebar, focus highlight text in main document 
             $(shadow).find('.hololink-annotation, .highlight-user, .highlight-time, .highlight-content').on('click', function(element){

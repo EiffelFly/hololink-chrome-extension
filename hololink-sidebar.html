@@ -55,6 +55,11 @@
         transition: background-color 0.3s ease-in;
     }
 
+    .hololink-annotation:hover .annotate-hololink-highlight{
+        background-color: #D1F2EB;
+        transition: background-color 0.3s ease-in;
+    }
+
     .highlight-content{
         padding: 10px; 
         font-size: 14px; 
@@ -69,12 +74,23 @@
         background-color: #F7F9F9;
         padding: 3px;
         border-radius: 5px;
-        transition: background-color 0.3s ease-in, opacity 0.3s ease-in;
-        margin-left: auto;
-        
+        transition: background-color 0.3s ease-in, opacity 0.3s ease-in;  
     }
 
     .delete-hololink-highlight:hover{
+        background-color: #D1F2EB;
+        opacity: 0.5;
+    }
+
+    .annotate-hololink-highlight{
+        border:none;
+        background-color: #F7F9F9;
+        padding: 3px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease-in, opacity 0.3s ease-in;  
+    }
+
+    .annotate-hololink-highlight:hover{
         background-color: #D1F2EB;
         opacity: 0.5;
     }
