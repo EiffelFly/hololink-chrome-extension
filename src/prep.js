@@ -517,31 +517,13 @@ async function open_sidebar(){
                     var data = {
                         "id_on_page":targetDataId,
                         "page_url": current_page_url,
-                        "page_title": current_page_title,
-                        'comment':'',
-                        'text':highlightText
+                        "page_title": current_page_title
                     }
+                    chrome.runtime.sendMessage({action:'get_specific_highlight_id_and_delete', data:data});
                 }
                 
 
             });
-
-            $(shadow).find('.delete-hololink-highlight', '.delete-hololink-highlight-img').on('click', function(element){
-                var data = {
-                    "id_on_page": highlight_id_on_page,
-                    "text": highlight_text,
-                    
-                    "comment":'',
-                    "range_object":serialized_range_object,
-                    "anchor_point_data":{
-                        highlight_parent_node_text:range.commonAncestorContainer.textContent, // TODO: verify this is correct
-                        character_offset:characterOffset,
-                        range_start_container_offset_top:RangeStartContainerOffsetTop
-                    },
-                    "highlighted_by_username":current_user
-                };
-            });
-
         },
         async:false // make quering hololink-sidebar.html become sync
     });

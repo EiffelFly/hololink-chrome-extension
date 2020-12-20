@@ -27,6 +27,48 @@ function send_response_to_content_script(response){
     }
 }
 
+function deleteHighlightHandler(response){
+    if (!response.ok){
+        console.log('ERROR: ' + response)
+    } else {
+        response.json().then(json => {
+            targetHighlightId = json.highlight[0].id
+            if (targetHighlightId){
+                chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
+                    if (cookie){
+                        csrf_token = cookie.value;
+                        chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
+                            if (cookie){
+                                session_id = cookie.value
+                                var myHeaders = new Headers();
+                                myHeaders.append("X-CSRFToken", csrf_token);
+                                myHeaders.append("Content-Type", "application/json");
+                                myHeaders.append("Cookie", `sessionid=${session_id}; csrftoken=${csrf_token}`);
+                                myHeaders.append("X-Requested-With", "XMLHttpRequest");
+
+                                var requestOptions = {
+                                    method: 'DELETE',
+                                    headers: myHeaders,
+                                    redirect: 'follow',
+                                    credentials: 'include',
+                                };
+            
+                                fetch(target_hololink_host+`api/highlight/${targetHighlightId}`, requestOptions)
+                                    .then(response => console.log(response))   
+                            } 
+                     
+                        });
+                    }
+                });
+            }
+        }).catch(err => {
+            // the status was ok but there is no json body
+           console.log(Promise.resolve({response: response}))
+           console.log(err)
+       });
+    }
+}
+
 function got_user_data_of_current_page_handler(response){
     if (!response.ok){
         console.log('ERROR: ' + response)
@@ -61,16 +103,12 @@ function got_user_data_of_current_page_handler(response){
                 } else {
                     chrome.tabs.sendMessage(tabs[0].id, {action: 'content_script_change_status', message:"hololink_have_this_article", user:json.user, highlight:json.highlight, csrf_token:csrf_token, session_id:session_id, current_page_title:current_page_title, current_page_url:current_page_url});
                 } 
-            });
-            
-            
+            });  
         }).catch(err => {
              // the status was ok but there is no json body
             console.log(Promise.resolve({response: response}))
             console.log(err)
         });
-
-        
     }
 }
 
@@ -125,6 +163,44 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     }
     return true
 });
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.action == "get_specific_highlight_id_and_delete"){
+        chrome.cookies.get({"url":target_hololink_host, "name":"csrftoken"}, function(cookie){
+            if (cookie){
+                csrf_token = cookie.value;
+                chrome.cookies.get({"url":target_hololink_host, "name":"sessionid"}, function(cookie){
+                    if (cookie){
+                        session_id = cookie.value
+                        var myHeaders = new Headers();
+                        myHeaders.append("X-CSRFToken", csrf_token);
+                        myHeaders.append("Content-Type", "application/json");
+                        myHeaders.append("Cookie", `sessionid=${session_id}; csrftoken=${csrf_token}`);
+                        myHeaders.append("X-Requested-With", "XMLHttpRequest");
+    
+                        var raw = JSON.stringify({
+                            "page_url":request.data.page_url,
+                            "page_title":request.data.page_title,
+                            "id_on_page":request.data.id_on_page
+                        })
+    
+                        var requestOptions = {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: raw,
+                            redirect: 'follow',
+                            credentials: 'include',
+                        };
+    
+                        fetch(target_hololink_host+"api/specific-highlight/", requestOptions)
+                            .then(deleteHighlightHandler)   
+                    } 
+             
+                });
+            }
+        });
+    }
+})
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.action == "loadUserProjects"){
