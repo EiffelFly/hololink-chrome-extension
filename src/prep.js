@@ -92,7 +92,7 @@ function render_toolbar(){
                 var highlight = render_highlight(selection);
                 highlightsDataArray.push(highlight);
                 sortHighlighsDataArray()
-                
+                console.log('highlightsDataArray',highlightsDataArray)
                 sidebar_highlight_content = ''
                 for (i=0; i<highlightsDataArray.length; i++){
                     assemble_sidebar_highlight_content(highlightsDataArray[i])
@@ -526,7 +526,11 @@ async function open_sidebar(){
                     for (var i=0; i<target_elements.length; i++){
                         removeHighlight(target_elements[i])
                     }
-                    
+                    for (const [key, value] of Object.entries(highlightsDataArray)) {
+                        if (value.id_on_page == targetDataId){
+                            highlightsDataArray.splice(key, 1)
+                        }
+                    }
                 }
                 
                 
