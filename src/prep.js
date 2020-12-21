@@ -3,6 +3,7 @@
 // TODO: yahoo news, toolbar css get override
 // TODO: if user select and mis-disselect range then immediately click highlight button, it will cause error
 // TODO: make django highlight created_at be the exact same time as we create ID
+// TODO: if sidebar is open, how to dynamically insert new highlight
 
 
 var csrf_token
@@ -116,7 +117,37 @@ function render_toolbar(){
             });
             
             $('#hololink_toolbar_annotate').on('click', function(){
-                render_annotation();
+                var highlight = render_annotation(selection);
+                highlightsDataArray.push(highlight);
+                sortHighlighsDataArray()
+                console.log('highlightsDataArray',highlightsDataArray)
+                sidebar_highlight_content = ''
+                for (i=0; i<highlightsDataArray.length; i++){
+                    assemble_sidebar_highlight_content(highlightsDataArray[i])
+                }
+                var hololink_sidebar = find_element_in_sidebar_shadow_root('.hololink-annotation-container')
+                
+                // when sidebar open, we have to insert the highlight content into sidebar right away 
+                if (hololink_sidebar.length){
+                    hololink_sidebar.html(sidebar_highlight_content)
+                }
+
+                //close hololink-toolbar bubble
+                if ($('.hololink-toolbar-inner').length){
+                    $('.hololink-toolbar-container').find('.hololink-toolbar-inner').remove();
+                }
+                
+                // Force tooltip to close after user clicked toolbar button
+                $('.hololink-toolbar-tooltip').remove()
+
+                var hololink_sidebar = $(shadow).find('.hololink-sidebar')
+                if(!hololink_sidebar.length){
+                    open_sidebar()
+                        .then(scoll_to_highlight_and_forcus_at_sidebar(highlight.id_on_page))
+                } else {
+                    scoll_to_highlight_and_forcus_at_sidebar(highlight.id_on_page)
+                }
+
             });
         } else if (content_script_status == 'loading') {
             position_toolbar(position.x, position.y);
@@ -133,35 +164,20 @@ function render_toolbar(){
 
 
 
-function render_annotation(){
-
-};
-
-function render_highlight(selection){
-    //console.log('sss', selection.anchorNode, selection.getRangeAt(0).commonAncestorContainer.innerText)
-
+function render_annotation(selection){
     if (!selection.isCollapsed) {
         const range = selection.getRangeAt(0);
         var datetime = Date.now();
-        
         var serialized_range_object = serialize(range)
 
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
         var highlight_text = getSelectionText(selection)
-        
         highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight_id_on_page});
-
         const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
-
-
-        // Element in overflow container will have 
-
+        // Element in overflow container will have different offset.top behavior
         const RangeStartContainerOffsetTop = getStaticOffsetFromStaticElement(range.startContainer);
-
-        console.log('check', RangeStartContainerOffsetTop)
-
 
         var data = {
             "id_on_page": highlight_id_on_page,
@@ -179,14 +195,63 @@ function render_highlight(selection){
         };
 
         $(`hololink-highlight[data-id^='${highlight_id_on_page}']`).on('click', function(e){
-            console.log('ff')
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
             var hololink_sidebar = $(shadow).find('.hololink-sidebar')
             if(!hololink_sidebar.length){
                 open_sidebar()
-                    .then(scoll_to_highlight_and_forcus_at_sidebar(e))
+                    .then(scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page))
             } else {
-                scoll_to_highlight_and_forcus_at_sidebar(e)
+                scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page)
+            }
+            
+        })
+
+        return data
+    }
+    
+};
+
+function render_highlight(selection){
+    //console.log('sss', selection.anchorNode, selection.getRangeAt(0).commonAncestorContainer.innerText)
+
+    if (!selection.isCollapsed) {
+        const range = selection.getRangeAt(0);
+        var datetime = Date.now();
+        var serialized_range_object = serialize(range)
+
+        // get selection text and insert it in sidebar, we need to access all necessary selection data before
+        // we highlight it
+        var highlight_text = getSelectionText(selection)
+        highlight_id_on_page = generate_url(datetime, current_page_url)
+        const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight_id_on_page});
+        const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
+
+        // Element in overflow container will have different offset.top behavior
+        const RangeStartContainerOffsetTop = getStaticOffsetFromStaticElement(range.startContainer);
+
+        var data = {
+            "id_on_page": highlight_id_on_page,
+            "text": highlight_text,
+            "page_url": current_page_url,
+            "page_title": current_page_title,
+            "comment":'',
+            "range_object":serialized_range_object,
+            "anchor_point_data":{
+                highlight_parent_node_text:range.commonAncestorContainer.textContent, // TODO: verify this is correct
+                character_offset:characterOffset,
+                range_start_container_offset_top:RangeStartContainerOffsetTop
+            },
+            "highlighted_by_username":current_user
+        };
+
+        $(`hololink-highlight[data-id^='${highlight_id_on_page}']`).on('click', function(e){
+            shadow = $('.hololink-sidebar-container')[0].shadowRoot
+            var hololink_sidebar = $(shadow).find('.hololink-sidebar')
+            if(!hololink_sidebar.length){
+                open_sidebar()
+                    .then(scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page))
+            } else {
+                scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page)
             }
             
         })
@@ -541,11 +606,10 @@ async function open_sidebar(){
     });
 };
 
-function scoll_to_highlight_and_forcus_at_sidebar(element){
+function scoll_to_highlight_and_forcus_at_sidebar(targetDataId){
     var shadow = $('.hololink-sidebar-container')[0].shadowRoot;
-    var targetDataId = element.target.getAttribute('data-id')
+    
     var target_element = $(shadow).find(`[data-id='${targetDataId}']`);
-    console.log(element.target.id, target_element.show())
     var target_window = $(shadow).find('.hololink-annotation-container');
     var target_element_offset = getOffsetFromElementInOverflowContainer(true, target_element, target_window);    
     target_window.animate({
@@ -621,13 +685,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
         // add click listener to activate sidebar when user click highlight
         $('.hololink-highlight').on('click', function(e){
+            var targetDataId = e.target.getAttribute('data-id')
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
             var hololink_sidebar = $(shadow).find('.hololink-sidebar')
             if(!hololink_sidebar.length){
                 open_sidebar()
-                    .then(scoll_to_highlight_and_forcus_at_sidebar(e))
+                    .then(scoll_to_highlight_and_forcus_at_sidebar(targetDataId))
             } else {
-                scoll_to_highlight_and_forcus_at_sidebar(e)
+                scoll_to_highlight_and_forcus_at_sidebar(targetDataId)
             }
             
         })
