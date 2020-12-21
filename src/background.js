@@ -53,7 +53,7 @@ function deleteHighlightHandler(response){
                                     credentials: 'include',
                                 };
             
-                                fetch(target_hololink_host+`api/highlight/${targetHighlightId}`, requestOptions)
+                                fetch(target_hololink_host+`api/highlight/${targetHighlightId}/`, requestOptions)
                                     .then(response => console.log(response))   
                             } 
                      
