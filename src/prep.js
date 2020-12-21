@@ -491,8 +491,8 @@ async function open_sidebar(){
                     console.log(targetDataId)
                 }
 
-                var target_element = $(`hololink-highlight[data-id='${targetDataId}']`)
-                var target_element_offset = getOffsetFromElementInOverflowContainer(true, target_element) - ($(window).height() - target_element.outerHeight(true))/2
+                var target_elements = $(`hololink-highlight[data-id='${targetDataId}']`)
+                var target_element_offset = getOffsetFromElementInOverflowContainer(true, target_elements) - ($(window).height() - target_elements.outerHeight(true))/2
                 var targetElementAtSideBar = $(shadow).find(`.hololink-annotation[data-id='${targetDataId}']`)
 
                 window.scrollTo({
@@ -504,7 +504,7 @@ async function open_sidebar(){
                 $('.hololink-highlight').removeClass('hovered')
                 $(shadow).find('.hololink-annotation').removeClass('hovered')
 
-                target_element.toggleClass('hovered')
+                target_elements.toggleClass('hovered')
 
                 // remove hovered element at sidebar
                 $(shadow).find('.hololink-annotation').removeClass('hovered')
@@ -520,7 +520,15 @@ async function open_sidebar(){
                         "page_title": current_page_title
                     }
                     chrome.runtime.sendMessage({action:'get_specific_highlight_id_and_delete', data:data});
+                    targetElementAtSideBar.remove();
+                    var target_elements_js = document.querySelectorAll(`hololink-highlight[data-id='${targetDataId}']`)
+                    console.log(target_elements)
+                    for (var i=0; i<target_elements.length; i++){
+                        removeHighlight(target_elements[i])
+                    }
+                    
                 }
+                
                 
 
             });
@@ -794,9 +802,11 @@ function wrapNodeInHighlight(node, tagName, attributes) {
 // Remove a highlight element created with wrapNodeInHighlight.
 function removeHighlight(highlightElement) {
     if (highlightElement.childNodes.length === 1) {
+        console.log(highlightElement)
         highlightElement.parentNode.replaceChild(highlightElement.firstChild, highlightElement);
     } else {
         // If the highlight somehow contains multiple nodes now, move them all.
+        console.log(highlightElement)
         while (highlightElement.firstChild) {
             highlightElement.parentNode.insertBefore(highlightElement.firstChild, highlightElement);
         }
