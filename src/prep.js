@@ -96,7 +96,7 @@ function render_toolbar(){
                 console.log('highlightsDataArray',highlightsDataArray)
                 sidebar_highlight_content = ''
                 for (i=0; i<highlightsDataArray.length; i++){
-                    assemble_sidebar_highlight_content(highlightsDataArray[i])
+                    assemble_sidebar_highlight_content(highlightsDataArray[i], type="highlight")
                 }
                 
                 var hololink_sidebar = find_element_in_sidebar_shadow_root('.hololink-annotation-container')
@@ -123,7 +123,7 @@ function render_toolbar(){
                 console.log('highlightsDataArray',highlightsDataArray)
                 sidebar_highlight_content = ''
                 for (i=0; i<highlightsDataArray.length; i++){
-                    assemble_sidebar_highlight_content(highlightsDataArray[i])
+                    assemble_sidebar_highlight_content(highlightsDataArray[i], type="annotation")
                 }
                 var hololink_sidebar = find_element_in_sidebar_shadow_root('.hololink-annotation-container')
                 
@@ -382,16 +382,10 @@ function calaculate_tooltip_position(){
     }
 };
 
-function assemble_sidebar_highlight_content(highlight_target){
-
-
+function assemble_sidebar_highlight_content(highlight_target, type){
     var highlightDateMilliseconds = highlight_target.id_on_page.split('-')
-    console.log(highlightDateMilliseconds)
     highlightDateMilliseconds = highlightDateMilliseconds[highlightDateMilliseconds.length - 1 ]
     var currentDate = Date.now()
-    
-
-    console.log(currentDate, currentDate-highlightDateMilliseconds)
 
     if (currentDate-highlightDateMilliseconds <= 1000){
         var highlightDate = 'now'
@@ -409,41 +403,86 @@ function assemble_sidebar_highlight_content(highlight_target){
         highlightDate = highlightDate.toLocaleDateString()
     }
 
-
-    // restore highlight from hololink data
-    var highlight_content = `
-        <div style="padding: 0 20px 20px 20px;">
-            <div class="card hololink-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" data-id="${highlight_target.id_on_page}">
-                <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
-                    <div class="col d-flex" style="margin: auto auto auto 0 ;">
-                        <div class="highlight-user">
-                            ${highlight_target.highlighted_by_username}
-                        </div>
-                    </div>
-                    <div class="col d-flex">
-                        <div class="highlight-time" style="margin: auto 0 auto auto;">
-                            ${highlightDate}
-                        </div>
-                    </div>
-                </div>
-                <div class="row d-flex">
-                    <div class="card shadow-sm highlight-content flex-grow-1">
-                        <div class="row">
-                            <div class="highlight-text">
-                                ${highlight_target.text}
+    if (type == "highlight"){
+        // restore highlight from hololink data
+            var highlight_content = `
+            <div style="padding: 0 20px 20px 20px;">
+                <div class="card hololink-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" data-id="${highlight_target.id_on_page}">
+                    <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
+                        <div class="col d-flex" style="margin: auto auto auto 0 ;">
+                            <div class="highlight-user">
+                                ${highlight_target.highlighted_by_username}
                             </div>
                         </div>
-                        <div class="row d-flex" style="margin-top: 10px;">
-                            <div class="hololink-annotation-buttons-container" style="margin-left:auto">
-                                <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
-                                <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                        <div class="col d-flex">
+                            <div class="highlight-time" style="margin: auto 0 auto auto;">
+                                ${highlightDate}
                             </div>
                         </div>
-                    </div>  
+                    </div>
+                    <div class="row d-flex">
+                        <div class="card shadow-sm highlight-content flex-grow-1">
+                            <div class="row">
+                                <div class="highlight-text">
+                                    ${highlight_target.text}
+                                </div>
+                            </div>
+                            <div class="row d-flex" style="margin-top: 10px;">
+                                <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                    <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
+                                    <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
                 </div>
             </div>
-        </div>
-    `
+        `
+    } else if (type == "annotation") {
+        var highlight_content = `
+            <div style="padding: 0 20px 20px 20px;">
+                <div class="card hololink-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" data-id="${highlight_target.id_on_page}">
+                    <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
+                        <div class="col d-flex" style="margin: auto auto auto 0 ;">
+                            <div class="highlight-user">
+                                ${highlight_target.highlighted_by_username}
+                            </div>
+                        </div>
+                        <div class="col d-flex">
+                            <div class="highlight-time" style="margin: auto 0 auto auto;">
+                                ${highlightDate}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex">
+                        <div class="card shadow-sm highlight-content flex-grow-1">
+                            <div class="row">
+                                <div class="highlight-text">
+                                    ${highlight_target.text}
+                                </div>
+                            </div>
+                            <div class="row hightlight-annotation-text-container">
+                                <textarea autofocus required class="hightlight-annotation-text" data-id="${highlight_target.id_on_page}" placeholder="Add annotation" rows="4"></textarea>
+                            </div>
+                            <div class="row" hightlight-annotation-button-container>
+                                <div class="d-flex" style="width=100%">
+                                    <button class="close-annotation-textarea mr-auto">cancel</button>
+                                    <button class="save-annotation ml-auto">save</button>  
+                                </div>
+                            </div>
+                            <div class="row d-flex" style="margin-top: 10px;">
+                                <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                    <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
+                                    <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        `
+    }
+    
     sidebar_highlight_content = sidebar_highlight_content + highlight_content
 }
 
@@ -679,7 +718,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         sidebar_highlight_content = ''
         // restore highlight when page is created
         for (var i=0; i<highlightsDataArray.length; i++){        
-            assemble_sidebar_highlight_content(highlightsDataArray[i])
+            assemble_sidebar_highlight_content(highlightsDataArray[i], type="highlight")
             deserialize_range_object_and_highlight(highlightsDataArray[i]);            
         }
 
