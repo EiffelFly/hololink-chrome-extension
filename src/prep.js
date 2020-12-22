@@ -123,7 +123,7 @@ function render_toolbar(){
                 console.log('highlightsDataArray',highlightsDataArray)
                 sidebar_highlight_content = ''
                 for (i=0; i<highlightsDataArray.length; i++){
-                    assemble_sidebar_highlight_content(highlightsDataArray[i], type="annotation")
+                    assemble_sidebar_highlight_content(highlightsDataArray[i], type="annotation", highlight.id_on_page)
                 }
                 var hololink_sidebar = find_element_in_sidebar_shadow_root('.hololink-annotation-container')
                 
@@ -197,14 +197,20 @@ function render_annotation(selection){
         $(`hololink-highlight[data-id^='${highlight_id_on_page}']`).on('click', function(e){
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
             var hololink_sidebar = $(shadow).find('.hololink-sidebar')
+            
             if(!hololink_sidebar.length){
+
+                // while user reopen sidebar after they annotate text, we make it become highlight status, remove edit panel
+                sidebar_highlight_content = ''
+                for (i=0; i<highlightsDataArray.length; i++){
+                    assemble_sidebar_highlight_content(highlightsDataArray[i], type="highlight")
+                }
                 open_sidebar()
                     .then(scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page))
             } else {
                 scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page)
             }
-            
-        })
+        });
 
         return data
     }
@@ -382,7 +388,10 @@ function calaculate_tooltip_position(){
     }
 };
 
-function assemble_sidebar_highlight_content(highlight_target, type){
+function assemble_sidebar_highlight_content(highlight_target, type, annotationId){
+
+    if (annotationId == "undefined") annotationId = 0;
+
     var highlightDateMilliseconds = highlight_target.id_on_page.split('-')
     highlightDateMilliseconds = highlightDateMilliseconds[highlightDateMilliseconds.length - 1 ]
     var currentDate = Date.now()
@@ -439,48 +448,85 @@ function assemble_sidebar_highlight_content(highlight_target, type){
             </div>
         `
     } else if (type == "annotation") {
-        var highlight_content = `
-            <div style="padding: 0 20px 20px 20px;">
-                <div class="card hololink-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" data-id="${highlight_target.id_on_page}">
-                    <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
-                        <div class="col d-flex" style="margin: auto auto auto 0 ;">
-                            <div class="highlight-user">
-                                ${highlight_target.highlighted_by_username}
+        if (highlight_target.id_on_page == annotationId){
+            var highlight_content = `
+                <div style="padding: 0 20px 20px 20px;">
+                    <div class="card hololink-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" data-id="${highlight_target.id_on_page}">
+                        <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
+                            <div class="col d-flex" style="margin: auto auto auto 0 ;">
+                                <div class="highlight-user">
+                                    ${highlight_target.highlighted_by_username}
+                                </div>
+                            </div>
+                            <div class="col d-flex">
+                                <div class="highlight-time" style="margin: auto 0 auto auto;">
+                                    ${highlightDate}
+                                </div>
                             </div>
                         </div>
-                        <div class="col d-flex">
-                            <div class="highlight-time" style="margin: auto 0 auto auto;">
-                                ${highlightDate}
-                            </div>
+                        <div class="row d-flex">
+                            <div class="card shadow-sm highlight-content flex-grow-1">
+                                <div class="row">
+                                    <div class="highlight-text">
+                                        ${highlight_target.text}
+                                    </div>
+                                </div>
+                                <div class="row hightlight-annotation-text-container">
+                                    <textarea autofocus required class="hightlight-annotation-text" data-id="${highlight_target.id_on_page}" placeholder="Add annotation" rows="4"></textarea>
+                                </div>
+                                <div class="row" hightlight-annotation-button-container>
+                                    <div class="d-flex" style="width=100%">
+                                        <button class="close-annotation-textarea mr-auto">cancel</button>
+                                        <button class="save-annotation ml-auto">save</button>  
+                                    </div>
+                                </div>
+                                <div class="row d-flex" style="margin-top: 10px;">
+                                    <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
+                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                    </div>
+                                </div>
+                            </div>  
                         </div>
-                    </div>
-                    <div class="row d-flex">
-                        <div class="card shadow-sm highlight-content flex-grow-1">
-                            <div class="row">
-                                <div class="highlight-text">
-                                    ${highlight_target.text}
-                                </div>
-                            </div>
-                            <div class="row hightlight-annotation-text-container">
-                                <textarea autofocus required class="hightlight-annotation-text" data-id="${highlight_target.id_on_page}" placeholder="Add annotation" rows="4"></textarea>
-                            </div>
-                            <div class="row" hightlight-annotation-button-container>
-                                <div class="d-flex" style="width=100%">
-                                    <button class="close-annotation-textarea mr-auto">cancel</button>
-                                    <button class="save-annotation ml-auto">save</button>  
-                                </div>
-                            </div>
-                            <div class="row d-flex" style="margin-top: 10px;">
-                                <div class="hololink-annotation-buttons-container" style="margin-left:auto">
-                                    <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
-                                    <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
-                                </div>
-                            </div>
-                        </div>  
                     </div>
                 </div>
-            </div>
-        `
+            `
+        } else {
+            var highlight_content = `
+                <div style="padding: 0 20px 20px 20px;">
+                    <div class="card hololink-annotation" style="border-radius: 5px; padding: 20px; cursor: pointer;" data-id="${highlight_target.id_on_page}">
+                        <div class="row highlight-information-container d-flex" style="margin-bottom: 10px;">
+                            <div class="col d-flex" style="margin: auto auto auto 0 ;">
+                                <div class="highlight-user">
+                                    ${highlight_target.highlighted_by_username}
+                                </div>
+                            </div>
+                            <div class="col d-flex">
+                                <div class="highlight-time" style="margin: auto 0 auto auto;">
+                                    ${highlightDate}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-flex">
+                            <div class="card shadow-sm highlight-content flex-grow-1">
+                                <div class="row">
+                                    <div class="highlight-text">
+                                        ${highlight_target.text}
+                                    </div>
+                                </div>
+                                <div class="row d-flex" style="margin-top: 10px;">
+                                    <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
+                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                    </div>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                </div>
+            `
+        }
+        
     }
     
     sidebar_highlight_content = sidebar_highlight_content + highlight_content
@@ -545,6 +591,7 @@ $(window).on('mousedown', function(e){
             }
         }
     } 
+
 });
 
 async function open_sidebar(){
