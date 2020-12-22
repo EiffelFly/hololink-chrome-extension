@@ -661,7 +661,7 @@ async function open_sidebar(){
                 targetElementAtSideBar.toggleClass('hovered')
 
                 // delete hololink highlight
-                if (element.target.className == "delete-hololink-highlight" || element.target.className == "delete-hololink-highlight-img"){
+                if (element.target.className.indexOf('delete-hololink-highlight') > -1 || element.target.className.indexOf('delete-hololink-highlight-img') > -1){
                     var highlightText = $.trim(targetElementAtSideBar.find('.highlight-text').text())
                     var data = {
                         "id_on_page":targetDataId,
@@ -681,7 +681,12 @@ async function open_sidebar(){
                         }
                     }
                 }
-                
+
+                if (element.target.className.indexOf('close-annotation-textarea') > -1){
+                    $(shadow).find('.hightlight-annotation-text-container').remove()
+                    $(shadow).find('.hightlight-annotation-button-container').remove()
+                }
+                console.log()
                 
 
             });
