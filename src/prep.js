@@ -638,7 +638,7 @@ async function open_sidebar(){
             var currentClickId = ''
             $(shadow).find('.hololink-annotation, .highlight-user, .highlight-time, .highlight-content').unbind('click'); // remove any previous click event listener
             $(shadow).find('.hololink-annotation, .highlight-user, .highlight-time, .highlight-content').on('click', function(element){
-                element.stopPropagation();
+                element.stopPropagation(); // prevent the event from bubbling up the DOM tree
                 var targetDataId = element.target.getAttribute('data-id')
                 if (!targetDataId){
                     targetDataId = $(this).closest('.hololink-annotation').attr('data-id')
