@@ -210,6 +210,8 @@ function render_annotation(selection){
             }
         });
 
+        post_highligh_to_hololink(data)
+
         return data
     }
     
@@ -261,7 +263,7 @@ function render_highlight(selection){
         })
 
         sidebar_update_highlight = true
-        post_highligh_to_hololink(data)
+        post_highligh_to_hololink(data);
 
         //clean selection
         if (window.getSelection) {
@@ -474,7 +476,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                 </div>
                                 <div class="row no-gutters d-flex hightlight-annotation-button-container"  style="margin-top: 10px;">
                                     <div class="d-flex" style="width:100%">
-                                        <button class="close-annotation-textarea mr-auto" data-id="${highlight_target.id_on_page}">cancel</button>
+                                        <button class="close-annotation-edit-panel mr-auto" data-id="${highlight_target.id_on_page}">cancel</button>
                                         <button class="save-annotation ml-auto" data-id="${highlight_target.id_on_page}">save</button>  
                                     </div>
                                 </div>
@@ -633,13 +635,16 @@ async function open_sidebar(){
             annotate_img_container.attr('src', `${annotate_img_path}`)
 
             // when user click highlight in sidebar, focus highlight text in main document 
+            var currentClickId = ''
+            $(shadow).find('.hololink-annotation, .highlight-user, .highlight-time, .highlight-content').unbind('click'); // remove any previous click event listener
             $(shadow).find('.hololink-annotation, .highlight-user, .highlight-time, .highlight-content').on('click', function(element){
+                element.stopPropagation();
                 var targetDataId = element.target.getAttribute('data-id')
                 if (!targetDataId){
                     targetDataId = $(this).closest('.hololink-annotation').attr('data-id')
                     console.log(targetDataId)
-                }
-
+                } 
+            
                 var target_elements = $(`hololink-highlight[data-id='${targetDataId}']`)
                 var target_element_offset = getOffsetFromElementInOverflowContainer(true, target_elements) - ($(window).height() - target_elements.outerHeight(true))/2
                 var targetElementAtSideBar = $(shadow).find(`.hololink-annotation[data-id='${targetDataId}']`)
@@ -669,7 +674,7 @@ async function open_sidebar(){
                         "page_title": current_page_title
                     }
                     chrome.runtime.sendMessage({action:'get_specific_highlight_id_and_delete', data:data});
-                    targetElementAtSideBar.remove();
+                    targetElementAtSideBar.parent().remove();
                     var target_elements_js = document.querySelectorAll(`hololink-highlight[data-id='${targetDataId}']`)
                     console.log(target_elements)
                     for (var i=0; i<target_elements.length; i++){
@@ -682,13 +687,29 @@ async function open_sidebar(){
                     }
                 }
 
-                if (element.target.className.indexOf('close-annotation-textarea') > -1){
+                if (element.target.className.indexOf('close-annotation-edit-panel') > -1){
                     $(shadow).find('.hightlight-annotation-text-container').remove()
                     $(shadow).find('.hightlight-annotation-button-container').remove()
                 }
-                console.log()
-                
 
+                if (element.target.className.indexOf('save-annotation') > -1){
+                    var annotationText = $(shadow).find('.hightlight-annotation-text').val();
+                    console.log('annotationText',annotationText)
+
+                    var data = {
+                        id_on_page:targetDataId,
+                        page_title:current_page_title,
+                        page_url:current_page_url,
+                        annotationText:annotationText
+                    }
+
+                    $(shadow).find('.hightlight-annotation-text-container').remove()
+                    $(shadow).find('.hightlight-annotation-button-container').remove()
+
+                    chrome.runtime.sendMessage({action:'updateAnnotation', data:data});
+
+                }
+                console.log('clicked', element)                
             });
         },
         async:false // make quering hololink-sidebar.html become sync
