@@ -173,7 +173,7 @@ function render_annotation(selection){
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
         var highlight_text = getSelectionText(selection)
-        highlight_id_on_page = generate_url(datetime, current_page_url)
+        var highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight_id_on_page});
         const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
         // Element in overflow container will have different offset.top behavior
@@ -208,6 +208,7 @@ function render_annotation(selection){
             } else {
                 scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page)
             }
+            console.log('annotation click', e)
         });
 
         post_highligh_to_hololink(data)
@@ -228,7 +229,7 @@ function render_highlight(selection){
         // get selection text and insert it in sidebar, we need to access all necessary selection data before
         // we highlight it
         var highlight_text = getSelectionText(selection)
-        highlight_id_on_page = generate_url(datetime, current_page_url)
+        var highlight_id_on_page = generate_url(datetime, current_page_url)
         const removeHighlights = highlightRange(range, 'hololink-highlight', { class: 'hololink-highlight', "data-id":highlight_id_on_page});
         const characterOffset = getCaretCharacterOffsetWithin(range.commonAncestorContainer)
 
@@ -583,6 +584,7 @@ $(window).on('mousedown', function(e){
     // Close sidebar if user's click event triggered outside the sidebar.
     var shadow = $('.hololink-sidebar-container')[0].shadowRoot
     var hololink_sidebar = $(shadow).find('.hololink-sidebar')
+    
 
     if (hololink_sidebar.length){
         if (check_click_event_occured_inside_sidebar == false){
@@ -686,6 +688,8 @@ async function open_sidebar(){
                         }
                     }
                 }
+
+
 
                 if (element.target.className.indexOf('close-annotation-edit-panel') > -1){
                     $(shadow).find('.hightlight-annotation-text-container').remove()
