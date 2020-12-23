@@ -438,7 +438,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                         </div>
                         <div class="row d-flex">
                             <div class="card shadow-sm highlight-content flex-grow-1">
-                                <div class="row">
+                                <div class="row highlight-text-container">
                                     <div class="highlight-text">
                                         ${highlight_target.text}
                                     </div>
@@ -477,7 +477,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                         </div>
                         <div class="row d-flex">
                             <div class="card shadow-sm highlight-content flex-grow-1">
-                                <div class="row">
+                                <div class="row highlight-text-container">
                                     <div class="highlight-text">
                                         ${highlight_target.text}
                                     </div>
@@ -514,7 +514,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                         </div>
                         <div class="row d-flex">
                             <div class="card shadow-sm highlight-content flex-grow-1">
-                                <div class="row">
+                                <div class="row highlight-text-container">
                                     <div class="highlight-text col">
                                         ${highlight_target.text}
                                     </div>
@@ -557,7 +557,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                         </div>
                         <div class="row d-flex">
                             <div class="card shadow-sm highlight-content flex-grow-1">
-                                <div class="row">
+                                <div class="row highlight-text-container">
                                     <div class="highlight-text">
                                         ${highlight_target.text}
                                     </div>
@@ -757,8 +757,14 @@ async function open_sidebar(){
                     $(shadow).find('.hightlight-annotation-text-container').remove()
                     $(shadow).find('.hightlight-annotation-button-container').remove()
 
-                    var highlightTextNode = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .highlight-information-container`)
+                    var highlightTextNode = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .highlight-text-container`)
                     console.log('highlightTextNode', highlightTextNode)
+
+                    var commentHtml = document.createElement('div');
+                    commentHtml.setAttribute('class', 'row');
+                    commentHtml.setAttribute('style', "margin-top: 15px");
+                    commentHtml.innerHTML = `<div class="highlight-comment">${annotationText}</div>`;
+                    highlightTextNode.after(commentHtml);
 
                     chrome.runtime.sendMessage({action:'updateAnnotation', data:data});
 
