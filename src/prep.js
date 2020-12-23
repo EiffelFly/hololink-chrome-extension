@@ -755,9 +755,32 @@ async function open_sidebar(){
 
                 if (element.target.className.indexOf('close-annotation-edit-panel') > -1){
                     var originalComment = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"]`).find('.hightlight-annotation-text')
-                    console.log(targetAnnotationTempText)
                     $(shadow).find('.hightlight-annotation-text-container').remove()
                     $(shadow).find('.hightlight-annotation-button-container').remove()
+
+                    var commentHtml = document.createElement('div');
+                    commentHtml.setAttribute('class', 'row');
+                    commentHtml.setAttribute('style', "margin-top: 15px");
+                    commentHtml.innerHTML = `<div class="highlight-comment">${targetAnnotationTempText}</div>`;
+
+                    var buttonsContainer = document.createElement('div');
+                    buttonsContainer.setAttribute('class', 'hololink-annotation-buttons-container row d-flex');
+                    buttonsContainer.setAttribute('style', 'margin-top: 10px;')
+                    buttonsContainer.innerHTML = `<div style="margin-left:auto"><button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${targetDataId}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${targetDataId}" style="right:0"><img class="delete-hololink-highlight-img"></button></div>`;
+                    
+                    var highlightTextNode = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .highlight-text-container`);
+                    highlightTextNode.after(commentHtml, buttonsContainer);
+
+                    var delete_highlight_container = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"]`).find('.delete-hololink-highlight-img');
+                    delete_highlight_container.attr('width', 20)
+                    delete_highlight_container.attr('height', 20)
+                    delete_highlight_container.attr('src', `${trashcan_img_path}`)
+
+                    var annotate_img_container = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"]`).find('.annotate-hololink-highlight-img');
+                    annotate_img_container.attr('width', 20)
+                    annotate_img_container.attr('height', 20)
+                    annotate_img_container.attr('src', `${annotate_img_path}`)
+                    
                 }
 
                 if (element.target.className.indexOf('save-annotation') > -1){
@@ -805,8 +828,6 @@ async function open_sidebar(){
                             value.comment = annotationText
                         }
                     }
-
-
                 }
                 console.log('clicked', element)                
             });
