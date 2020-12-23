@@ -713,6 +713,14 @@ async function open_sidebar(){
                 $(shadow).find('.hololink-annotation').removeClass('hovered')
 
                 targetElementAtSideBar.toggleClass('hovered')
+                
+
+                if (element.target.className.indexOf('annotate-hololink-highlight') > -1 || element.target.className.indexOf('annotate-hololink-highlight-img') > -1){
+                    var originalComment = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .row > .highlight-comment`)
+                    const originalCommentText = originalComment.text();
+                    originalComment.remove();
+
+                }
 
                 // delete hololink highlight
                 if (element.target.className.indexOf('delete-hololink-highlight') > -1 || element.target.className.indexOf('delete-hololink-highlight-img') > -1){
