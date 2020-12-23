@@ -529,11 +529,6 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
-                                    <div style="margin-left:auto">
-                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
-                                    </div>
-                                </div>
                             </div>  
                         </div>
                     </div>
@@ -803,8 +798,14 @@ async function open_sidebar(){
                     annotate_img_container.attr('height', 20)
                     annotate_img_container.attr('src', `${annotate_img_path}`)
 
-
                     chrome.runtime.sendMessage({action:'updateAnnotation', data:data});
+
+                    for (const [key, value] of Object.entries(highlightsDataArray)) {
+                        if (value.id_on_page == targetDataId){
+                            value.comment = annotationText
+                        }
+                    }
+
 
                 }
                 console.log('clicked', element)                
