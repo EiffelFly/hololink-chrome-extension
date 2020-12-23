@@ -448,8 +448,8 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                         ${highlight_target.comment}
                                     </div>
                                 </div>
-                                <div class="row d-flex" style="margin-top: 10px;">
-                                    <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
+                                    <div style="margin-left:auto">
                                         <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
                                         <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
@@ -482,8 +482,8 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                         ${highlight_target.text}
                                     </div>
                                 </div>
-                                <div class="row d-flex" style="margin-top: 10px;">
-                                    <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
+                                    <div style="margin-left:auto">
                                         <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
                                         <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
@@ -530,8 +530,8 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row d-flex no-gutters" style="margin-top: 10px;">
-                                    <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
+                                    <div style="margin-left:auto">
                                         <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
                                         <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
@@ -564,8 +564,8 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                         ${highlight_target.text}
                                     </div>
                                 </div>
-                                <div class="row d-flex" style="margin-top: 10px;">
-                                    <div class="hololink-annotation-buttons-container" style="margin-left:auto">
+                                <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
+                                    <div style="margin-left:auto">
                                         <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
                                         <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
@@ -718,10 +718,25 @@ async function open_sidebar(){
                 
 
                 if (element.target.className.indexOf('annotate-hololink-highlight') > -1 || element.target.className.indexOf('annotate-hololink-highlight-img') > -1){
+                    $(shadow).find('.annotation-edit-panel').remove()
+                    $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"]`).find('.hololink-annotation-buttons-container').remove()
+
                     var originalComment = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .row > .highlight-comment`)
-                    const originalCommentText = originalComment.text();
+                    const originalCommentText = $.trim(originalComment.text());
                     originalComment.remove();
 
+                    var annotationEditPanel = document.createElement('div');
+                    annotationEditPanel.setAttribute('class', 'row annotation-edit-panel flex-column')
+                    annotationEditPanel.innerHTML = `<div class="hightlight-annotation-text-container col" style="margin-top: 10px;"><textarea autofocus required class="hightlight-annotation-text" data-id="${targetDataId}" placeholder="Add annotation" rows="4" style="width:100%; padding:10px"></textarea></div><div class="hightlight-annotation-button-containerno-gutters d-flex col"><div class="d-flex" style="width:100%"><button class="close-annotation-edit-panel mr-auto" data-id="${targetDataId}">cancel</button><button class="save-annotation ml-auto" data-id="${targetDataId}">save</button></div></div>`
+                    
+                    var highlightTextNode = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .highlight-text-container`)
+
+                    
+
+                    $(shadow).find('.hightlight-annotation-text').val(originalCommentText);
+
+                    highlightTextNode.after(annotationEditPanel);
+    
                 }
 
                 // delete hololink highlight
@@ -773,7 +788,26 @@ async function open_sidebar(){
                     commentHtml.setAttribute('class', 'row');
                     commentHtml.setAttribute('style', "margin-top: 15px");
                     commentHtml.innerHTML = `<div class="highlight-comment">${annotationText}</div>`;
-                    highlightTextNode.after(commentHtml);
+                    
+
+                    var buttonsContainer = document.createElement('div');
+                    buttonsContainer.setAttribute('class', 'hololink-annotation-buttons-container row');
+                    buttonsContainer.setAttribute('style', 'margin-left:auto')
+                    buttonsContainer.innerHTML = `<div><button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${targetDataId}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${targetDataId}" style="right:0"><img class="delete-hololink-highlight-img"></button></div>`
+
+                    
+                    highlightTextNode.after(commentHtml, buttonsContainer);
+
+                    var delete_highlight_container = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"]`).find('.delete-hololink-highlight-img');
+                    delete_highlight_container.attr('width', 20)
+                    delete_highlight_container.attr('height', 20)
+                    delete_highlight_container.attr('src', `${trashcan_img_path}`)
+
+                    var annotate_img_container = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"]`).find('.annotate-hololink-highlight-img');
+                    annotate_img_container.attr('width', 20)
+                    annotate_img_container.attr('height', 20)
+                    annotate_img_container.attr('src', `${annotate_img_path}`)
+
 
                     chrome.runtime.sendMessage({action:'updateAnnotation', data:data});
 
