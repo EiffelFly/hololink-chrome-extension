@@ -255,6 +255,10 @@ function render_highlight(selection){
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
             var hololink_sidebar = $(shadow).find('.hololink-sidebar')
             if(!hololink_sidebar.length){
+                sidebar_highlight_content = ''
+                for (i=0; i<highlightsDataArray.length; i++){
+                    assemble_sidebar_highlight_content(highlightsDataArray[i], type="highlight")
+                }
                 open_sidebar()
                     .then(scoll_to_highlight_and_forcus_at_sidebar(highlight_id_on_page))
             } else {
@@ -803,6 +807,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
             shadow = $('.hololink-sidebar-container')[0].shadowRoot
             var hololink_sidebar = $(shadow).find('.hololink-sidebar')
             if(!hololink_sidebar.length){
+                sidebar_highlight_content = ''
+                for (i=0; i<highlightsDataArray.length; i++){
+                    assemble_sidebar_highlight_content(highlightsDataArray[i], type="highlight")
+                }
                 open_sidebar()
                     .then(scoll_to_highlight_and_forcus_at_sidebar(targetDataId))
             } else {
