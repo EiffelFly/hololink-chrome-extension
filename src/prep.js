@@ -20,6 +20,7 @@ var page_got_highlighted_when_created = false
 var content_script_status = 'loading'
 var current_page_url = window.location.href;
 var current_page_title = document.title; // this will change sometimes, like stratechery. So we send this info via background script.
+var targetAnnotationTempText = '' //only use when user edit annotation at sidebar
 
 var hololink_toolbar_container = document.createElement('div');
 hololink_toolbar_container.setAttribute('class', 'hololink-toolbar-container');
@@ -450,8 +451,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                 </div>
                                 <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
                                     <div style="margin-left:auto">
-                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
-                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
                                 </div>
                             </div>  
@@ -484,8 +484,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                 </div>
                                 <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
                                     <div style="margin-left:auto">
-                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
-                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
                                 </div>
                             </div>  
@@ -523,7 +522,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                     <div class="hightlight-annotation-text-container col" style="margin-top: 10px;">
                                         <textarea autofocus required class="hightlight-annotation-text" data-id="${highlight_target.id_on_page}" placeholder="Add annotation" rows="4" style="width:100%; padding:10px"></textarea>
                                     </div>
-                                    <div class="hightlight-annotation-button-containerno-gutters d-flex col">
+                                    <div class="hightlight-annotation-button-container no-gutters d-flex col">
                                         <div class="d-flex" style="width:100%">
                                             <button class="close-annotation-edit-panel mr-auto" data-id="${highlight_target.id_on_page}">cancel</button>
                                             <button class="save-annotation ml-auto" data-id="${highlight_target.id_on_page}">save</button>  
@@ -532,8 +531,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                 </div>
                                 <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
                                     <div style="margin-left:auto">
-                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
-                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
                                 </div>
                             </div>  
@@ -566,8 +564,7 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                 </div>
                                 <div class="row d-flex hololink-annotation-buttons-container" style="margin-top: 10px;">
                                     <div style="margin-left:auto">
-                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button>
-                                        <button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
+                                        <button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${highlight_target.id_on_page}" style="right:0"><img class="delete-hololink-highlight-img"></button>     
                                     </div>
                                 </div>
                             </div>  
@@ -714,8 +711,7 @@ async function open_sidebar(){
                 // remove hovered element at sidebar
                 $(shadow).find('.hololink-annotation').removeClass('hovered')
 
-                targetElementAtSideBar.toggleClass('hovered')
-                
+                targetElementAtSideBar.toggleClass('hovered');
 
                 if (element.target.className.indexOf('annotate-hololink-highlight') > -1 || element.target.className.indexOf('annotate-hololink-highlight-img') > -1){
                     $(shadow).find('.annotation-edit-panel').remove()
@@ -723,19 +719,20 @@ async function open_sidebar(){
 
                     var originalComment = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .row > .highlight-comment`)
                     const originalCommentText = $.trim(originalComment.text());
+                    targetAnnotationTempText = $.trim(originalComment.text());
                     originalComment.remove();
 
+                    // create textarea node
                     var annotationEditPanel = document.createElement('div');
                     annotationEditPanel.setAttribute('class', 'row annotation-edit-panel flex-column')
-                    annotationEditPanel.innerHTML = `<div class="hightlight-annotation-text-container col" style="margin-top: 10px;"><textarea autofocus required class="hightlight-annotation-text" data-id="${targetDataId}" placeholder="Add annotation" rows="4" style="width:100%; padding:10px"></textarea></div><div class="hightlight-annotation-button-containerno-gutters d-flex col"><div class="d-flex" style="width:100%"><button class="close-annotation-edit-panel mr-auto" data-id="${targetDataId}">cancel</button><button class="save-annotation ml-auto" data-id="${targetDataId}">save</button></div></div>`
+                    annotationEditPanel.innerHTML = `<div class="hightlight-annotation-text-container col" style="margin-top: 10px;"><textarea autofocus required class="hightlight-annotation-text" data-id="${targetDataId}" placeholder="Add annotation" rows="4" style="width:100%; padding:10px"></textarea></div><div class="hightlight-annotation-button-container no-gutters d-flex col"><div class="d-flex" style="width:100%"><button class="close-annotation-edit-panel mr-auto" data-id="${targetDataId}">cancel</button><button class="save-annotation ml-auto" data-id="${targetDataId}">save</button></div></div>`
                     
+                    // insert new textarea after highlight text node
                     var highlightTextNode = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .highlight-text-container`)
-
-                    
-
-                    $(shadow).find('.hightlight-annotation-text').val(originalCommentText);
-
                     highlightTextNode.after(annotationEditPanel);
+
+                    // then insert previous comment into new textarea
+                    $(shadow).find('.hightlight-annotation-text').val(originalCommentText);
     
                 }
 
@@ -761,9 +758,9 @@ async function open_sidebar(){
                     }
                 }
 
-
-
                 if (element.target.className.indexOf('close-annotation-edit-panel') > -1){
+                    var originalComment = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"]`).find('.hightlight-annotation-text')
+                    console.log(targetAnnotationTempText)
                     $(shadow).find('.hightlight-annotation-text-container').remove()
                     $(shadow).find('.hightlight-annotation-button-container').remove()
                 }
@@ -788,13 +785,11 @@ async function open_sidebar(){
                     commentHtml.setAttribute('class', 'row');
                     commentHtml.setAttribute('style', "margin-top: 15px");
                     commentHtml.innerHTML = `<div class="highlight-comment">${annotationText}</div>`;
-                    
 
                     var buttonsContainer = document.createElement('div');
-                    buttonsContainer.setAttribute('class', 'hololink-annotation-buttons-container row');
-                    buttonsContainer.setAttribute('style', 'margin-left:auto')
-                    buttonsContainer.innerHTML = `<div><button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${targetDataId}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${targetDataId}" style="right:0"><img class="delete-hololink-highlight-img"></button></div>`
-
+                    buttonsContainer.setAttribute('class', 'hololink-annotation-buttons-container row d-flex');
+                    buttonsContainer.setAttribute('style', 'margin-top: 10px;')
+                    buttonsContainer.innerHTML = `<div style="margin-left:auto"><button class="annotate-hololink-highlight" id="annotate_hololink_highlight_${targetDataId}" style="right:0"><img class="annotate-hololink-highlight-img"></button><button class="delete-hololink-highlight" id="delete_hololink_highlight_${targetDataId}" style="right:0"><img class="delete-hololink-highlight-img"></button></div>`
                     
                     highlightTextNode.after(commentHtml, buttonsContainer);
 
