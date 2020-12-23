@@ -519,13 +519,15 @@ function assemble_sidebar_highlight_content(highlight_target, type, annotationId
                                         ${highlight_target.text}
                                     </div>
                                 </div>
-                                <div class="row hightlight-annotation-text-container no-gutters" style="margin-top: 10px;">
-                                    <textarea autofocus required class="hightlight-annotation-text" data-id="${highlight_target.id_on_page}" placeholder="Add annotation" rows="4" style="width:100%; padding:10px"></textarea>
-                                </div>
-                                <div class="row no-gutters d-flex hightlight-annotation-button-container"  style="margin-top: 10px;">
-                                    <div class="d-flex" style="width:100%">
-                                        <button class="close-annotation-edit-panel mr-auto" data-id="${highlight_target.id_on_page}">cancel</button>
-                                        <button class="save-annotation ml-auto" data-id="${highlight_target.id_on_page}">save</button>  
+                                <div class="row annotation-edit-panel flex-column">
+                                    <div class="hightlight-annotation-text-container col" style="margin-top: 10px;">
+                                        <textarea autofocus required class="hightlight-annotation-text" data-id="${highlight_target.id_on_page}" placeholder="Add annotation" rows="4" style="width:100%; padding:10px"></textarea>
+                                    </div>
+                                    <div class="hightlight-annotation-button-containerno-gutters d-flex col">
+                                        <div class="d-flex" style="width:100%">
+                                            <button class="close-annotation-edit-panel mr-auto" data-id="${highlight_target.id_on_page}">cancel</button>
+                                            <button class="save-annotation ml-auto" data-id="${highlight_target.id_on_page}">save</button>  
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row d-flex no-gutters" style="margin-top: 10px;">
@@ -762,8 +764,7 @@ async function open_sidebar(){
                         annotationText:annotationText
                     }
 
-                    $(shadow).find('.hightlight-annotation-text-container').remove()
-                    $(shadow).find('.hightlight-annotation-button-container').remove()
+                    $(shadow).find('.annotation-edit-panel').remove();
 
                     var highlightTextNode = $(shadow).find(`.hololink-annotation[data-id="${targetDataId}"] > .row > .highlight-content > .highlight-text-container`)
                     console.log('highlightTextNode', highlightTextNode)
