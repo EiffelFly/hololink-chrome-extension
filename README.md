@@ -6,9 +6,9 @@ Chrome extension built for scraping web page and highlighting sentence. It can r
 
 ## Features
 
-- Using shadowRoot interface to inject customize sidebar on user's window.
-- Algorithm to scrape the main context of the page.
-- Using Vanilla js to highlight sentence, memorize the position, restore it when needed.
+- Custome sidebar at user's window
+- Scrape the main context of the page.
+- Highlight sentence, memorize the position, restore it when needed.
 
 
 
